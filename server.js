@@ -31,11 +31,23 @@ app.post("/api/notes", async (req,res)=>{
     if(!id) return res.status(400).json({error:"Valid YouTube video link डालें।"});
     if(!ai) return res.status(503).json({error:"SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"});
 
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(id);
-    const transcript = transcriptItems.map(x=>x.text).join(" ").replace(/\s+/g," ").trim();
-    if(!transcript) throw new Error("इस वीडियो का accessible transcript/captions नहीं मिला।");
+    const transcriptItems = await fetch(
+  `https://www.youtube.com/api/timedtext?v=${id}&lang=hi`
+).then(r => r.text());
 
-    const clipped = transcript.slice(0,110000);
+if (!transcriptItems) {
+  throw new Error("YouTube transcript नहीं मिला।");
+}
+
+const transcript = transcriptItems
+  .replace(/<[^>]+>/g, " ")
+  .replace(/&amp;/g, "&")
+  .replace(/\s+/g, " ")
+  .trim();
+
+if (!transcript) {
+  throw new Error("इस वीडियो के captions उपलब्ध नहीं हैं।");
+}
     const prompt = `You are SKNotes, an exam-focused study-note generator for Indian students.
 Create accurate, compact but useful notes from the supplied YouTube lecture transcript.
 Language: ${language}. Student level: ${level}.
