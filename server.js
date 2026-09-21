@@ -31,7 +31,7 @@ app.post("/api/notes", async (req,res)=>{
     const id = getVideoId(url || "");
     if(!id) return res.status(400).json({error:"Valid YouTube video link डालें।"});
     if(!ai) return res.status(503).json({error:"SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"});
-
+const youtube = await Innertube.create();
     const transcriptItems = await fetch(
   `https://www.youtube.com/api/timedtext?v=${id}&lang=hi`
 ).then(r => r.text());
