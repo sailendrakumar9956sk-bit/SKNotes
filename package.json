@@ -1,0 +1,13 @@
+{
+  "name": "sknotes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "express": "^5.1.0",
+    "openai": "^5.12.2",
+    "pdfkit": "^0.17.2",
+    "youtube-transcript": "^1.2.1"
+  }
+}
