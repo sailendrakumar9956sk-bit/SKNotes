@@ -90,3 +90,6 @@ app.post("/api/pdf", (req,res)=>{
 });
 
 app.listen(PORT,()=>console.log(`SKNotes running on http://localhost:${PORT}`));
+app.get("/", (req, res) => {
+  res.sendFile(process.cwd() + "/index.html");
+});
