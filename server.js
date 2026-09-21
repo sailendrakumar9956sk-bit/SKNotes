@@ -19,6 +19,7 @@ function getVideoId(value){
   return u.searchParams.get("v") ||
     (u.pathname.match(/\/(?:shorts|live)\/([^/]+)/)?.[1] ?? null);
   return null;
+  } catch {}
 }
 
 app.get("/api/health",(req,res)=>res.json({ok:true, aiConfigured:!!ai}));
