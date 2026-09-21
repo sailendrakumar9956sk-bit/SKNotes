@@ -16,8 +16,8 @@ function getVideoId(value){
     if(u.hostname === "youtu.be" || u.hostname.endsWith(".youtu.be"))
       return u.pathname.split("/").filter(Boolean)[0] || null;
     if(u.hostname.includes("youtube.com"))
-      return u.searchParams.get("v") || (u.pathname.match(/\/shorts\/([^/]+)/)?.[1] ?? null);
-  }catch{}
+  return u.searchParams.get("v") ||
+    (u.pathname.match(/\/(?:shorts|live)\/([^/]+)/)?.[1] ?? null);
   return null;
 }
 
