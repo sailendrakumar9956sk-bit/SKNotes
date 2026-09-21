@@ -32,7 +32,11 @@ app.post("/api/notes", async (req,res)=>{
     if(!id) return res.status(400).json({error:"Valid YouTube video link डालें।"});
     if(!ai) return res.status(503).json({error:"SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"});
 const youtube = await Innertube.create();
+    const info = await youtube.getInfo(id);
+const transcriptData = await info.getTranscript();
     const transcriptItems = await fetch(
+      const segments = transcriptData.transcript.content.body.initial_segments;
+const clipped = segments.map(x => x.snippet?.text || "").join(" ").replace(/\s+/g, " ").trim().slice(0, 110000);
   `https://www.youtube.com/api/timedtext?v=${id}&lang=hi`
 ).then(r => r.text());
 
