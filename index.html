@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>SKNotes — YouTube to Notes & PDF</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#111827;--muted:#64748b;--line:#dbe2ea;--brand:#111827;--soft:#eef2ff}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+header{padding:18px 16px;text-align:center;background:var(--brand);color:#fff}
+.logo{font-size:27px;font-weight:900;letter-spacing:-.5px}.tag{opacity:.8;font-size:13px;margin-top:3px}
+main{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 7px 25px rgba(15,23,42,.05)}
+label{display:block;font-size:13px;font-weight:750;margin:4px 0 7px}
+input,select{width:100%;border:1px solid var(--line);border-radius:13px;padding:14px;font-size:15px;outline:none;background:#fff}
+input:focus,select:focus{border-color:#7c8cff;box-shadow:0 0 0 3px #7c8cff22}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button{width:100%;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer}
+.primary{background:var(--brand);color:#fff;margin-top:13px}.secondary{background:#e9eef5;color:#111827;margin-top:10px}
+.status{font-size:13px;color:var(--muted);margin-top:12px;text-align:center;min-height:18px}
+.notes{white-space:pre-wrap;line-height:1.65;font-size:15px;overflow-wrap:anywhere}
+.hidden{display:none}.pill{display:inline-block;background:var(--soft);padding:6px 9px;border-radius:999px;font-size:12px;margin-bottom:10px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 10px}
+@media(max-width:520px){main{padding:12px 10px 28px}.grid{grid-template-columns:1fr}.card{padding:15px;border-radius:17px}}
+</style>
+</head>
+<body>
+<header><div class="logo">📚 SKNotes</div><div class="tag">YouTube Class → Smart Notes → PDF</div></header>
+<main>
+<section class="card">
+  <div class="pill">AI Study Assistant</div>
+  <label for="url">YouTube Class Link</label>
+  <input id="url" type="url" placeholder="https://youtube.com/watch?v=..." autocomplete="off">
+  <div class="grid">
+    <div><label for="language">Notes Language</label>
+      <select id="language"><option>Hindi/Hinglish</option><option>Hindi</option><option>English</option></select>
+    </div>
+    <div><label for="level">Student Level</label>
+      <select id="level"><option>Class 11-12</option><option>Class 9-10</option><option>JEE/NEET</option><option>General</option></select>
+    </div>
+  </div>
+  <button class="primary" id="generate">✨ Generate Notes</button>
+  <div class="status" id="status"></div>
+</section>
+
+<section class="card hidden" id="result">
+  <div class="pill">Your SKNotes</div>
+  <div class="notes" id="notes"></div>
+  <button class="primary" id="download">📄 Download PDF</button>
+  <button class="secondary" id="copy">📋 Copy Notes</button>
+</section>
+
+<footer>SKNotes prototype • Use only with content you have permission to process.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let currentNotes="";
+$("generate").onclick=async()=>{
+  const url=$("url").value.trim();
+  if(!url){$("status").textContent="पहले YouTube link डालें।";return}
+  $("generate").disabled=true;$("generate").textContent="⏳ Notes बन रहे हैं...";
+  $("status").textContent="Video transcript पढ़कर notes तैयार किए जा रहे हैं...";
+  $("result").classList.add("hidden");
+  try{
+    const r=await fetch("/api/notes",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({url,language:$("language").value,level:$("level").value})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||"Something went wrong");
+    currentNotes=d.notes||"";
+    $("notes").textContent=currentNotes;
+    $("result").classList.remove("hidden");
+    $("status").textContent="✅ Notes तैयार हैं।";
+    $("result").scrollIntoView({behavior:"smooth"});
+  }catch(e){$("status").textContent="❌ "+e.message}
+  finally{$("generate").disabled=false;$("generate").textContent="✨ Generate Notes"}
+};
+$("download").onclick=async()=>{
+  $("download").disabled=true;$("download").textContent="⏳ PDF बन रहा है...";
+  try{
+    const r=await fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({notes:currentNotes,title:"SKNotes Lecture Notes"})});
+    if(!r.ok) throw Error("PDF नहीं बन पाया");
+    const blob=await r.blob(), a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download="SKNotes.pdf";a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }catch(e){alert(e.message)}
+  finally{$("download").disabled=false;$("download").textContent="📄 Download PDF"}
+};
+$("copy").onclick=async()=>{
+  await navigator.clipboard.writeText(currentNotes);
+  $("copy").textContent="✅ Copied";
+  setTimeout(()=>$("copy").textContent="📋 Copy Notes",1500);
+};
+</script>
+</body>
+</html>
