@@ -1,5 +1,4 @@
 import express from "express";
-import { Innertube } from "youtubei.js";
 import OpenAI from "openai";
 import PDFDocument from "pdfkit";
 
@@ -69,27 +68,37 @@ app.post("/api/notes", async (req, res) => {
     }
 
     // YouTube से video information और transcript लेना
-    const youtube = await Innertube.create();
+    const transcriptResponse = await fetch(
+  "https://www.youtubetranscript.dev/api/v2/transcribe",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
+    },
+    body: JSON.stringify({
+      video: id
+    })
+  }
+);
 
-    const info = await youtube.getInfo(id);
+const transcriptData = await transcriptResponse.json();
 
-    const transcriptData = await info.getTranscript();
+if (!transcriptResponse.ok) {
+  throw new Error(
+    transcriptData?.error || "Transcript API error"
+  );
+}
 
-    const segments =
-      transcriptData?.transcript?.content?.body?.initial_segments || [];
+const transcript = transcriptData?.transcription?.trim();
 
-    const transcript = segments
-      .filter(
-        (segment) =>
-          segment?.snippet?.text
-      )
-      .map(
-        (segment) =>
-          segment.snippet.text
-      )
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+if (!transcript) {
+  throw new Error(
+    "इस वीडियो का transcript नहीं मिला।"
+  );
+};
+
+    
 
     if (!transcript) {
       throw new Error(
