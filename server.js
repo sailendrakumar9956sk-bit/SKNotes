@@ -1,92 +1,320 @@
 import express from "express";
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 import PDFDocument from "pdfkit";
-import { YoutubeTranscript } from "youtube-transcript";
 
 const app = express();
-app.use(express.json({limit:"3mb"}));
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json({ limit: "10mb" }));
 app.use(express.static("public"));
 
-const PORT = process.env.PORT || 3000;
-const ai = process.env.OPENAI_API_KEY ? new OpenAI({apiKey:process.env.OPENAI_API_KEY}) : null;
+/* =========================
+   GROQ AI
+========================= */
 
-function getVideoId(value){
-  try{
-    const u = new URL(value.trim());
-    if(u.hostname === "youtu.be" || u.hostname.endsWith(".youtu.be"))
-      return u.pathname.split("/").filter(Boolean)[0] || null;
-    if(u.hostname.includes("youtube.com"))
-      return u.searchParams.get("v") || (u.pathname.match(/\/shorts\/([^/]+)/)?.[1] ?? null);
-  }catch{}
-  return null;
-}
+const ai = process.env.GROQ_API_KEY
+  ? new Groq({
+      apiKey: process.env.GROQ_API_KEY
+    })
+  : null;
 
-app.get("/api/health",(req,res)=>res.json({ok:true, aiConfigured:!!ai}));
 
-app.post("/api/notes", async (req,res)=>{
-  try{
-    const {url, language="Hindi/Hinglish", level="Class 11-12"} = req.body || {};
-    const id = getVideoId(url || "");
-    if(!id) return res.status(400).json({error:"Valid YouTube video link डालें।"});
-    if(!ai) return res.status(503).json({error:"SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"});
+/* =========================
+   HOME
+========================= */
 
-    const transcriptItems = await YoutubeTranscript.fetchTranscript(id);
-    const transcript = transcriptItems.map(x=>x.text).join(" ").replace(/\s+/g," ").trim();
-    if(!transcript) throw new Error("इस वीडियो का accessible transcript/captions नहीं मिला।");
+app.get("/", (req, res) => {
+  res.sendFile("index.html", { root: "public" });
+});
 
-    const clipped = transcript.slice(0,110000);
-    const prompt = `You are SKNotes, an exam-focused study-note generator for Indian students.
-Create accurate, compact but useful notes from the supplied YouTube lecture transcript.
-Language: ${language}. Student level: ${level}.
+
+/* =========================
+   FLASHCARDS
+========================= */
+
+app.post("/api/flashcards", async (req, res) => {
+  try {
+    const { text = "" } = req.body || {};
+
+    if (!text.trim()) {
+      return res.status(400).json({
+        error: "Notes text missing."
+      });
+    }
+
+    if (!ai) {
+      return res.status(503).json({
+        error: "Groq AI key configure nahi hui hai."
+      });
+    }
+
+    const prompt = `
+You are SKNotes, an AI study assistant.
+
+Create 8-12 useful study flashcards from the notes below.
+
+Return ONLY valid JSON in exactly this format:
+
+[
+  {
+    "question": "Question here",
+    "answer": "Answer here"
+  }
+]
+
 Rules:
-- Never invent facts not supported by the transcript.
-- Keep formulas, symbols and numerical steps readable.
-- Use clear Markdown headings.
-- Include:
-1. Lecture title/topic
-2. Key concepts
-3. Definitions
-4. Detailed notes
-5. Formulas / equations (if applicable)
-6. Solved examples or methods mentioned
-7. Common mistakes / cautions
-8. Quick revision
-9. Important exam questions
-Make it easy to revise from a phone and suitable for PDF export.
+- Use only information supported by the notes.
+- Questions should be useful for revision.
+- Answers should be short and clear.
+- Do not add markdown.
+- Do not add explanations outside JSON.
+- Do not invent information.
 
-TRANSCRIPT:
-${clipped}`;
+NOTES:
+${text.slice(0, 30000)}
+`;
 
-    const response = await ai.responses.create({
-      model: "gpt-5-mini",
-      input: prompt
+    const completion = await ai.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.2
     });
 
-    res.json({videoId:id, notes:response.output_text});
-  }catch(err){
-    res.status(500).json({error: err?.message || "Notes बनाते समय समस्या आई।"});
+    let raw =
+      completion.choices?.[0]?.message?.content?.trim() || "";
+
+    raw = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    const start = raw.indexOf("[");
+    const end = raw.lastIndexOf("]");
+
+    if (start !== -1 && end !== -1) {
+      raw = raw.slice(start, end + 1);
+    }
+
+    const flashcards = JSON.parse(raw);
+
+    if (!Array.isArray(flashcards)) {
+      throw new Error("AI response format invalid.");
+    }
+
+    res.json({
+      flashcards
+    });
+
+  } catch (err) {
+    console.error("Flashcards error:", err);
+
+    res.status(500).json({
+      error:
+        err?.message ||
+        "Flashcards banane me problem aayi."
+    });
   }
 });
 
-app.post("/api/pdf", (req,res)=>{
-  const {notes="", title="SKNotes"} = req.body || {};
-  if(!notes.trim()) return res.status(400).send("Notes missing");
-  res.setHeader("Content-Type","application/pdf");
-  res.setHeader("Content-Disposition",'attachment; filename="SKNotes.pdf"');
 
-  const doc = new PDFDocument({margin:45, size:"A4"});
-  doc.pipe(res);
-  doc.fontSize(22).text("SKNotes", {align:"center"});
-  doc.moveDown(.3);
-  doc.fontSize(11).text(title, {align:"center"});
-  doc.moveDown();
-  doc.fontSize(10);
-  for(const line of notes.split("\n")){
-    const t=line.replace(/^#{1,6}\s*/,"").replace(/\*\*/g,"");
-    if(!t.trim()){ doc.moveDown(.35); continue; }
-    doc.text(t,{lineGap:3});
+/* =========================
+   YOUTUBE NOTES
+========================= */
+
+app.post("/api/notes", async (req, res) => {
+  try {
+    const { url } = req.body || {};
+
+    if (!url) {
+      return res.status(400).json({
+        error: "YouTube URL missing."
+      });
+    }
+
+    if (!process.env.YOUTUBE_TRANSCRIPT_API_KEY) {
+      return res.status(503).json({
+        error: "YouTube Transcript API key configure nahi hui hai."
+      });
+    }
+
+    if (!ai) {
+      return res.status(503).json({
+        error: "Groq AI key configure nahi hui hai."
+      });
+    }
+
+    const videoIdMatch =
+      url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?/]+)/
+      );
+
+    const videoId = videoIdMatch?.[1];
+
+    if (!videoId) {
+      return res.status(400).json({
+        error: "Valid YouTube URL nahi hai."
+      });
+    }
+
+    const transcriptResponse = await fetch(
+      "https://www.youtubetranscript.dev/api/v2/transcribe",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
+        },
+        body: JSON.stringify({
+          video_id: videoId
+        })
+      }
+    );
+
+    const transcriptData =
+      await transcriptResponse.json();
+
+    if (!transcriptResponse.ok) {
+      return res.status(500).json({
+        error:
+          transcriptData?.message ||
+          "Transcript fetch nahi ho paya."
+      });
+    }
+
+    const transcript =
+      transcriptData?.data?.transcript?.text?.trim();
+
+    if (!transcript) {
+      return res.status(404).json({
+        error: "Is video ka transcript nahi mila."
+      });
+    }
+
+    const prompt = `
+You are SKNotes, an AI study assistant.
+
+Convert the following YouTube transcript into clear study notes.
+
+Make:
+1. Main topic
+2. Important concepts
+3. Key points
+4. Definitions
+5. Examples where available
+6. Short revision summary
+
+Use simple student-friendly language.
+
+Transcript:
+${transcript.slice(0, 50000)}
+`;
+
+    const completion =
+      await ai.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.3
+      });
+
+    const notes =
+      completion.choices?.[0]?.message?.content || "";
+
+    res.json({
+      videoId,
+      notes
+    });
+
+  } catch (err) {
+    console.error("YouTube Notes error:", err);
+
+    res.status(500).json({
+      error:
+        err?.message ||
+        "YouTube notes banane me problem aayi."
+    });
   }
-  doc.end();
 });
 
-app.listen(PORT,()=>console.log(`SKNotes running on http://localhost:${PORT}`));
+
+/* =========================
+   PDF EXPORT
+========================= */
+
+app.post("/api/pdf", async (req, res) => {
+  try {
+    const { title = "SKNotes", notes = "" } =
+      req.body || {};
+
+    if (!notes.trim()) {
+      return res.status(400).json({
+        error: "Notes missing."
+      });
+    }
+
+    const doc = new PDFDocument({
+      margin: 50
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/pdf"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${title
+        .replace(/[^a-z0-9]/gi, "_")
+        .slice(0, 50)}.pdf"`
+    );
+
+    doc.pipe(res);
+
+    doc
+      .fontSize(22)
+      .text(title, {
+        align: "center"
+      });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(11)
+      .text(notes);
+
+    doc.end();
+
+  } catch (err) {
+    console.error("PDF error:", err);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        error:
+          err?.message ||
+          "PDF banane me problem aayi."
+      });
+    }
+  }
+});
+
+
+/* =========================
+   SERVER START
+========================= */
+
+app.listen(PORT, () => {
+  console.log(
+    `SKNotes server running on port ${PORT}`
+  );
+});
