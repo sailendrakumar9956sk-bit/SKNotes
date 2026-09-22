@@ -9,8 +9,8 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-const ai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const ai = process.env.GROQ_API_KEY
+  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
   : null;
 
 function getVideoId(value) {
