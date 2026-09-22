@@ -63,7 +63,7 @@ app.post("/api/notes", async (req, res) => {
     if (!ai) {
       return res.status(503).json({
         error:
-          "SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"
+          "SKNotes में AI key अभी configure नहीं हुई है। Server में GROQ_API_KEY जोड़ें।"
       });
     }
 
@@ -137,15 +137,23 @@ Make it easy to revise from a phone and suitable for PDF export.
 TRANSCRIPT:
 ${clipped}`;
 
-    const response = await ai.responses.create({
-      model: "gpt-5-mini",
-      input: prompt
-    });
+    const completion = await ai.chat.completions.create({
+  model: "llama-3.3-70b-versatile",
+  messages: [
+    {
+      role: "user",
+      content: prompt
+    }
+  ]
+});
+
+const notes =
+  completion.choices?.[0]?.message?.content || "";
 
     res.json({
-      videoId: id,
-      notes: response.output_text
-    });
+  videoId: id,
+  notes
+});
 
   } catch (err) {
     console.error("SKNotes error:", err);
