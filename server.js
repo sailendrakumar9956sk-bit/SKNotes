@@ -91,7 +91,7 @@ if (!transcriptResponse.ok) {
   );
 }
 
-const transcript = transcriptData?.transcription?.trim();
+const transcript = transcriptData?.data?.transcript?.text?.trim();
 
 if (!transcript) {
   throw new Error(
