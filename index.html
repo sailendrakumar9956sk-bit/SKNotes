@@ -857,33 +857,80 @@ input.type==="password" ? "text" : "password";
 
 }
 
-function handleAuth(){
+async function handleAuth(){
 
-const msg=document.getElementById("authMsg");
+  const msg = document.getElementById("authMsg");
+  const email = document.getElementById("emailInput").value.trim();
+  const password = document.getElementById("passwordInput").value;
+  const submit = document.getElementById("authSubmit");
 
-if(authMode==="signup"){
+  msg.style.color = "#dc2626";
 
-const name=document.getElementById("nameInput").value.trim();
+  if(!email || !password){
+    msg.textContent = "Email aur password enter karo.";
+    return;
+  }
 
-if(!name){
+  submit.disabled = true;
 
-msg.style.color="#dc2626";
-msg.textContent="Please enter your name.";
-return;
+  try{
 
-}
+    if(authMode === "signup"){
 
-msg.style.color="#4f46e5";
-msg.textContent=
-"Signup system will be connected with secure authentication.";
+      const name = document.getElementById("nameInput").value.trim();
 
-}else{
+      if(!name){
+        msg.textContent = "Please enter your name.";
+        submit.disabled = false;
+        return;
+      }
 
-msg.style.color="#4f46e5";
-msg.textContent=
-"Login system will be connected with secure authentication.";
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: name
+            }
+          }
+        });
 
-}
+      if(error) throw error;
+
+      msg.style.color = "#16a34a";
+
+      msg.textContent = data.session
+        ? "Account created successfully!"
+        : "Account created. Email inbox check karke verification complete karo.";
+
+    }else{
+
+      const { error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if(error) throw error;
+
+      msg.style.color = "#16a34a";
+      msg.textContent = "Login successful!";
+
+      setTimeout(closeAuth, 800);
+    }
+
+  }catch(error){
+
+    msg.style.color = "#dc2626";
+    msg.textContent =
+      error.message || "Authentication failed.";
+
+  }finally{
+
+    submit.disabled = false;
+
+  }
 
 }
 
