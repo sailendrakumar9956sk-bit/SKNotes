@@ -1,951 +1,753 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>SKNotes — AI Study Notes</title>
-  <meta name="theme-color" content="#0f172a">
-
-  <link rel="manifest" href="/manifest.json">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #f6f8fc;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --primary: #4f46e5;
-      --primary2: #7c3aed;
-      --dark: #0f172a;
-      --danger: #dc2626;
-    }
-
-    body.dark {
-      --bg: #080d18;
-      --card: #111827;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #263244;
-    }
-
-    body {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      transition: .25s;
-    }
-
-    /* HEADER */
-
-    header {
-      background: linear-gradient(135deg, #0f172a, #1e1b4b);
-      color: white;
-      padding: 17px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      box-shadow: 0 5px 25px rgba(0,0,0,.12);
-    }
-
-    .nav {
-      max-width: 1050px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 43px;
-      height: 43px;
-      border-radius: 13px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg,#6366f1,#8b5cf6);
-      font-size: 22px;
-    }
-
-    .brand-name {
-      font-size: 21px;
-      font-weight: 800;
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      opacity: .7;
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .theme-btn,
-    .login-btn {
-      height: 42px;
-      border-radius: 11px;
-      cursor: pointer;
-    }
-
-    .theme-btn {
-      width: 42px;
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(255,255,255,.1);
-      color: white;
-      font-size: 18px;
-    }
-
-    .login-btn {
-      padding: 0 17px;
-      border: 0;
-      background: white;
-      color: #312e81;
-      font-weight: 800;
-    }
-
-    /* MAIN */
-
-    main {
-      width: min(1050px, calc(100% - 30px));
-      margin: auto;
-      padding: 45px 0;
-    }
-
-    .hero {
-      text-align: center;
-      max-width: 750px;
-      margin: auto;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 7px 13px;
-      border-radius: 999px;
-      background: #eef2ff;
-      color: #4f46e5;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    body.dark .badge {
-      background: #1e1b4b;
-      color: #a5b4fc;
-    }
-
-    .hero h1 {
-      font-size: clamp(32px,6vw,55px);
-      line-height: 1.08;
-      margin-bottom: 15px;
-    }
-
-    .gradient {
-      background: linear-gradient(90deg,#4f46e5,#9333ea);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero p {
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    /* GENERATOR */
-
-    .generator {
-      max-width: 800px;
-      margin: 35px auto 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 25px;
-      box-shadow: 0 15px 50px rgba(15,23,42,.08);
-    }
-
-    .field {
-      margin-bottom: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 14px;
-      border-radius: 13px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    .generate {
-      width: 100%;
-      padding: 16px;
-      border: 0;
-      border-radius: 14px;
-      color: white;
-      background: linear-gradient(135deg,var(--primary),var(--primary2));
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .generate:disabled {
-      opacity: .6;
-    }
-
-    .status {
-      min-height: 22px;
-      margin-top: 13px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* NOTES */
-
-    .notes-card {
-      max-width: 900px;
-      margin: 25px auto;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      overflow: hidden;
-      display: none;
-    }
-
-    .notes-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .notes-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .action-btn {
-      padding: 9px 13px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .action-btn.primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .notes-body {
-      padding: 23px;
-      white-space: pre-wrap;
-      line-height: 1.75;
-      overflow-wrap: anywhere;
-    }
-
-    /* FEATURES */
-
-    .features {
-      max-width: 900px;
-      margin: 35px auto;
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 15px;
-    }
-
-    .feature {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .feature h3 {
-      font-size: 15px;
-      margin-bottom: 6px;
-    }
-
-    .feature p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 25px;
-      font-size: 13px;
-    }
-
-    /* LOGIN OVERLAY */
-
-    .auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,.72);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      z-index: 100;
-    }
-
-    .auth-overlay.show {
-      display: flex;
-    }
-
-    .auth-box {
-      width: min(430px,100%);
-      background: var(--card);
-      color: var(--text);
-      border-radius: 25px;
-      padding: 27px;
-      position: relative;
-      box-shadow: 0 25px 80px rgba(0,0,0,.3);
-      animation: pop .2s ease;
-    }
-
-    @keyframes pop {
-      from {
-        transform: scale(.96);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .close-auth {
-      position: absolute;
-      right: 16px;
-      top: 16px;
-      width: 34px;
-      height: 34px;
-      border: 0;
-      border-radius: 50%;
-      background: var(--bg);
-      color: var(--text);
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    .auth-logo {
-      width: 55px;
-      height: 55px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 15px;
-      background: linear-gradient(135deg,#6366f1,#8b5cf6);
-      color: white;
-      font-size: 27px;
-    }
-
-    .auth-box h2 {
-      text-align: center;
-      font-size: 25px;
-      margin-bottom: 7px;
-    }
-
-    .auth-description {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 22px;
-    }
-
-    .auth-form .field {
-      margin-bottom: 14px;
-    }
-
-    .password-wrap {
-      position: relative;
-    }
-
-    .password-wrap input {
-      padding-right: 48px;
-    }
-
-    .show-password {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      font-size: 17px;
-    }
-
-    .forgot {
-      display: block;
-      text-align: right;
-      color: var(--primary);
-      font-size: 13px;
-      margin: -4px 0 15px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .auth-submit {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 13px;
-      background: linear-gradient(135deg,#4f46e5,#7c3aed);
-      color: white;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .auth-message {
-      min-height: 20px;
-      text-align: center;
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--danger);
-    }
-
-    .switch-auth {
-      text-align: center;
-      margin-top: 19px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .switch-auth span {
-      color: var(--primary);
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .terms {
-      text-align: center;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-      margin-top: 15px;
-    }
-
-    /* MOBILE */
-
-    @media(max-width:650px) {
-
-      main {
-        padding-top: 30px;
-      }
-
-      .hero h1 {
-        font-size: 35px;
-      }
-
-      .generator {
-        padding: 18px;
-      }
-
-      .options,
-      .features {
-        grid-template-columns: 1fr;
-      }
-
-      .notes-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .notes-actions {
-        width: 100%;
-      }
-
-      .action-btn {
-        flex: 1;
-      }
-
-      .login-btn {
-        padding: 0 12px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="SKNotes - AI Study Platform">
+<link rel="manifest" href="/manifest.json">
+<title>SKNotes — AI Study Platform</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f5f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;
+--border:#e2e8f0;--primary:#4f46e5;--primary2:#7c3aed;
+--dark:#0f172a;--green:#16a34a;--red:#dc2626
+}
+body.dark{
+--bg:#070b14;--card:#111827;--text:#f8fafc;
+--muted:#94a3b8;--border:#263244
+}
+body{
+font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);
+min-height:100vh;transition:.25s
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+/* HEADER */
+header{
+position:sticky;top:0;z-index:50;background:rgba(15,23,42,.97);
+color:#fff;border-bottom:1px solid rgba(255,255,255,.08);
+backdrop-filter:blur(15px)
+}
+.nav{
+width:min(1150px,calc(100% - 30px));min-height:68px;margin:auto;
+display:flex;align-items:center;justify-content:space-between;gap:15px
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+width:43px;height:43px;border-radius:13px;display:grid;place-items:center;
+background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:22px
+}
+.brand b{font-size:21px}
+.brand small{display:block;font-size:10px;opacity:.65}
+.nav-right{display:flex;gap:8px;align-items:center}
+.theme,.login{
+height:40px;border-radius:11px;border:0
+}
+.theme{
+width:40px;background:rgba(255,255,255,.1);
+border:1px solid rgba(255,255,255,.15);color:white
+}
+.login{padding:0 16px;background:#fff;color:#312e81;font-weight:800}
+
+/* LAYOUT */
+main{width:min(1150px,calc(100% - 30px));margin:auto}
+.hero{text-align:center;padding:55px 10px 30px;max-width:850px;margin:auto}
+.badge{
+display:inline-block;padding:8px 14px;border-radius:30px;
+background:#eef2ff;color:#4f46e5;font-size:13px;font-weight:800;margin-bottom:17px
+}
+.dark .badge{background:#1e1b4b;color:#a5b4fc}
+.hero h1{font-size:clamp(35px,7vw,62px);line-height:1.05;letter-spacing:-2px}
+.gradient{
+background:linear-gradient(90deg,#4f46e5,#9333ea);
+-webkit-background-clip:text;color:transparent
+}
+.hero p{margin:18px auto 0;color:var(--muted);line-height:1.7;max-width:680px}
+.hero-actions{margin-top:25px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.hero-btn{
+padding:13px 19px;border-radius:12px;border:0;font-weight:800
+}
+.hero-btn.primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2))}
+.hero-btn.secondary{background:var(--card);border:1px solid var(--border);color:var(--text)}
+
+/* GENERATOR */
+.generator{
+max-width:850px;margin:20px auto 40px;padding:27px;
+background:var(--card);border:1px solid var(--border);border-radius:24px;
+box-shadow:0 18px 55px rgba(15,23,42,.08)
+}
+.heading{margin-bottom:20px}
+.heading h2{font-size:21px}
+.heading p{font-size:13px;color:var(--muted);margin-top:5px}
+.field{margin-bottom:16px}
+label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
+input,select,textarea{
+width:100%;padding:14px;border:1px solid var(--border);
+border-radius:12px;background:var(--card);color:var(--text);outline:none
+}
+input:focus,select:focus,textarea:focus{
+border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)
+}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.generate{
+width:100%;padding:16px;border:0;border-radius:13px;color:#fff;
+font-weight:800;font-size:16px;
+background:linear-gradient(135deg,var(--primary),var(--primary2))
+}
+.generate:disabled{opacity:.6}
+.status{text-align:center;color:var(--muted);font-size:13px;min-height:20px;margin-top:12px}
+
+/* SERVICE SECTION */
+.section{padding:35px 0}
+.section-title{text-align:center;margin-bottom:25px}
+.section-title h2{font-size:28px}
+.section-title p{color:var(--muted);margin-top:7px;font-size:14px}
+.service-grid{
+display:grid;grid-template-columns:repeat(4,1fr);gap:14px
+}
+.service{
+position:relative;background:var(--card);border:1px solid var(--border);
+border-radius:18px;padding:19px;min-height:155px;
+transition:.2s
+}
+.service:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(15,23,42,.08)}
+.service-icon{font-size:28px;margin-bottom:12px}
+.service h3{font-size:15px;margin-bottom:6px}
+.service p{font-size:12px;color:var(--muted);line-height:1.5}
+.soon{
+position:absolute;right:12px;top:12px;font-size:9px;
+background:#f1f5f9;color:#64748b;padding:4px 7px;border-radius:20px
+}
+.dark .soon{background:#1e293b;color:#94a3b8}
+
+/* NOTES */
+.notes-card{
+max-width:900px;margin:25px auto;background:var(--card);
+border:1px solid var(--border);border-radius:20px;overflow:hidden;display:none
+}
+.notes-head{
+padding:15px 18px;border-bottom:1px solid var(--border);
+display:flex;justify-content:space-between;gap:10px;align-items:center
+}
+.actions{display:flex;gap:8px}
+.action{
+padding:9px 12px;border:1px solid var(--border);border-radius:9px;
+background:var(--card);color:var(--text);font-weight:700
+}
+.action.pdf{background:var(--primary);border-color:var(--primary);color:#fff}
+.notes-body{padding:22px;white-space:pre-wrap;line-height:1.75;overflow-wrap:anywhere}
+
+/* ACCOUNT */
+.account{
+display:grid;grid-template-columns:1fr 1fr;gap:15px
+}
+.account-card{
+background:var(--card);border:1px solid var(--border);
+border-radius:18px;padding:22px
+}
+.account-card h3{margin-bottom:7px}
+.account-card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* FOOTER */
+footer{
+margin-top:45px;background:#0f172a;color:#cbd5e1;padding:35px 20px
+}
+.footer-inner{width:min(1050px,100%);margin:auto;text-align:center}
+.footer-brand{font-size:22px;font-weight:800;color:#fff}
+.creator{margin:8px 0;color:#94a3b8}
+.instagram{
+display:inline-block;margin-top:13px;padding:10px 16px;border-radius:10px;
+background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);
+color:white;font-weight:800
+}
+.footer-copy{margin-top:20px;font-size:12px;color:#64748b}
+
+/* AUTH */
+.overlay{
+position:fixed;inset:0;background:rgba(2,6,23,.75);
+backdrop-filter:blur(8px);display:none;align-items:center;
+justify-content:center;padding:18px;z-index:100
+}
+.overlay.show{display:flex}
+.auth{
+width:min(420px,100%);background:var(--card);color:var(--text);
+border-radius:24px;padding:27px;position:relative;
+box-shadow:0 25px 80px rgba(0,0,0,.3)
+}
+.close{
+position:absolute;right:15px;top:15px;width:34px;height:34px;
+border:0;border-radius:50%;background:var(--bg);color:var(--text);font-size:19px
+}
+.auth-logo{
+width:55px;height:55px;margin:0 auto 14px;border-radius:16px;
+display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+font-size:27px;color:#fff
+}
+.auth h2{text-align:center}
+.auth-desc{text-align:center;color:var(--muted);font-size:13px;margin:7px 0 20px}
+.pass{position:relative}
+.pass button{
+position:absolute;right:9px;top:50%;transform:translateY(-50%);
+border:0;background:transparent
+}
+.auth-submit{
+width:100%;padding:14px;border:0;border-radius:12px;
+background:linear-gradient(135deg,var(--primary),var(--primary2));
+color:white;font-weight:800
+}
+.auth-switch{text-align:center;color:var(--muted);font-size:13px;margin-top:17px}
+.auth-switch span{color:var(--primary);font-weight:800;cursor:pointer}
+.auth-msg{text-align:center;font-size:13px;min-height:20px;margin-top:10px}
+
+/* RESPONSIVE */
+@media(max-width:850px){
+.service-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+.nav{min-height:62px}
+.brand b{font-size:19px}
+.login{padding:0 12px}
+.hero{padding-top:38px}
+.options,.account{grid-template-columns:1fr}
+.service-grid{grid-template-columns:1fr 1fr}
+.generator{padding:19px}
+.notes-head{flex-direction:column;align-items:flex-start}
+.actions{width:100%}
+.action{flex:1}
+}
+@media(max-width:420px){
+.service-grid{grid-template-columns:1fr}
+.hero h1{font-size:37px}
+}
+</style>
 </head>
-
 
 <body>
 
+<!-- HEADER -->
 <header>
+<div class="nav">
 
-  <div class="nav">
+<div class="brand">
+<div class="logo">📚</div>
+<div>
+<b>SKNotes</b>
+<small>AI STUDY PLATFORM</small>
+</div>
+</div>
 
-    <div class="brand">
+<div class="nav-right">
+<button class="theme" id="themeBtn" onclick="toggleDark()">🌙</button>
+<button class="login" onclick="openAuth('login')">Login</button>
+</div>
 
-      <div class="brand-icon">
-        📚
-      </div>
-
-      <div>
-        <div class="brand-name">
-          SKNotes
-        </div>
-
-        <div class="brand-sub">
-          AI Study Assistant
-        </div>
-      </div>
-
-    </div>
-
-
-    <div class="nav-right">
-
-      <button
-        class="theme-btn"
-        id="themeBtn"
-        onclick="toggleDarkMode()"
-      >
-        🌙
-      </button>
-
-      <button
-        class="login-btn"
-        onclick="openAuth('login')"
-      >
-        Login
-      </button>
-
-    </div>
-
-  </div>
-
+</div>
 </header>
 
 
 <main>
 
-  <section class="hero">
+<!-- HERO -->
+<section class="hero">
 
-    <div class="badge">
-      ✨ AI-Powered Study Notes
-    </div>
+<div class="badge">✨ AI-Powered Study Platform</div>
 
-    <h1>
-      Learn smarter from
-      <span class="gradient">
-        YouTube
-      </span>
-    </h1>
+<h1>
+Study Smarter with
+<span class="gradient">SKNotes</span>
+</h1>
 
-    <p>
-      YouTube lecture का link डालें और SKNotes
-      आपके लिए clear, exam-focused AI notes
-      और PDF तैयार करेगा।
-    </p>
+<p>
+YouTube lectures, PDFs, text और study material को
+AI-powered notes, revision material और practice tools में बदलें।
+</p>
 
-  </section>
+<div class="hero-actions">
+<button class="hero-btn primary" onclick="document.getElementById('generator').scrollIntoView({behavior:'smooth'})">
+🚀 Start Learning
+</button>
 
+<button class="hero-btn secondary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
+Explore Services
+</button>
+</div>
 
-  <section class="generator">
+</section>
 
-    <div class="field">
 
-      <label>
-        🎥 YouTube Lecture Link
-      </label>
+<!-- YOUTUBE GENERATOR -->
+<section class="generator" id="generator">
 
-      <input
-        id="url"
-        type="url"
-        placeholder="Paste YouTube video link here..."
-      >
+<div class="heading">
+<h2>🎥 AI Notes Generator</h2>
+<p>YouTube lecture का link डालकर exam-focused notes बनाएं।</p>
+</div>
 
-    </div>
+<div class="field">
+<label>YouTube Lecture Link</label>
+<input id="url" type="url" placeholder="https://youtube.com/watch?v=...">
+</div>
 
+<div class="options">
 
-    <div class="options">
+<div class="field">
+<label>🌐 Notes Language</label>
+<select id="language">
+<option>Hindi/Hinglish</option>
+<option>English</option>
+<option>Hindi</option>
+</select>
+</div>
 
-      <div class="field">
-
-        <label>
-          🌐 Notes Language
-        </label>
-
-        <select id="language">
-
-          <option>
-            Hindi/Hinglish
-          </option>
-
-          <option>
-            English
-          </option>
-
-          <option>
-            Hindi
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          🎓 Student Level
-        </label>
-
-        <select id="level">
-
-          <option>
-            Class 11-12
-          </option>
-
-          <option>
-            Class 9-10
-          </option>
-
-          <option>
-            College
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <button
-      id="generateBtn"
-      class="generate"
-      onclick="generateNotes()"
-    >
-      ✨ Generate AI Notes
-    </button>
-
-
-    <div
-      id="status"
-      class="status"
-    ></div>
-
-  </section>
-
-
-  <section
-    id="notesCard"
-    class="notes-card"
-  >
-
-    <div class="notes-header">
-
-      <strong>
-        📖 Your AI Notes
-      </strong>
-
-      <div class="notes-actions">
-
-        <button
-          class="action-btn"
-          onclick="copyNotes()"
-        >
-          📋 Copy
-        </button>
-
-        <button
-          class="action-btn primary"
-          onclick="downloadPDF()"
-        >
-          📄 PDF
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="notes"
-      class="notes-body"
-    ></div>
-
-  </section>
-
-
-  <section class="features">
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        🎥
-      </div>
-
-      <h3>
-        YouTube → Notes
-      </h3>
-
-      <p>
-        Lecture link से notes तैयार करें।
-      </p>
-
-    </div>
-
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        🤖
-      </div>
-
-      <h3>
-        AI Powered
-      </h3>
-
-      <p>
-        Important concepts automatically organize करें।
-      </p>
-
-    </div>
-
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        📄
-      </div>
-
-      <h3>
-        PDF Ready
-      </h3>
-
-      <p>
-        Notes को PDF में download करें।
-      </p>
-
-    </div>
-
-  </section>
+<div class="field">
+<label>🎓 Student Level</label>
+<select id="level">
+<option>Class 11-12</option>
+<option>Class 9-10</option>
+<option>College</option>
+</select>
+</div>
+
+</div>
+
+<button id="generateBtn" class="generate" onclick="generateNotes()">
+✨ Generate AI Notes
+</button>
+
+<div id="status" class="status"></div>
+
+</section>
+
+
+<!-- NOTES RESULT -->
+<section id="notesCard" class="notes-card">
+
+<div class="notes-head">
+<strong>📖 Your AI Notes</strong>
+
+<div class="actions">
+<button class="action" onclick="copyNotes()">📋 Copy</button>
+<button class="action pdf" onclick="downloadPDF()">📄 PDF</button>
+</div>
+</div>
+
+<div id="notes" class="notes-body"></div>
+
+</section>
+
+
+<!-- AI NOTES SERVICES -->
+<section class="section" id="services">
+
+<div class="section-title">
+<h2>📝 AI Notes Generator</h2>
+<p>Different sources से smart study material तैयार करें।</p>
+</div>
+
+<div class="service-grid">
+
+<div class="service" onclick="showComingSoon('PDF → Notes')">
+<div class="service-icon">📄</div>
+<h3>PDF → Notes</h3>
+<p>PDF से important study notes तैयार करें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Text → Notes')">
+<div class="service-icon">📝</div>
+<h3>Text → Notes</h3>
+<p>अपने text को organized notes में बदलें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Photo → Notes')">
+<div class="service-icon">📸</div>
+<h3>Photo → Notes</h3>
+<p>Handwritten या textbook photo से notes बनाएं।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="document.getElementById('generator').scrollIntoView({behavior:'smooth'})">
+<div class="service-icon">🎥</div>
+<h3>YouTube → Notes</h3>
+<p>Lecture से detailed exam-focused notes।</p>
+</div>
+
+</div>
+</section>
+
+
+<!-- AI STUDY TOOLS -->
+<section class="section">
+
+<div class="section-title">
+<h2>🧠 AI Study Tools</h2>
+<p>Revision और practice को smarter बनाएं।</p>
+</div>
+
+<div class="service-grid">
+
+<div class="service" onclick="showComingSoon('AI Quiz Generator')">
+<div class="service-icon">🧠</div>
+<h3>AI Quiz Generator</h3>
+<p>Lecture या chapter से MCQ quiz बनाएं।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Practice Test')">
+<div class="service-icon">📝</div>
+<h3>Practice Test</h3>
+<p>Questions solve करें और अपना score देखें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Ask AI')">
+<div class="service-icon">🤖</div>
+<h3>Ask AI</h3>
+<p>अपने study doubts AI से पूछें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Question Explainer')">
+<div class="service-icon">💡</div>
+<h3>Question Explainer</h3>
+<p>Questions को step-by-step समझें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Flashcards')">
+<div class="service-icon">🃏</div>
+<h3>Flashcards</h3>
+<p>Fast revision के लिए smart cards।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Important Questions')">
+<div class="service-icon">⭐</div>
+<h3>Important Questions</h3>
+<p>Chapter से important practice questions।</p>
+<span class="soon">SOON</span>
+</div>
+
+</div>
+</section>
+
+
+<!-- EXAM PREPARATION -->
+<section class="section">
+
+<div class="section-title">
+<h2>📚 Exam Preparation</h2>
+<p>Exam preparation के लिए dedicated tools।</p>
+</div>
+
+<div class="service-grid">
+
+<div class="service" onclick="showComingSoon('Chapter-wise Notes')">
+<div class="service-icon">📖</div>
+<h3>Chapter-wise Notes</h3>
+<p>हर chapter का organized material।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Quick Revision')">
+<div class="service-icon">⚡</div>
+<h3>Quick Revision</h3>
+<p>कम समय में important points revise करें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Formula Sheet')">
+<div class="service-icon">➗</div>
+<h3>Formula Sheet</h3>
+<p>Important formulas एक जगह।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Definitions')">
+<div class="service-icon">📌</div>
+<h3>Definitions</h3>
+<p>Important definitions को जल्दी revise करें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('PYQ Analysis')">
+<div class="service-icon">📊</div>
+<h3>PYQ Analysis</h3>
+<p>Previous-year questions को analyze करें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('1-Day Revision Plan')">
+<div class="service-icon">📅</div>
+<h3>1-Day Revision</h3>
+<p>Last-minute revision plan।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('7-Day Revision Plan')">
+<div class="service-icon">🗓️</div>
+<h3>7-Day Plan</h3>
+<p>एक week का structured revision plan।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Study Planner')">
+<div class="service-icon">🎯</div>
+<h3>Study Planner</h3>
+<p>Subject-wise study schedule बनाएं।</p>
+<span class="soon">SOON</span>
+</div>
+
+</div>
+</section>
+
+
+<!-- LECTURE TOOLS -->
+<section class="section">
+
+<div class="section-title">
+<h2>🎙️ Lecture Tools</h2>
+<p>Lecture को useful revision material में बदलें।</p>
+</div>
+
+<div class="service-grid">
+
+<div class="service" onclick="showComingSoon('Lecture Summary')">
+<div class="service-icon">📋</div>
+<h3>Lecture Summary</h3>
+<p>पूरे lecture का concise summary।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Short Notes')">
+<div class="service-icon">⚡</div>
+<h3>Short Notes</h3>
+<p>Fast revision के लिए compact notes।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Detailed Notes')">
+<div class="service-icon">📚</div>
+<h3>Detailed Notes</h3>
+<p>Complete lecture-based notes।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Key Points')">
+<div class="service-icon">🔑</div>
+<h3>Key Points</h3>
+<p>Lecture के सबसे important points।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Important Timestamps')">
+<div class="service-icon">⏱️</div>
+<h3>Important Timestamps</h3>
+<p>Important lecture sections जल्दी खोजें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Automatic Questions')">
+<div class="service-icon">❓</div>
+<h3>Auto Questions</h3>
+<p>Lecture से practice questions generate करें।</p>
+<span class="soon">SOON</span>
+</div>
+
+</div>
+</section>
+
+
+<!-- DOCUMENT TOOLS -->
+<section class="section">
+
+<div class="section-title">
+<h2>📄 Document Tools</h2>
+<p>Study documents के साथ AI tools इस्तेमाल करें।</p>
+</div>
+
+<div class="service-grid">
+
+<div class="service" onclick="showComingSoon('PDF Summary')">
+<div class="service-icon">📄</div>
+<h3>PDF → Summary</h3>
+<p>Long PDF को concise summary में बदलें।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('PDF Questions')">
+<div class="service-icon">❓</div>
+<h3>PDF → Questions</h3>
+<p>PDF से practice questions बनाएं।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('PDF Flashcards')">
+<div class="service-icon">🃏</div>
+<h3>PDF → Flashcards</h3>
+<p>PDF content से revision cards।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Image → Notes')">
+<div class="service-icon">📸</div>
+<h3>Image → Notes</h3>
+<p>Images और handwritten material से notes।</p>
+<span class="soon">SOON</span>
+</div>
+
+<div class="service" onclick="showComingSoon('Multiple PDF Revision')">
+<div class="service-icon">📚</div>
+<h3>Multiple PDFs</h3>
+<p>कई documents को एक revision set में बदलें।</p>
+<span class="soon">SOON</span>
+</div>
+
+</div>
+</section>
+
+
+<!-- ACCOUNT -->
+<section class="section">
+
+<div class="section-title">
+<h2>👤 Your Study Account</h2>
+<p>अपना personal study workspace तैयार करें।</p>
+</div>
+
+<div class="account">
+
+<div class="account-card">
+<h3>📚 Notes History</h3>
+<p>Generated notes, saved notes और future revision material एक जगह रखें।</p>
+<br>
+<button class="hero-btn secondary" onclick="showComingSoon('Notes History')">
+Open History
+</button>
+</div>
+
+<div class="account-card">
+<h3>⭐ Favourite Notes</h3>
+<p>Important notes को favourite करके बाद में जल्दी access करें।</p>
+<br>
+<button class="hero-btn secondary" onclick="showComingSoon('Favourite Notes')">
+View Favourites
+</button>
+</div>
+
+<div class="account-card">
+<h3>📥 Download History</h3>
+<p>अपने downloaded study PDFs को आसानी से track करें।</p>
+<br>
+<button class="hero-btn secondary" onclick="showComingSoon('Download History')">
+View Downloads
+</button>
+</div>
+
+<div class="account-card">
+<h3>👤 Profile</h3>
+<p>अपना नाम, account details और study preferences manage करें।</p>
+<br>
+<button class="hero-btn secondary" onclick="openAuth('login')">
+Login / Signup
+</button>
+</div>
+
+</div>
+</section>
 
 </main>
 
 
+<!-- FOOTER -->
 <footer>
-  © 2026 SKNotes • Study smarter, not harder.
+
+<div class="footer-inner">
+
+<div class="footer-brand">
+📚 SKNotes
+</div>
+
+<div class="creator">
+Created by <strong>Shailendra</strong>
+</div>
+
+<a
+class="instagram"
+href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
+target="_blank"
+rel="noopener noreferrer"
+>
+📸 Follow @also__sk
+</a>
+
+<div class="footer-copy">
+© 2026 SKNotes. All rights reserved.
+</div>
+
+</div>
+
 </footer>
 
 
 <!-- LOGIN / SIGNUP -->
+<div id="authOverlay" class="overlay">
 
-<div
-  id="authOverlay"
-  class="auth-overlay"
-  onclick="closeAuthOutside(event)"
+<div class="auth">
+
+<button class="close" onclick="closeAuth()">×</button>
+
+<div class="auth-logo">📚</div>
+
+<h2 id="authTitle">Welcome Back</h2>
+
+<p id="authDesc" class="auth-desc">
+Login to continue using SKNotes.
+</p>
+
+<div id="nameField" class="field" style="display:none">
+<label>👤 Full Name</label>
+<input id="nameInput" type="text" placeholder="Enter your name">
+</div>
+
+<div class="field">
+<label>📧 Email Address</label>
+<input id="emailInput" type="email" placeholder="Enter your email">
+</div>
+
+<div class="field">
+<label>🔑 Password</label>
+<div class="pass">
+<input id="passwordInput" type="password" placeholder="Enter password">
+<button onclick="togglePassword()" type="button">👁️</button>
+</div>
+</div>
+
+<button
+id="authSubmit"
+class="auth-submit"
+onclick="handleAuth()"
 >
+Login
+</button>
 
-  <div class="auth-box">
+<div id="authMsg" class="auth-msg"></div>
 
-    <button
-      class="close-auth"
-      onclick="closeAuth()"
-    >
-      ×
-    </button>
+<div class="auth-switch">
+<span id="switchQuestion">Don't have an account?</span>
+&nbsp;
+<span onclick="switchAuth()" id="switchAction">
+Create account
+</span>
+</div>
 
-
-    <div class="auth-logo">
-      📚
-    </div>
-
-
-    <h2 id="authTitle">
-      Welcome Back
-    </h2>
-
-
-    <p
-      id="authDescription"
-      class="auth-description"
-    >
-      Login to continue using SKNotes
-    </p>
-
-
-    <form
-      class="auth-form"
-      onsubmit="handleAuth(event)"
-    >
-
-      <!-- NAME -->
-
-      <div
-        id="nameField"
-        class="field"
-        style="display:none;"
-      >
-
-        <label>
-          👤 Full Name
-        </label>
-
-        <input
-          id="nameInput"
-          type="text"
-          placeholder="Enter your name"
-        >
-
-      </div>
-
-
-      <!-- EMAIL -->
-
-      <div class="field">
-
-        <label>
-          📧 Email Address
-        </label>
-
-        <input
-          id="emailInput"
-          type="email"
-          placeholder="Enter your email"
-          required
-        >
-
-      </div>
-
-
-      <!-- PASSWORD -->
-
-      <div class="field">
-
-        <label>
-          🔑 Password
-        </label>
-
-        <div class="password-wrap">
-
-          <input
-            id="passwordInput"
-            type="password"
-            placeholder="Enter your password"
-            minlength="6"
-            required
-          >
-
-          <button
-            type="button"
-            class="show-password"
-            onclick="togglePassword()"
-          >
-            👁️
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <!-- FORGOT -->
-
-      <span
-        id="forgotPassword"
-        class="forgot"
-        onclick="showForgotMessage()"
-      >
-        Forgot password?
-      </span>
-
-
-      <button
-        id="authSubmit"
-        class="auth-submit"
-        type="submit"
-      >
-        Login
-      </button>
-
-
-      <div
-        id="authMessage"
-        class="auth-message"
-      ></div>
-
-    </form>
-
-
-    <div class="switch-auth">
-
-      <span id="switchText">
-        Don't have an account?
-      </span>
-
-      <span
-        id="switchButton"
-        onclick="switchAuth()"
-      >
-        Create account
-      </span>
-
-    </div>
-
-
-    <div class="terms">
-      By continuing, you agree to use SKNotes responsibly.
-    </div>
-
-  </div>
-
+</div>
 </div>
 
 
@@ -957,471 +759,304 @@ let authMode = "login";
 
 /* DARK MODE */
 
-function toggleDarkMode() {
+function toggleDark(){
 
-  document.body.classList.toggle("dark");
+document.body.classList.toggle("dark");
 
-  const dark =
-    document.body.classList.contains("dark");
+const dark=document.body.classList.contains("dark");
 
-  document.getElementById("themeBtn").textContent =
-    dark ? "☀️" : "🌙";
+document.getElementById("themeBtn").textContent=
+dark ? "☀️" : "🌙";
 
-  localStorage.setItem(
-    "sknotes-dark",
-    dark ? "1" : "0"
-  );
-}
-
-
-if (
-  localStorage.getItem("sknotes-dark") === "1"
-) {
-
-  document.body.classList.add("dark");
-
-  document.getElementById("themeBtn").textContent =
-    "☀️";
-}
-
-
-/* AUTH OPEN */
-
-function openAuth(mode = "login") {
-
-  authMode = mode;
-
-  updateAuthUI();
-
-  document
-    .getElementById("authOverlay")
-    .classList.add("show");
-
-  document.body.style.overflow = "hidden";
-}
-
-
-/* AUTH CLOSE */
-
-function closeAuth() {
-
-  document
-    .getElementById("authOverlay")
-    .classList.remove("show");
-
-  document.body.style.overflow = "";
-
-  document.getElementById("authMessage").textContent = "";
-}
-
-
-function closeAuthOutside(event) {
-
-  if (
-    event.target ===
-    document.getElementById("authOverlay")
-  ) {
-
-    closeAuth();
-
-  }
+localStorage.setItem(
+"sknotes-dark",
+dark ? "1" : "0"
+);
 
 }
 
-
-/* UPDATE LOGIN/SIGNUP UI */
-
-function updateAuthUI() {
-
-  const title =
-    document.getElementById("authTitle");
-
-  const description =
-    document.getElementById("authDescription");
-
-  const nameField =
-    document.getElementById("nameField");
-
-  const submit =
-    document.getElementById("authSubmit");
-
-  const forgot =
-    document.getElementById("forgotPassword");
-
-  const switchText =
-    document.getElementById("switchText");
-
-  const switchButton =
-    document.getElementById("switchButton");
+if(localStorage.getItem("sknotes-dark")==="1"){
+document.body.classList.add("dark");
+document.getElementById("themeBtn").textContent="☀️";
+}
 
 
-  if (authMode === "login") {
+/* AUTH */
 
-    title.textContent =
-      "Welcome Back";
+function openAuth(mode){
 
-    description.textContent =
-      "Login to continue using SKNotes";
+authMode=mode;
+updateAuth();
+document.getElementById("authOverlay").classList.add("show");
 
-    nameField.style.display =
-      "none";
+}
 
-    submit.textContent =
-      "Login";
+function closeAuth(){
 
-    forgot.style.display =
-      "block";
+document.getElementById("authOverlay").classList.remove("show");
+document.getElementById("authMsg").textContent="";
 
-    switchText.textContent =
-      "Don't have an account?";
+}
 
-    switchButton.textContent =
-      "Create account";
+function switchAuth(){
 
-  } else {
+authMode=authMode==="login" ? "signup" : "login";
+updateAuth();
 
-    title.textContent =
-      "Create Account";
+}
 
-    description.textContent =
-      "Create your SKNotes account";
+function updateAuth(){
 
-    nameField.style.display =
-      "block";
+const title=document.getElementById("authTitle");
+const desc=document.getElementById("authDesc");
+const name=document.getElementById("nameField");
+const submit=document.getElementById("authSubmit");
+const question=document.getElementById("switchQuestion");
+const action=document.getElementById("switchAction");
 
-    submit.textContent =
-      "Create Account";
+document.getElementById("authMsg").textContent="";
 
-    forgot.style.display =
-      "none";
+if(authMode==="login"){
 
-    switchText.textContent =
-      "Already have an account?";
+title.textContent="Welcome Back";
+desc.textContent="Login to continue using SKNotes";
+name.style.display="none";
+submit.textContent="Login";
+question.textContent="Don't have an account?";
+action.textContent="Create account";
 
-    switchButton.textContent =
-      "Login";
+}else{
 
-  }
+title.textContent="Create Account";
+desc.textContent="Create your SKNotes study account";
+name.style.display="block";
+submit.textContent="Create Account";
+question.textContent="Already have an account?";
+action.textContent="Login";
+
+}
+
+}
+
+function togglePassword(){
+
+const input=document.getElementById("passwordInput");
+
+input.type=
+input.type==="password" ? "text" : "password";
+
+}
+
+function handleAuth(){
+
+const msg=document.getElementById("authMsg");
+
+if(authMode==="signup"){
+
+const name=document.getElementById("nameInput").value.trim();
+
+if(!name){
+
+msg.style.color="#dc2626";
+msg.textContent="Please enter your name.";
+return;
+
+}
+
+msg.style.color="#4f46e5";
+msg.textContent=
+"Signup system will be connected with secure authentication.";
+
+}else{
+
+msg.style.color="#4f46e5";
+msg.textContent=
+"Login system will be connected with secure authentication.";
+
+}
 
 }
 
 
-/* SWITCH */
+/* COMING SOON */
 
-function switchAuth() {
+function showComingSoon(name){
 
-  authMode =
-    authMode === "login"
-      ? "signup"
-      : "login";
-
-  document.getElementById(
-    "authMessage"
-  ).textContent = "";
-
-  updateAuthUI();
-
-}
-
-
-/* PASSWORD */
-
-function togglePassword() {
-
-  const input =
-    document.getElementById("passwordInput");
-
-  input.type =
-    input.type === "password"
-      ? "text"
-      : "password";
-
-}
-
-
-/* TEMP AUTH HANDLER */
-
-function handleAuth(event) {
-
-  event.preventDefault();
-
-  const message =
-    document.getElementById("authMessage");
-
-  const email =
-    document.getElementById("emailInput").value.trim();
-
-  const password =
-    document.getElementById("passwordInput").value;
-
-  if (authMode === "signup") {
-
-    const name =
-      document.getElementById("nameInput").value.trim();
-
-    if (!name) {
-
-      message.textContent =
-        "Please enter your name.";
-
-      return;
-    }
-
-    message.style.color =
-      "#16a34a";
-
-    message.textContent =
-      "Signup UI ready. Authentication will be connected next.";
-
-  } else {
-
-    message.style.color =
-      "#16a34a";
-
-    message.textContent =
-      "Login UI ready. Authentication will be connected next.";
-
-  }
-
-}
-
-
-/* FORGOT PASSWORD */
-
-function showForgotMessage() {
-
-  const message =
-    document.getElementById("authMessage");
-
-  message.style.color =
-    "#4f46e5";
-
-  message.textContent =
-    "Password reset will be connected with the authentication system.";
+alert(
+"🚀 "+name+
+" अभी development में है.\n\nयह feature अगले backend update में activate किया जाएगा."
+);
 
 }
 
 
 /* GENERATE NOTES */
 
-async function generateNotes() {
+async function generateNotes(){
 
-  const url =
-    document.getElementById("url").value.trim();
+const url=document.getElementById("url").value.trim();
+const language=document.getElementById("language").value;
+const level=document.getElementById("level").value;
 
-  const language =
-    document.getElementById("language").value;
+const button=document.getElementById("generateBtn");
+const status=document.getElementById("status");
+const card=document.getElementById("notesCard");
+const box=document.getElementById("notes");
 
-  const level =
-    document.getElementById("level").value;
+if(!url){
 
-  const button =
-    document.getElementById("generateBtn");
+status.textContent="⚠️ पहले YouTube video का link डालें.";
+return;
 
-  const status =
-    document.getElementById("status");
+}
 
-  const notesCard =
-    document.getElementById("notesCard");
+button.disabled=true;
+button.textContent="⏳ Generating AI Notes...";
+status.textContent=
+"Transcript और AI notes तैयार किए जा रहे हैं...";
 
-  const notesBox =
-    document.getElementById("notes");
+card.style.display="none";
 
+try{
 
-  if (!url) {
+const response=await fetch("/api/notes",{
 
-    status.textContent =
-      "⚠️ पहले YouTube video का link डालें।";
+method:"POST",
 
-    return;
-  }
+headers:{
+"Content-Type":"application/json"
+},
 
+body:JSON.stringify({
+url,
+language,
+level
+})
 
-  button.disabled = true;
+});
 
-  button.textContent =
-    "⏳ Generating Notes...";
+const data=await response.json();
 
-  status.textContent =
-    "Transcript और AI notes तैयार किए जा रहे हैं...";
+if(!response.ok){
 
+throw new Error(
+data.error || "Notes बनाने में समस्या आई."
+);
 
-  try {
+}
 
-    const response =
-      await fetch("/api/notes", {
+currentNotes=data.notes || "";
 
-        method: "POST",
+if(!currentNotes){
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+throw new Error("Notes प्राप्त नहीं हुए.");
 
-        body: JSON.stringify({
-          url,
-          language,
-          level
-        })
+}
 
-      });
+box.textContent=currentNotes;
+card.style.display="block";
 
+status.textContent="✅ AI Notes तैयार हैं!";
 
-    const data =
-      await response.json();
+card.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
 
+}catch(error){
 
-    if (!response.ok) {
+status.textContent="❌ "+error.message;
 
-      throw new Error(
-        data.error ||
-        "Notes बनाने में समस्या आई।"
-      );
+}finally{
 
-    }
+button.disabled=false;
+button.textContent="✨ Generate AI Notes";
 
-
-    currentNotes =
-      data.notes || "";
-
-
-    notesBox.textContent =
-      currentNotes;
-
-    notesCard.style.display =
-      "block";
-
-    status.textContent =
-      "✅ Notes successfully तैयार हैं!";
-
-
-    notesCard.scrollIntoView({
-      behavior: "smooth"
-    });
-
-
-  } catch (error) {
-
-    status.textContent =
-      "❌ " + error.message;
-
-  } finally {
-
-    button.disabled = false;
-
-    button.textContent =
-      "✨ Generate AI Notes";
-
-  }
+}
 
 }
 
 
-/* COPY */
+/* COPY NOTES */
 
-async function copyNotes() {
+async function copyNotes(){
 
-  if (!currentNotes) {
+if(!currentNotes){
 
-    alert("पहले notes generate करें।");
+alert("पहले notes generate करें.");
+return;
 
-    return;
-  }
+}
 
-  try {
+try{
 
-    await navigator.clipboard.writeText(
-      currentNotes
-    );
+await navigator.clipboard.writeText(currentNotes);
 
-    alert(
-      "✅ Notes copied successfully!"
-    );
+alert("✅ Notes copied successfully!");
 
-  } catch {
+}catch{
 
-    alert(
-      "Notes copy नहीं हो पाए।"
-    );
+alert("Notes copy नहीं हो पाए.");
 
-  }
+}
 
 }
 
 
 /* PDF */
 
-async function downloadPDF() {
+async function downloadPDF(){
 
-  if (!currentNotes) {
+if(!currentNotes){
 
-    alert(
-      "पहले notes generate करें।"
-    );
+alert("पहले notes generate करें.");
+return;
 
-    return;
-  }
+}
 
+try{
 
-  try {
+const response=await fetch("/api/pdf",{
 
-    const response =
-      await fetch("/api/pdf", {
+method:"POST",
 
-        method: "POST",
+headers:{
+"Content-Type":"application/json"
+},
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+body:JSON.stringify({
+notes:currentNotes,
+title:"SKNotes"
+})
 
-        body: JSON.stringify({
+});
 
-          notes: currentNotes,
+if(!response.ok){
 
-          title: "SKNotes"
+throw new Error("PDF बनाने में समस्या आई.");
 
-        })
+}
 
-      });
+const blob=await response.blob();
 
+const url=window.URL.createObjectURL(blob);
 
-    if (!response.ok) {
+const link=document.createElement("a");
 
-      throw new Error(
-        "PDF बनाने में समस्या आई।"
-      );
+link.href=url;
+link.download="SKNotes.pdf";
 
-    }
+document.body.appendChild(link);
+link.click();
+link.remove();
 
+window.URL.revokeObjectURL(url);
 
-    const blob =
-      await response.blob();
+}catch(error){
 
-    const url =
-      window.URL.createObjectURL(blob);
+alert(error.message);
 
-    const link =
-      document.createElement("a");
-
-    link.href = url;
-
-    link.download =
-      "SKNotes.pdf";
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    link.remove();
-
-    window.URL.revokeObjectURL(url);
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
+}
 
 }
 
