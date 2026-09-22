@@ -83,6 +83,7 @@ app.post("/api/notes", async (req, res) => {
 );
 
 const transcriptData = await transcriptResponse.json();
+    console.log("TRANSCRIPT API RESPONSE:", JSON.stringify(transcriptData));
 
 if (!transcriptResponse.ok) {
   throw new Error(
