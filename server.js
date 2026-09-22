@@ -10,9 +10,12 @@ app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 
 const ai = process.env.GROQ_API_KEY
-  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
+  ? new Groq({
+      apiKey: process.env.GROQ_API_KEY
+    })
   : null;
 
+// YouTube Video ID निकालने के लिए
 function getVideoId(value) {
   try {
     const u = new URL(value.trim());
@@ -21,13 +24,19 @@ function getVideoId(value) {
       u.hostname === "youtu.be" ||
       u.hostname.endsWith(".youtu.be")
     ) {
-      return u.pathname.split("/").filter(Boolean)[0] || null;
+      return (
+        u.pathname.split("/").filter(Boolean)[0] || null
+      );
     }
 
     if (u.hostname.includes("youtube.com")) {
+      const match = u.pathname.match(
+        /\/(?:shorts|live)\/([^/]+)\/?/
+      );
+
       return (
         u.searchParams.get("v") ||
-        (u.pathname.match(/\/(?:shorts|live)\/([^/]+)/)?.[1] ?? null)
+        (match?.[1] ?? null)
       );
     }
 
@@ -37,6 +46,7 @@ function getVideoId(value) {
   }
 }
 
+// Health check
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
@@ -44,6 +54,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// YouTube → Transcript → AI Notes
 app.post("/api/notes", async (req, res) => {
   try {
     const {
@@ -63,52 +74,53 @@ app.post("/api/notes", async (req, res) => {
     if (!ai) {
       return res.status(503).json({
         error:
-          "SKNotes में AI key अभी configure नहीं हुई है। Server में OPENAI_API_KEY जोड़ें।"
+          "SKNotes में Groq AI key अभी configure नहीं हुई है। Render में GROQ_API_KEY जोड़ें।"
       });
     }
 
-    // YouTube से video information और transcript लेना
+    // Transcript API
     const transcriptResponse = await fetch(
-  "https://www.youtubetranscript.dev/api/v2/transcribe",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
-    },
-    body: JSON.stringify({
-      video: id
-    })
-  }
-);
+      "https://www.youtubetranscript.dev/api/v2/transcribe",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
+        },
+        body: JSON.stringify({
+          video: id
+        })
+      }
+    );
 
-const transcriptData = await transcriptResponse.json();
-    console.log("TRANSCRIPT API RESPONSE:", JSON.stringify(transcriptData));
+    const transcriptData =
+      await transcriptResponse.json();
 
-if (!transcriptResponse.ok) {
-  throw new Error(
-    transcriptData?.error || "Transcript API error"
-  );
-}
+    console.log(
+      "TRANSCRIPT API RESPONSE:",
+      JSON.stringify(transcriptData)
+    );
 
-const transcript = transcriptData?.data?.transcript?.text?.trim();
-
-if (!transcript) {
-  throw new Error(
-    "इस वीडियो का transcript नहीं मिला।"
-  );
-};
-
-    
-
-    if (!transcript) {
+    if (!transcriptResponse.ok) {
       throw new Error(
-        "इस वीडियो का accessible transcript/captions नहीं मिला।"
+        transcriptData?.error ||
+          "Transcript API error"
       );
     }
 
+    const transcript =
+      transcriptData?.data?.transcript?.text?.trim();
+
+    if (!transcript) {
+      throw new Error(
+        "इस वीडियो का transcript नहीं मिला।"
+      );
+    }
+
+    // Transcript बहुत बड़ा होने पर limit
     const clipped = transcript.slice(0, 110000);
 
+    // AI Prompt
     const prompt = `You are SKNotes, an exam-focused study-note generator for Indian students.
 
 Create accurate, compact but useful notes from the supplied YouTube lecture transcript.
@@ -137,14 +149,24 @@ Make it easy to revise from a phone and suitable for PDF export.
 TRANSCRIPT:
 ${clipped}`;
 
-    const response = await ai.responses.create({
-      model: "gpt-5-mini",
-      input: prompt
-    });
+    // Groq AI
+    const completion =
+      await ai.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      });
+
+    const notes =
+      completion.choices?.[0]?.message?.content || "";
 
     res.json({
       videoId: id,
-      notes: response.output_text
+      notes
     });
 
   } catch (err) {
@@ -158,6 +180,7 @@ ${clipped}`;
   }
 });
 
+// Notes → PDF
 app.post("/api/pdf", (req, res) => {
   const {
     notes = "",
@@ -221,12 +244,14 @@ app.post("/api/pdf", (req, res) => {
   doc.end();
 });
 
+// Homepage
 app.get("/", (req, res) => {
   res.sendFile(
     process.cwd() + "/index.html"
   );
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(
     `SKNotes running on http://localhost:${PORT}`
