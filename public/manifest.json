@@ -1,16 +1,12 @@
-{
-  "name": "SKNotes",
-  "short_name": "SKNotes",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
-  "description": "YouTube classes se AI notes aur PDF banane wala app",
-  "icons": [
-    {
-      "src": "/file_0000000080dc82119e0f621b25b1ff79.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+"icons": [
+  {
+    "src": "/sknotes-icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "/sknotes-icon-512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
