@@ -1536,14 +1536,16 @@ async function authSubmit(event){
       message.textContent =
         "Login successful!";
 
-      setTimeout(function(){
+      message.textContent =
+  "Login successful!";
 
-        closeAuth();
-        updateAccount();
+await updateAccount();
 
-      },700);
+setTimeout(function(){
 
-    }
+  closeAuth();
+
+},700);
 
   }catch(error){
 
