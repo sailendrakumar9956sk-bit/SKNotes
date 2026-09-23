@@ -192,7 +192,7 @@ ${text.slice(0, 30000)}
       ],
       temperature: 0.2
     });
-
+console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
     let raw =
       completion.choices?.[0]?.message?.content?.trim() || "";
 
