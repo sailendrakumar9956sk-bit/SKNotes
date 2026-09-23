@@ -147,9 +147,9 @@ app.post("/api/quiz", async (req, res) => {
     const prompt = `
 You are SKNotes, an AI study assistant.
 
-Create exactly 10 useful multiple-choice questions from the notes below.
+Create exactly 10 multiple-choice questions from the notes below.
 
-Return ONLY valid JSON in this exact format:
+Return a JSON object with this exact structure:
 
 {
   "quiz": [
@@ -168,14 +168,13 @@ Return ONLY valid JSON in this exact format:
 
 Rules:
 - Create exactly 10 questions.
-- Each question must have exactly 4 options.
-- Only one option must be correct.
+- Every question must have exactly 4 options.
+- Only one option is correct.
 - The answer must exactly match one of the four options.
-- Use only information supported by the notes.
-- Keep questions and answers short and clear.
-- Do not use markdown.
-- Do not add any text outside the JSON.
+- Use only information from the notes.
 - Do not invent information.
+- Keep questions short and clear.
+- Return JSON only.
 
 NOTES:
 ${text.slice(0, 30000)}
@@ -216,9 +215,7 @@ ${text.slice(0, 30000)}
     console.error("Quiz error:", err);
 
     res.status(500).json({
-      error:
-        err?.message ||
-        "Quiz banane me problem aayi."
+      error: err?.message || "Quiz banane me problem aayi."
     });
   }
 });
