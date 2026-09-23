@@ -123,6 +123,7 @@ ${text.slice(0, 30000)}
 });
 
 
+
 /* =========================
    NOTES → QUIZ / MCQ
 ========================= */
@@ -146,26 +147,34 @@ app.post("/api/quiz", async (req, res) => {
     const prompt = `
 You are SKNotes, an AI study assistant.
 
-Create 10 useful multiple-choice questions from the notes below.
+Create exactly 10 useful multiple-choice questions from the notes below.
 
-Return ONLY valid JSON in exactly this format:
+Return ONLY valid JSON in this exact format:
 
-[
-  {
-    "question": "Question here",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "answer": "Option A"
-  }
-]
+{
+  "quiz": [
+    {
+      "question": "Question here",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "answer": "Option A"
+    }
+  ]
+}
 
 Rules:
-- Use only information supported by the notes.
+- Create exactly 10 questions.
 - Each question must have exactly 4 options.
-- Only one option should be correct.
-- Questions should be useful for revision.
+- Only one option must be correct.
+- The answer must exactly match one of the four options.
+- Use only information supported by the notes.
 - Keep questions and answers short and clear.
-- Do not add markdown.
-- Do not add explanations outside JSON.
+- Do not use markdown.
+- Do not add any text outside the JSON.
 - Do not invent information.
 
 NOTES:
@@ -180,33 +189,27 @@ ${text.slice(0, 30000)}
           content: prompt
         }
       ],
-      temperature: 0.2
+      temperature: 0.2,
+      response_format: {
+        type: "json_object"
+      }
     });
 
-    let raw =
+    const raw =
       completion.choices?.[0]?.message?.content?.trim() || "";
 
-    raw = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    const start = raw.indexOf("[");
-    const end = raw.lastIndexOf("]");
-
-    if (start !== -1 && end !== -1) {
-      raw = raw.slice(start, end + 1);
+    if (!raw) {
+      throw new Error("AI ne koi response nahi diya.");
     }
 
-    const quiz = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
 
-    if (!Array.isArray(quiz)) {
+    if (!parsed.quiz || !Array.isArray(parsed.quiz)) {
       throw new Error("AI quiz format invalid.");
     }
 
     res.json({
-      quiz
+      quiz: parsed.quiz
     });
 
   } catch (err) {
@@ -219,7 +222,6 @@ ${text.slice(0, 30000)}
     });
   }
 });
-
 
 /* =========================
    YOUTUBE NOTES
