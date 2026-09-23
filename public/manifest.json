@@ -1,12 +1,21 @@
-"icons": [
-  {
-    "src": "/sknotes-icon-192.png",
-    "sizes": "192x192",
-    "type": "image/png"
-  },
-  {
-    "src": "/sknotes-icon-512.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }
-]
+{
+  "name": "SKNotes - AI Study Assistant",
+  "short_name": "SKNotes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#6366f1",
+  "description": "AI Study Assistant for smarter learning",
+  "icons": [
+    {
+      "src": "/sknotes-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/sknotes-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
