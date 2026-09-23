@@ -1657,20 +1657,18 @@ supabaseClient.auth.onAuthStateChange(
    MY DOCUMENTS
    ===================================================== */
 
-async function openDocuments(){
+function openDocuments(){
 
-  const { data:{user} } =
-    await supabaseClient.auth.getUser();
+  const section =
+    document.getElementById("documentsSection");
 
-  if(!user){
+  section.style.display = "block";
 
-    alert(
-      "🔐 My Documents use karne ke liye pehle Login karo."
-    );
+  section.scrollIntoView({
+    behavior: "smooth"
+  });
 
-    openAuth();
-
-    return;
+  loadDocuments();
   }
 
   const section =
