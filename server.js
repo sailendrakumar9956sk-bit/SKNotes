@@ -121,6 +121,100 @@ ${text.slice(0, 30000)}
     });
   }
 });
+/* =========================
+   NOTES → QUIZ / MCQ
+========================= */
+
+app.post("/api/quiz", async (req, res) => {
+  try {
+    const { text = "" } = req.body || {};
+
+    if (!text.trim()) {
+      return res.status(400).json({
+        error: "Notes text missing."
+      });
+    }
+
+    if (!ai) {
+      return res.status(503).json({
+        error: "Groq AI key configure nahi hui hai."
+      });
+    }
+
+    const prompt = `
+You are SKNotes, an AI study assistant.
+
+Create 10 useful multiple-choice questions from the notes below.
+
+Return ONLY valid JSON in exactly this format:
+
+[
+  {
+    "question": "Question here",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "Option A"
+  }
+]
+
+Rules:
+- Use only information supported by the notes.
+- Each question must have exactly 4 options.
+- Only one option should be correct.
+- Questions should be useful for revision.
+- Keep questions and answers short and clear.
+- Do not add markdown.
+- Do not add explanations outside JSON.
+- Do not invent information.
+
+NOTES:
+${text.slice(0, 30000)}
+`;
+
+    const completion = await ai.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.2
+    });
+
+    let raw =
+      completion.choices?.[0]?.message?.content?.trim() || "";
+
+    raw = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    const start = raw.indexOf("[");
+    const end = raw.lastIndexOf("]");
+
+    if (start !== -1 && end !== -1) {
+      raw = raw.slice(start, end + 1);
+    }
+
+    const quiz = JSON.parse(raw);
+
+    if (!Array.isArray(quiz)) {
+      throw new Error("AI quiz format invalid.");
+    }
+
+    res.json({ quiz });
+
+  } catch (err) {
+    console.error("Quiz error:", err);
+
+    res.status(500).json({
+      error:
+        err?.message ||
+        "Quiz banane me problem aayi."
+    });
+  }
+});
 
 
 /* =========================
