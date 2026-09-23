@@ -1528,6 +1528,13 @@ loadDark();
 updateTimer();
 
 updateAccount();
+  setTimeout(async function(){
+  const result = await supabaseClient.auth.getSession();
+
+  if (!result.data.session) {
+    openAuth();
+  }
+}, 500);
 
 </script>
 
