@@ -75,7 +75,7 @@ ${text.slice(0, 30000)}
 `;
 
     const completion = await ai.chat.completions.create({
-      model: "model: "llama-3.1-8b-instant",",
+      model: "model: "model: "llama-3.1-8b-instant",",",
       messages: [
         {
           role: "user",
