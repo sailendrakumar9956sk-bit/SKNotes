@@ -1,341 +1,566 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111827" />
 
-  <title>SKNotes - AI Study Assistant</title>
+  <title>SKNotes — AI Study Assistant</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+    }
+
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #6366f1;
+      --primary2: #4f46e5;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --shadow: 0 12px 35px rgba(0,0,0,.08);
+    }
+
+    body.dark {
+      --bg: #0b1120;
+      --card: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #263244;
+      --shadow: 0 12px 35px rgba(0,0,0,.28);
     }
 
     body {
-      background: #f5f7ff;
-      color: #111827;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: .2s;
     }
 
-    header {
-      background: #fff;
-      padding: 16px 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e5e7eb;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-      color: #4f46e5;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+    button,
+    input,
+    textarea {
+      font: inherit;
     }
 
     button {
       cursor: pointer;
     }
 
-    .timer-top-btn,
-    .login-btn {
-      border: 0;
+    .container {
+      width: min(1120px, calc(100% - 28px));
+      margin: auto;
+    }
+
+    /* HEADER */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--card) 94%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .logo span {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-btn,
+    .theme-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
       border-radius: 10px;
-      padding: 10px 14px;
-      font-weight: 600;
+      padding: 9px 12px;
     }
 
-    .timer-top-btn {
-      background: #111827;
-      color: #fff;
+    .primary-btn {
+      border: 0;
+      background: var(--primary);
+      color: white;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 700;
     }
 
-    .login-btn {
-      background: #4f46e5;
-      color: #fff;
+    .primary-btn:hover {
+      background: var(--primary2);
     }
+
+    /* HERO */
 
     .hero {
       text-align: center;
-      padding: 45px 20px 30px;
-    }
-
-    .hero h1 {
-      font-size: 38px;
-      margin-bottom: 12px;
-    }
-
-    .hero h1 span {
-      color: #4f46e5;
-    }
-
-    .hero p {
-      max-width: 650px;
-      margin: auto;
-      color: #6b7280;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 15px 18px 60px;
-    }
-
-    .section-title {
-      margin: 25px 0 15px;
-      font-size: 22px;
-    }
-
-    .services {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-bottom: 25px;
-    }
-
-    .service {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 20px;
-      min-height: 130px;
-    }
-
-    .service h3 {
-      margin-bottom: 7px;
-    }
-
-    .service p {
-      color: #6b7280;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .service.active {
-      border: 2px solid #4f46e5;
-    }
-
-    .service.coming {
-      opacity: .72;
+      padding: 62px 0 35px;
     }
 
     .badge {
       display: inline-block;
-      margin-top: 12px;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      background: #eef2ff;
-      color: #4f46e5;
-      font-weight: bold;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(99,102,241,.12);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
 
-    .soon {
-      background: #f3f4f6;
-      color: #6b7280;
+    .hero h1 {
+      font-size: clamp(34px, 7vw, 62px);
+      line-height: 1.05;
+      margin-bottom: 16px;
     }
 
-    .card {
-      background: #fff;
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 680px;
+      margin: auto;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* USER */
+
+    .user-panel {
+      display: none;
+      margin: 15px 0 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+      padding: 18px;
+      box-shadow: var(--shadow);
     }
 
-    .card h2 {
-      margin-bottom: 8px;
+    .user-panel-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
     }
 
-    .desc {
-      color: #6b7280;
-      margin-bottom: 18px;
+    .user-name {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .user-email {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    /* STATS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 35px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    /* SECTION */
+
+    .section-title {
+      margin: 35px 0 17px;
+    }
+
+    .section-title h2 {
+      font-size: 25px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* SERVICES */
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .service {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      transition: .2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.03);
+    }
+
+    .service:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .service-icon {
+      font-size: 30px;
+      margin-bottom: 13px;
+    }
+
+    .service h3 {
+      margin-bottom: 7px;
+      font-size: 18px;
+    }
+
+    .service p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 42px;
+    }
+
+    .service-btn {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .service-btn.available {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .coming {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #d97706;
+      background: rgba(217,119,6,.1);
+      padding: 5px 8px;
+      border-radius: 999px;
+    }
+
+    /* FLASHCARDS */
+
+    .workspace {
+      margin-top: 25px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
     textarea {
       width: 100%;
-      min-height: 220px;
-      padding: 15px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
+      min-height: 180px;
       resize: vertical;
-      font-size: 15px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
       outline: none;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    textarea:focus {
-      border-color: #4f46e5;
+    textarea:focus,
+    input:focus {
+      border-color: var(--primary);
     }
 
-    .generate {
-      width: 100%;
-      margin-top: 14px;
-      padding: 14px;
-      border: 0;
-      border-radius: 12px;
-      background: #4f46e5;
-      color: #fff;
-      font-size: 16px;
-      font-weight: bold;
+    .workspace-actions {
+      margin-top: 13px;
+      display: flex;
+      justify-content: flex-end;
     }
 
-    .generate:disabled {
-      opacity: .6;
+    .loading {
+      display: none;
+      margin-top: 15px;
+      color: var(--muted);
     }
 
-    .result {
+    .flashcards {
+      display: grid;
+      gap: 14px;
       margin-top: 20px;
     }
 
     .flashcard {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 13px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
       padding: 17px;
-      margin-bottom: 12px;
+      background: var(--bg);
     }
 
-    .question {
-      color: #4f46e5;
-      font-weight: bold;
+    .flashcard-q {
+      font-weight: 800;
       margin-bottom: 8px;
     }
 
-    .answer {
-      color: #374151;
-      line-height: 1.6;
+    .flashcard-a {
+      color: var(--muted);
+      line-height: 1.55;
     }
 
-    .error {
-      display: none;
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #fee2e2;
-      color: #b91c1c;
-    }
+    /* TIMER */
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #6b7280;
-    }
-
-    /* TIMER OVERLAY */
-
-    #timerOverlay {
+    .timer-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: #111827;
-      color: white;
-      z-index: 1000;
+      z-index: 100;
+      background: rgba(0,0,0,.75);
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
 
     .timer-box {
-      width: min(600px, 100%);
+      width: min(500px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      padding: 30px;
       text-align: center;
+      box-shadow: 0 25px 80px rgba(0,0,0,.35);
     }
 
-    .timer-title {
-      font-size: 25px;
-      margin-bottom: 25px;
+    .timer-box h2 {
+      margin-bottom: 15px;
     }
 
     .timer-display {
-      font-size: clamp(65px, 15vw, 125px);
-      font-weight: 800;
+      font-size: clamp(55px, 15vw, 90px);
+      font-weight: 900;
       letter-spacing: 3px;
       margin: 20px 0;
     }
 
-    .timer-label {
-      color: #cbd5e1;
-      margin-bottom: 20px;
-    }
-
-    .timer-input {
-      width: 100%;
-      max-width: 260px;
-      padding: 13px;
-      border: 1px solid #4b5563;
-      border-radius: 10px;
-      background: #1f2937;
-      color: white;
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .timer-buttons {
+    .timer-controls {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
-    .timer-buttons button {
-      border: 0;
+    .timer-controls button {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      padding: 10px 14px;
       border-radius: 10px;
-      padding: 12px 18px;
-      font-weight: bold;
+      font-weight: 700;
     }
 
-    .start-btn {
-      background: #4f46e5;
+    .timer-controls .start {
+      background: var(--primary);
       color: white;
+      border-color: var(--primary);
     }
 
-    .pause-btn {
-      background: #374151;
-      color: white;
+    /* MODAL */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      background: rgba(0,0,0,.7);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .reset-btn {
-      background: #ef4444;
-      color: white;
+    .modal-box {
+      width: min(430px, 100%);
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.3);
     }
 
-    .close-btn {
-      background: white;
-      color: #111827;
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
     }
 
-    .study-total {
-      margin-top: 25px;
-      color: #cbd5e1;
+    .close {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 24px;
     }
 
-    @media (max-width: 650px) {
+    .field {
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .auth-submit {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-switch button {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .auth-message {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* FOOTER */
+
+    footer {
+      margin-top: 65px;
+      padding: 32px 15px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 14px;
+    }
+
+    footer strong {
+      color: var(--text);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 850px) {
+      .services {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav {
+        min-height: 62px;
+      }
+
+      .logo {
+        font-size: 19px;
+      }
+
+      .nav-btn,
+      .theme-btn {
+        padding: 8px 9px;
+        font-size: 12px;
+      }
+
+      .hero {
+        padding-top: 42px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
       .services {
         grid-template-columns: 1fr;
       }
 
-      .hero h1 {
-        font-size: 30px;
-      }
-
-      .logo {
-        font-size: 20px;
-      }
-
-      .timer-top-btn,
-      .login-btn {
-        padding: 9px 10px;
-        font-size: 12px;
+      .user-panel-inner {
+        align-items: flex-start;
+        flex-direction: column;
       }
     }
   </style>
@@ -343,216 +568,305 @@
 
 <body>
 
-<header>
-  <div class="logo">📚 SKNotes</div>
+  <!-- HEADER -->
+  <header>
+    <div class="container nav">
+      <div class="logo">SK<span>Notes</span></div>
 
-  <div class="header-actions">
-    <button
-      class="timer-top-btn"
-      type="button"
-      onclick="openTimer()">
-      ⏱️ Study Timer
-    </button>
+      <div class="nav-actions">
+        <button class="nav-btn" onclick="openTimer()">⏱️ Timer</button>
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+        <button class="nav-btn" onclick="openAuth()" id="authBtn">Login</button>
+      </div>
+    </div>
+  </header>
 
-    <button
-      class="login-btn"
-      type="button"
-      onclick="openLogin()">
-      Login
-    </button>
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="badge">🤖 AI Study Assistant</div>
+
+      <h1>Study Smarter with <span>SKNotes</span></h1>
+
+      <p>
+        Notes, flashcards, quizzes and study tools — all designed to make
+        studying easier and faster.
+      </p>
+    </section>
+
+    <!-- USER -->
+    <section class="user-panel" id="userPanel">
+      <div class="user-panel-inner">
+        <div>
+          <div class="user-name" id="userName">Welcome!</div>
+          <div class="user-email" id="userEmail"></div>
+        </div>
+
+        <button class="nav-btn" onclick="logout()">Logout</button>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-value" id="studyTimeStat">00:00:00</div>
+        <div class="stat-label">Study Time</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="flashcardCount">0</div>
+        <div class="stat-label">Flashcards Created</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">Learning Potential</div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section>
+      <div class="section-title">
+        <h2>📚 Study Tools</h2>
+        <p>Choose a tool and start learning.</p>
+      </div>
+
+      <div class="services">
+
+        <div class="service">
+          <div class="service-icon">🧠</div>
+          <h3>Text → Flashcards</h3>
+          <p>Convert your study material into AI-generated flashcards.</p>
+          <button class="service-btn available" onclick="scrollToFlashcards()">
+            Use Now
+          </button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">▶️</div>
+          <h3>YouTube → Notes</h3>
+          <p>Turn educational YouTube videos into useful notes.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">🖼️</div>
+          <h3>Image → Text</h3>
+          <p>Extract text from images using OCR technology.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">📷</div>
+          <h3>Question Scanner</h3>
+          <p>Scan a question and get help with solving it.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">📝</div>
+          <h3>Notes → Quiz</h3>
+          <p>Generate practice questions and MCQs from your notes.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">📄</div>
+          <h3>PDF Export</h3>
+          <p>Save your notes and study material as PDF.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">🤖</div>
+          <h3>AI Tutor</h3>
+          <p>Ask questions and learn concepts with AI assistance.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">🗺️</div>
+          <h3>Mind Map</h3>
+          <p>Organize important concepts into visual study maps.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">📚</div>
+          <h3>Study Pack</h3>
+          <p>Create a complete study package from your material.</p>
+          <span class="coming">COMING SOON</span>
+          <button class="service-btn" onclick="comingSoon()">Open</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FLASHCARD WORKSPACE -->
+    <section id="flashcardsSection">
+      <div class="section-title">
+        <h2>🧠 Text → Flashcards</h2>
+        <p>Paste your notes below and let AI create flashcards.</p>
+      </div>
+
+      <div class="workspace">
+
+        <textarea
+          id="flashcardInput"
+          placeholder="Paste your study notes here...
+
+Example:
+Photosynthesis is the process by which green plants convert light energy into chemical energy. Chlorophyll absorbs sunlight..."
+        ></textarea>
+
+        <div class="workspace-actions">
+          <button class="primary-btn" onclick="generateFlashcards()">
+            ✨ Generate Flashcards
+          </button>
+        </div>
+
+        <div class="loading" id="flashcardLoading">
+          🤖 AI is creating your flashcards...
+        </div>
+
+        <div class="flashcards" id="flashcardsOutput"></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 <strong>SKNotes</strong></div>
+    <div>Created by <strong>Sailendra</strong></div>
+    <div>
+      Instagram:
+      <a
+        href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        @also__sk
+      </a>
+    </div>
+  </footer>
+
+
+  <!-- TIMER -->
+  <div class="timer-overlay" id="timerOverlay">
+
+    <div class="timer-box">
+
+      <h2>⏱️ Study Timer</h2>
+
+      <div class="timer-display" id="timerDisplay">
+        25:00
+      </div>
+
+      <div class="timer-controls">
+
+        <button class="start" onclick="startTimer()">
+          ▶ Start
+        </button>
+
+        <button onclick="pauseTimer()">
+          ⏸ Pause
+        </button>
+
+        <button onclick="resetTimer()">
+          ↻ Reset
+        </button>
+
+        <button onclick="closeTimer()">
+          ✕ Close
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
-</header>
 
 
-<section class="hero">
-  <h1>Study Smarter with <span>SKNotes</span></h1>
+  <!-- AUTH MODAL -->
+  <div class="modal" id="authModal">
 
-  <p>
-    Notes, flashcards, quizzes aur study tools —
-    sab ek hi jagah.
-  </p>
-</section>
+    <div class="modal-box">
 
+      <div class="modal-header">
+        <h2 id="authTitle">Login</h2>
+        <button class="close" onclick="closeAuth()">×</button>
+      </div>
 
-<main class="container">
+      <form onsubmit="handleAuth(event)">
 
-  <h2 class="section-title">🚀 Study Services</h2>
+        <div class="field" id="nameField" style="display:none;">
+          <label>Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Your name"
+          />
+        </div>
 
-  <div class="services">
+        <div class="field">
+          <label>Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
 
-    <div class="service active">
-      <h3>🃏 Text → Flashcards</h3>
-      <p>
-        Apne notes paste karke AI flashcards banao.
-      </p>
-      <span class="badge">AVAILABLE</span>
-    </div>
+        <div class="field">
+          <label>Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="••••••••"
+            required
+            minlength="6"
+          />
+        </div>
 
-    <div class="service coming"
-         onclick="comingSoon()">
-      <h3>📺 YouTube → Notes</h3>
-      <p>
-        YouTube lecture ko useful study notes mein convert karo.
-      </p>
-      <span class="badge soon">COMING SOON</span>
-    </div>
+        <button class="primary-btn auth-submit" type="submit" id="authSubmit">
+          Login
+        </button>
 
-    <div class="service coming"
-         onclick="comingSoon()">
-      <h3>📷 Image → Text</h3>
-      <p>
-        Notes ki photo se text extract karo.
-      </p>
-      <span class="badge soon">COMING SOON</span>
-    </div>
+      </form>
 
-    <div class="service coming"
-         onclick="comingSoon()">
-      <h3>📸 Question Scanner</h3>
-      <p>
-        Question ki photo scan karke explanation pao.
-      </p>
-      <span class="badge soon">COMING SOON</span>
-    </div>
+      <div class="auth-message" id="authMessage"></div>
 
-    <div class="service coming"
-         onclick="comingSoon()">
-      <h3>🧠 Notes → Quiz</h3>
-      <p>
-        Notes se practice MCQs generate karo.
-      </p>
-      <span class="badge soon">COMING SOON</span>
-    </div>
+      <div class="auth-switch">
+        <span id="switchText">Don't have an account?</span>
 
-    <div class="service coming"
-         onclick="comingSoon()">
-      <h3>📄 PDF Export</h3>
-      <p>
-        Notes ko clean PDF mein export karo.
-      </p>
-      <span class="badge soon">COMING SOON</span>
+        <button onclick="switchAuthMode()" id="switchBtn">
+          Sign Up
+        </button>
+      </div>
+
     </div>
 
   </div>
 
-
-  <div class="card">
-
-    <h2>🃏 Text → Flashcards</h2>
-
-    <p class="desc">
-      Apne notes ya study material ko neeche paste karo.
-    </p>
-
-    <textarea
-      id="notesInput"
-      placeholder="Yahan apne notes paste karo..."></textarea>
-
-    <button
-      id="generateBtn"
-      class="generate"
-      type="button"
-      onclick="generateFlashcards()">
-      ✨ Generate Flashcards
-    </button>
-
-    <div id="errorBox" class="error"></div>
-
-    <div id="result" class="result"></div>
-
-  </div>
-
-</main>
-
-
-<footer>
-  © 2026 SKNotes — AI Study Assistant
-</footer>
-
-
-<!-- FULL SCREEN STUDY TIMER -->
-
-<div id="timerOverlay">
-
-  <div class="timer-box">
-
-    <div class="timer-title">
-      📚 SKNotes Study Timer
-    </div>
-
-    <div class="timer-label">
-      Kitne minutes padhna hai?
-    </div>
-
-    <input
-      id="timerMinutes"
-      class="timer-input"
-      type="number"
-      min="1"
-      max="1440"
-      value="25"
-      placeholder="Minutes">
-
-    <div
-      id="timerDisplay"
-      class="timer-display">
-      25:00
-    </div>
-
-    <div class="timer-buttons">
-
-      <button
-        class="start-btn"
-        type="button"
-        onclick="startTimer()">
-        ▶ Start
-      </button>
-
-      <button
-        class="pause-btn"
-        type="button"
-        onclick="pauseTimer()">
-        ⏸ Pause
-      </button>
-
-      <button
-        class="reset-btn"
-        type="button"
-        onclick="resetTimer()">
-        ↻ Reset
-      </button>
-
-      <button
-        class="close-btn"
-        type="button"
-        onclick="closeTimer()">
-        ✕ Close
-      </button>
-
-    </div>
-
-    <div
-      id="studyTotal"
-      class="study-total">
-      Aaj ka study time: 0 min
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- Supabase -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+  /* =========================================================
+     SUPABASE
+     ========================================================= */
 
-  const SUPABASE_URL =
-    "YAHAN_APNA_PROJECT_URL_DALO";
-
-  const SUPABASE_KEY =
-    "YAHAN_APNI_PUBLISHABLE_KEY_DALO";
+  const SUPABASE_URL = "https://ejwdvlenqdfelmahajct.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_qy0u-EQxaagkqQioyeNfgA_xvN6amzA";
 
   const supabaseClient =
     window.supabase.createClient(
@@ -561,47 +875,394 @@
     );
 
 
-  /* =========================
+  /* =========================================================
+     THEME
+     ========================================================= */
+
+  function loadTheme() {
+    const saved = localStorage.getItem("sknotes-theme");
+
+    if (saved === "dark") {
+      document.body.classList.add("dark");
+      document.getElementById("themeBtn").textContent = "☀️";
+    } else {
+      document.getElementById("themeBtn").textContent = "🌙";
+    }
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const dark =
+      document.body.classList.contains("dark");
+
+    localStorage.setItem(
+      "sknotes-theme",
+      dark ? "dark" : "light"
+    );
+
+    document.getElementById("themeBtn").textContent =
+      dark ? "☀️" : "🌙";
+  }
+
+
+  /* =========================================================
+     AUTH
+     ========================================================= */
+
+  let authMode = "login";
+
+  function openAuth() {
+    document.getElementById("authModal").style.display = "flex";
+    document.getElementById("authMessage").textContent = "";
+  }
+
+  function closeAuth() {
+    document.getElementById("authModal").style.display = "none";
+  }
+
+  function switchAuthMode() {
+
+    authMode =
+      authMode === "login"
+        ? "signup"
+        : "login";
+
+    const signup = authMode === "signup";
+
+    document.getElementById("authTitle").textContent =
+      signup ? "Create Account" : "Login";
+
+    document.getElementById("authSubmit").textContent =
+      signup ? "Sign Up" : "Login";
+
+    document.getElementById("nameField").style.display =
+      signup ? "block" : "none";
+
+    document.getElementById("switchText").textContent =
+      signup
+        ? "Already have an account?"
+        : "Don't have an account?";
+
+    document.getElementById("switchBtn").textContent =
+      signup ? "Login" : "Sign Up";
+
+    document.getElementById("authMessage").textContent = "";
+  }
+
+
+  async function handleAuth(event) {
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const fullName =
+      document.getElementById("fullName").value.trim();
+
+    const message =
+      document.getElementById("authMessage");
+
+    message.textContent = "Please wait...";
+
+    try {
+
+      if (authMode === "signup") {
+
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+
+            email,
+            password,
+
+            options: {
+              data: {
+                full_name: fullName
+              }
+            }
+
+          });
+
+        if (error) throw error;
+
+        message.textContent =
+          "Account created successfully.";
+
+        setTimeout(() => {
+          closeAuth();
+        }, 1000);
+
+      } else {
+
+        const { data, error } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) throw error;
+
+        message.textContent =
+          "Login successful!";
+
+        setTimeout(() => {
+          closeAuth();
+          updateUserUI();
+        }, 500);
+      }
+
+    } catch (error) {
+
+      message.textContent =
+        error.message || "Something went wrong.";
+
+    }
+  }
+
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    updateUserUI();
+  }
+
+
+  async function updateUserUI() {
+
+    const {
+      data: {
+        session
+      }
+    } = await supabaseClient.auth.getSession();
+
+    const authBtn =
+      document.getElementById("authBtn");
+
+    const panel =
+      document.getElementById("userPanel");
+
+    if (session && session.user) {
+
+      const user = session.user;
+
+      const name =
+        user.user_metadata?.full_name ||
+        user.email?.split("@")[0] ||
+        "Student";
+
+      document.getElementById("userName").textContent =
+        "👋 Welcome, " + name;
+
+      document.getElementById("userEmail").textContent =
+        user.email || "";
+
+      panel.style.display = "block";
+
+      authBtn.textContent = "Account";
+
+    } else {
+
+      panel.style.display = "none";
+
+      authBtn.textContent = "Login";
+    }
+  }
+
+
+  supabaseClient.auth.onAuthStateChange(
+    function() {
+      updateUserUI();
+    }
+  );
+
+
+  /* =========================================================
+     TIMER
+     ========================================================= */
+
+  let timerSeconds = 25 * 60;
+  let timerRunning = false;
+  let timerInterval = null;
+
+  let totalStudySeconds =
+    Number(
+      localStorage.getItem(
+        "sknotes-study-seconds"
+      ) || 0
+    );
+
+
+  function formatTime(seconds) {
+
+    const h =
+      Math.floor(seconds / 3600);
+
+    const m =
+      Math.floor((seconds % 3600) / 60);
+
+    const s =
+      seconds % 60;
+
+    return (
+      String(h).padStart(2, "0") +
+      ":" +
+      String(m).padStart(2, "0") +
+      ":" +
+      String(s).padStart(2, "0")
+    );
+  }
+
+
+  function formatTimer(seconds) {
+
+    const m =
+      Math.floor(seconds / 60);
+
+    const s =
+      seconds % 60;
+
+    return (
+      String(m).padStart(2, "0") +
+      ":" +
+      String(s).padStart(2, "0")
+    );
+  }
+
+
+  function updateTimerDisplay() {
+
+    document.getElementById("timerDisplay").textContent =
+      formatTimer(timerSeconds);
+
+    document.getElementById("studyTimeStat").textContent =
+      formatTime(totalStudySeconds);
+  }
+
+
+  function openTimer() {
+
+    document.getElementById("timerOverlay").style.display =
+      "flex";
+
+    updateTimerDisplay();
+  }
+
+
+  function closeTimer() {
+
+    document.getElementById("timerOverlay").style.display =
+      "none";
+  }
+
+
+  function startTimer() {
+
+    if (timerRunning) return;
+
+    timerRunning = true;
+
+    timerInterval =
+      setInterval(function() {
+
+        if (timerSeconds > 0) {
+
+          timerSeconds--;
+
+          totalStudySeconds++;
+
+          localStorage.setItem(
+            "sknotes-study-seconds",
+            totalStudySeconds
+          );
+
+          updateTimerDisplay();
+
+        } else {
+
+          pauseTimer();
+
+          alert("🎉 Study session complete!");
+
+        }
+
+      }, 1000);
+  }
+
+
+  function pauseTimer() {
+
+    timerRunning = false;
+
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+
+  function resetTimer() {
+
+    pauseTimer();
+
+    timerSeconds = 25 * 60;
+
+    updateTimerDisplay();
+  }
+
+
+  /* =========================================================
      FLASHCARDS
-  ========================= */
+     ========================================================= */
+
+  let createdFlashcards = Number(
+    localStorage.getItem(
+      "sknotes-flashcards-count"
+    ) || 0
+  );
+
+  document.getElementById("flashcardCount").textContent =
+    createdFlashcards;
+
+
+  function scrollToFlashcards() {
+
+    document
+      .getElementById("flashcardsSection")
+      .scrollIntoView({
+        behavior: "smooth"
+      });
+  }
+
 
   async function generateFlashcards() {
 
     const input =
-      document.getElementById("notesInput");
+      document
+        .getElementById("flashcardInput")
+        .value.trim();
 
-    const button =
-      document.getElementById("generateBtn");
+    const output =
+      document.getElementById("flashcardsOutput");
 
-    const result =
-      document.getElementById("result");
+    const loading =
+      document.getElementById("flashcardLoading");
 
-    const errorBox =
-      document.getElementById("errorBox");
+    if (!input) {
 
-    const text =
-      input.value.trim();
-
-    errorBox.style.display = "none";
-
-    if (!text) {
-
-      errorBox.textContent =
-        "Pehle notes enter karo.";
-
-      errorBox.style.display =
-        "block";
+      alert(
+        "Please paste some study material first."
+      );
 
       return;
     }
 
-    button.disabled = true;
-
-    button.textContent =
-      "⏳ Flashcards ban rahe hain...";
-
-    result.innerHTML =
-      "<p>AI flashcards bana raha hai...</p>";
+    loading.style.display = "block";
+    output.innerHTML = "";
 
     try {
 
@@ -615,7 +1276,7 @@
           },
 
           body: JSON.stringify({
-            text: text
+            text: input
           })
 
         });
@@ -626,326 +1287,121 @@
 
 
       if (!response.ok) {
+
         throw new Error(
           data.error ||
-          "Flashcards generate nahi ho paye."
+          "Unable to generate flashcards."
         );
+
       }
 
 
-      const flashcards =
+      const cards =
         data.flashcards || [];
 
 
-      result.innerHTML = "";
+      if (!cards.length) {
+
+        throw new Error(
+          "No flashcards were generated."
+        );
+
+      }
 
 
-      flashcards.forEach(
-        (card, index) => {
+      cards.forEach(function(card) {
 
-          const div =
-            document.createElement("div");
+        const question =
+          card.question ||
+          card.front ||
+          "Question";
 
-          div.className =
-            "flashcard";
+        const answer =
+          card.answer ||
+          card.back ||
+          "Answer";
 
-          div.innerHTML = `
-            <div class="question">
-              ${index + 1}. ${escapeHtml(card.question)}
-            </div>
 
-            <div class="answer">
-              ${escapeHtml(card.answer)}
-            </div>
-          `;
+        const div =
+          document.createElement("div");
 
-          result.appendChild(div);
+        div.className = "flashcard";
 
-        }
+        div.innerHTML = `
+          <div class="flashcard-q">
+            Q. ${escapeHTML(question)}
+          </div>
+
+          <div class="flashcard-a">
+            A. ${escapeHTML(answer)}
+          </div>
+        `;
+
+        output.appendChild(div);
+
+      });
+
+
+      createdFlashcards += cards.length;
+
+      localStorage.setItem(
+        "sknotes-flashcards-count",
+        createdFlashcards
       );
+
+      document.getElementById(
+        "flashcardCount"
+      ).textContent = createdFlashcards;
 
 
     } catch (error) {
 
-      errorBox.textContent =
-        error.message ||
-        "Something went wrong.";
-
-      errorBox.style.display =
-        "block";
-
-      result.innerHTML = "";
+      output.innerHTML = `
+        <div class="flashcard">
+          ❌ ${escapeHTML(
+            error.message ||
+            "Something went wrong."
+          )}
+        </div>
+      `;
 
     } finally {
 
-      button.disabled = false;
-
-      button.textContent =
-        "✨ Generate Flashcards";
-
+      loading.style.display = "none";
     }
-
   }
 
 
-  function escapeHtml(value) {
+  function escapeHTML(value) {
 
     return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
 
-  /* =========================
+  /* =========================================================
      COMING SOON
-  ========================= */
+     ========================================================= */
 
   function comingSoon() {
 
     alert(
-      "Ye service jaldi SKNotes mein available hogi. 🚀"
+      "🚧 This feature is coming soon in SKNotes."
     );
-
   }
 
 
-  /* =========================
-     LOGIN
-  ========================= */
-
-  function openLogin() {
-
-    alert(
-      "Login system ko next step mein connect karenge."
-    );
-
-  }
-
-
-  /* =========================
-     STUDY TIMER
-  ========================= */
-
-  let timerInterval = null;
-
-  let remainingSeconds = 25 * 60;
-
-  let totalStudySeconds = 0;
-
-  let timerRunning = false;
-
-
-  function openTimer() {
-
-    document.getElementById(
-      "timerOverlay"
-    ).style.display = "flex";
-
-    updateTimerDisplay();
-
-  }
-
-
-  function closeTimer() {
-
-    pauseTimer();
-
-    document.getElementById(
-      "timerOverlay"
-    ).style.display = "none";
-
-  }
-
-
-  function startTimer() {
-
-    if (timerRunning) {
-      return;
-    }
-
-
-    const input =
-      document.getElementById(
-        "timerMinutes"
-      );
-
-    let minutes =
-      Number(input.value);
-
-
-    if (
-      !Number.isFinite(minutes) ||
-      minutes < 1
-    ) {
-
-      minutes = 25;
-
-      input.value = 25;
-
-    }
-
-
-    if (
-      remainingSeconds <= 0 ||
-      remainingSeconds === Number(input.value) * 60
-    ) {
-
-      remainingSeconds =
-        Math.min(minutes, 1440) * 60;
-
-    }
-
-
-    timerRunning = true;
-
-
-    timerInterval =
-      setInterval(() => {
-
-        if (remainingSeconds <= 0) {
-
-          clearInterval(timerInterval);
-
-          timerInterval = null;
-
-          timerRunning = false;
-
-          updateTimerDisplay();
-
-          alert(
-            "🎉 Study session complete!"
-          );
-
-          return;
-
-        }
-
-
-        remainingSeconds--;
-
-        totalStudySeconds++;
-
-        updateTimerDisplay();
-
-        updateStudyTotal();
-
-      }, 1000);
-
-  }
-
-
-  function pauseTimer() {
-
-    if (timerInterval) {
-
-      clearInterval(
-        timerInterval
-      );
-
-      timerInterval = null;
-
-    }
-
-    timerRunning = false;
-
-  }
-
-
-  function resetTimer() {
-
-    pauseTimer();
-
-    const input =
-      document.getElementById(
-        "timerMinutes"
-      );
-
-    let minutes =
-      Number(input.value);
-
-
-    if (
-      !Number.isFinite(minutes) ||
-      minutes < 1
-    ) {
-      minutes = 25;
-      input.value = 25;
-    }
-
-
-    minutes =
-      Math.min(minutes, 1440);
-
-
-    remainingSeconds =
-      minutes * 60;
-
-
-    updateTimerDisplay();
-
-  }
-
-
-  function updateTimerDisplay() {
-
-    const display =
-      document.getElementById(
-        "timerDisplay"
-      );
-
-    const minutes =
-      Math.floor(
-        remainingSeconds / 60
-      );
-
-    const seconds =
-      remainingSeconds % 60;
-
-
-    display.textContent =
-      String(minutes).padStart(2, "0") +
-      ":" +
-      String(seconds).padStart(2, "0");
-
-  }
-
-
-  function updateStudyTotal() {
-
-    const element =
-      document.getElementById(
-        "studyTotal"
-      );
-
-    const minutes =
-      Math.floor(
-        totalStudySeconds / 60
-      );
-
-    element.textContent =
-      "Aaj ka study time: " +
-      minutes +
-      " min";
-
-  }
-
-
-  document
-    .getElementById("timerMinutes")
-    .addEventListener(
-      "input",
-      function () {
-
-        if (!timerRunning) {
-          resetTimer();
-        }
-
-      }
-    );
+  /* =========================================================
+     START
+     ========================================================= */
+
+  loadTheme();
+  updateTimerDisplay();
+  updateUserUI();
 
 </script>
 
