@@ -574,6 +574,7 @@ footer a:hover{
     <button class="nav-btn" onclick="logout()">
       Logout
     </button>
+    <button class="nav-btn" id="installBtn" style="display:none;">📱 Install App</button>
 
   </div>
 
@@ -1534,7 +1535,25 @@ updateAccount();
   });
   }
   
+let deferredPrompt;
 
+window.addEventListener("beforeinstallprompt", function(event) {
+  event.preventDefault();
+  deferredPrompt = event;
+
+  const installBtn = document.getElementById("installBtn");
+  installBtn.style.display = "block";
+
+  installBtn.onclick = async function() {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  };
+});
 </script>
 
 </body>
