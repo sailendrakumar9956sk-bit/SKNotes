@@ -553,12 +553,11 @@ footer a:hover{
       </button>
 
       <button
-        class="nav-btn"
-        onclick="openDocuments()"
-        id="documentsBtn"
-        style="display:none;"
-      >
-        📁 My Documents
+  class="nav-btn"
+  onclick="openDocuments()"
+  id="documentsBtn"
+>
+  📁 My Documents
       </button>
 
     </div>
@@ -1616,7 +1615,7 @@ async function updateAccount(){
       "Login";
 
     documentsBtn.style.display =
-      "none";
+  "block";
 
     const section =
       document.getElementById(
@@ -1658,7 +1657,21 @@ supabaseClient.auth.onAuthStateChange(
    MY DOCUMENTS
    ===================================================== */
 
-function openDocuments(){
+async function openDocuments(){
+
+  const { data:{user} } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+
+    alert(
+      "🔐 My Documents use karne ke liye pehle Login karo."
+    );
+
+    openAuth();
+
+    return;
+  }
 
   const section =
     document.getElementById(
