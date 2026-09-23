@@ -121,6 +121,8 @@ ${text.slice(0, 30000)}
     });
   }
 });
+
+
 /* =========================
    NOTES → QUIZ / MCQ
 ========================= */
@@ -171,7 +173,7 @@ ${text.slice(0, 30000)}
 `;
 
     const completion = await ai.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "user",
@@ -203,7 +205,9 @@ ${text.slice(0, 30000)}
       throw new Error("AI quiz format invalid.");
     }
 
-    res.json({ quiz });
+    res.json({
+      quiz
+    });
 
   } catch (err) {
     console.error("Quiz error:", err);
@@ -348,8 +352,10 @@ ${transcript.slice(0, 50000)}
 
 app.post("/api/pdf", async (req, res) => {
   try {
-    const { title = "SKNotes", notes = "" } =
-      req.body || {};
+    const {
+      title = "SKNotes",
+      notes = ""
+    } = req.body || {};
 
     if (!notes.trim()) {
       return res.status(400).json({
