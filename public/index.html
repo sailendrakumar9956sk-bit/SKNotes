@@ -1519,6 +1519,88 @@ function soon(){
   );
 
 }
+  function goQuiz(){
+  document.getElementById("quizSection").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+async function generateQuiz(){
+
+  const text = document.getElementById("quizInput").value.trim();
+  const output = document.getElementById("quizOutput");
+  const loading = document.getElementById("quizLoading");
+
+  if(!text){
+    alert("Pehle apne notes paste karo.");
+    return;
+  }
+
+  loading.style.display = "block";
+  output.innerHTML = "";
+
+  try{
+
+    const response = await fetch("/api/quiz",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({text:text})
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || "Quiz generate nahi hua.");
+    }
+
+    const quiz = data.quiz || [];
+
+    quiz.forEach(function(q,index){
+
+      const div = document.createElement("div");
+      div.className = "flashcard";
+
+      let options = (q.options || []).map(function(option){
+
+        return "<div style='margin:6px 0;'>• " +
+          safe(option) +
+          "</div>";
+
+      }).join("");
+
+      div.innerHTML =
+        "<div class='q'>" +
+        (index + 1) +
+        ". " +
+        safe(q.question) +
+        "</div>" +
+
+        "<div class='a'>" +
+        options +
+        "<strong>Answer: " +
+        safe(q.answer) +
+        "</strong>" +
+        "</div>";
+
+      output.appendChild(div);
+
+    });
+
+  }catch(error){
+
+    output.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
+      "</div>";
+
+  }finally{
+
+    loading.style.display = "none";
+
+  }
+  }
 
 
 /* =====================================================
