@@ -1641,3 +1641,25 @@ window.addEventListener("beforeinstallprompt", function(event) {
 
 </body>
   </html>
+<section id="quizSection">
+  <div class="section-title">
+    <h2>📝 Notes → Quiz</h2>
+    <p>Paste your notes and generate AI MCQs.</p>
+  </div>
+
+  <div class="workspace">
+    <textarea id="quizInput" placeholder="Paste your study notes here..."></textarea>
+
+    <div class="workspace-actions">
+      <button class="primary" onclick="generateQuiz()">
+        ✨ Generate Quiz
+      </button>
+    </div>
+
+    <div class="loading" id="quizLoading">
+      🤖 AI is creating your quiz...
+    </div>
+
+    <div class="flashcards" id="quizOutput"></div>
+  </div>
+</section>
