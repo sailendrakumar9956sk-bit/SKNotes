@@ -1482,7 +1482,6 @@ async function authSubmit(event){
   message.textContent =
     "Please wait...";
 
-
   try{
 
     if(authMode === "signup"){
@@ -1490,22 +1489,20 @@ async function authSubmit(event){
       const result =
         await supabaseClient.auth.signUp({
 
-          email:email,
+          email: email,
 
-          password:password,
+          password: password,
 
-          options:{
-            data:{
-              full_name:name
+          options: {
+            data: {
+              full_name: name
             }
           }
 
         });
 
-
       if(result.error)
         throw result.error;
-
 
       message.textContent =
         "Account created successfully.";
@@ -1515,37 +1512,33 @@ async function authSubmit(event){
         1000
       );
 
-
     }else{
 
       const result =
         await supabaseClient.auth
           .signInWithPassword({
 
-            email:email,
+            email: email,
 
-            password:password
+            password: password
 
           });
-
 
       if(result.error)
         throw result.error;
 
-
       message.textContent =
         "Login successful!";
 
-      message.textContent =
-  "Login successful!";
+      await updateAccount();
 
-await updateAccount();
+      setTimeout(function(){
 
-setTimeout(function(){
+        closeAuth();
 
-  closeAuth();
+      },700);
 
-},700);
+    }
 
   }catch(error){
 
@@ -1555,7 +1548,7 @@ setTimeout(function(){
 
   }
 
-}
+  }
 
 
 /* =====================================================
