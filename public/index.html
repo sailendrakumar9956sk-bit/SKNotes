@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest.json">
 <title>SKNotes - AI Study Assistant</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -37,7 +37,6 @@ body{
 }
 
 button,input,textarea{font:inherit}
-
 button{cursor:pointer}
 
 .container{
@@ -75,6 +74,7 @@ header{
 .nav-actions{
   display:flex;
   gap:8px;
+  flex-wrap:wrap;
 }
 
 .nav-btn{
@@ -286,7 +286,8 @@ textarea{
   outline:none;
 }
 
-textarea:focus,input:focus{
+textarea:focus,
+input:focus{
   border-color:var(--primary);
 }
 
@@ -323,6 +324,18 @@ textarea:focus,input:focus{
 .flashcard .a{
   color:var(--muted);
   line-height:1.5;
+}
+
+/* DOCUMENTS */
+
+#documentsSection{
+  margin-top:25px;
+}
+
+.document-info{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:8px;
 }
 
 /* TIMER */
@@ -478,12 +491,15 @@ footer a:hover{
 /* MOBILE */
 
 @media(max-width:800px){
+
   .services{
     grid-template-columns:repeat(2,1fr);
   }
+
 }
 
 @media(max-width:600px){
+
   .services{
     grid-template-columns:1fr;
   }
@@ -505,13 +521,17 @@ footer a:hover{
     padding:8px 9px;
     font-size:12px;
   }
+
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+
 <header>
+
   <div class="container nav">
 
     <div class="logo">
@@ -532,12 +552,25 @@ footer a:hover{
         Login
       </button>
 
+      <button
+        class="nav-btn"
+        onclick="openDocuments()"
+        id="documentsBtn"
+        style="display:none;"
+      >
+        📁 My Documents
+      </button>
+
     </div>
+
   </div>
+
 </header>
 
 
 <main class="container">
+
+<!-- HERO -->
 
 <section class="hero">
 
@@ -565,17 +598,30 @@ footer a:hover{
   <div class="account-inner">
 
     <div>
+
       <div class="account-name" id="accountName">
         👋 Welcome
       </div>
 
       <div class="account-email" id="accountEmail"></div>
+
     </div>
 
-    <button class="nav-btn" onclick="logout()">
-      Logout
-    </button>
-    <button class="nav-btn" id="installBtn" style="display:none;">📱 Install App</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+
+      <button class="nav-btn" onclick="logout()">
+        Logout
+      </button>
+
+      <button
+        class="nav-btn"
+        id="installBtn"
+        style="display:none;"
+      >
+        📱 Install App
+      </button>
+
+    </div>
 
   </div>
 
@@ -608,124 +654,360 @@ footer a:hover{
 
 <section>
 
-<div class="section-title">
-  <h2>📚 Study Tools</h2>
-  <p>Everything you need for smarter studying.</p>
-</div>
+  <div class="section-title">
+
+    <h2>📚 Study Tools</h2>
+
+    <p>
+      Everything you need for smarter studying.
+    </p>
+
+  </div>
 
 
-<div class="services">
+  <div class="services">
 
 
-<div class="service">
-  <div class="icon">🧠</div>
-  <h3>Text → Flashcards</h3>
-  <p>Create AI flashcards from your notes.</p>
-  <button class="primary" onclick="goFlashcards()">
-    Use Now
-  </button>
-</div>
+    <div class="service">
+
+      <div class="icon">🧠</div>
+
+      <h3>Text → Flashcards</h3>
+
+      <p>
+        Create AI flashcards from your notes.
+      </p>
+
+      <button
+        class="primary"
+        onclick="goFlashcards()"
+      >
+        Use Now
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">▶️</div>
-  <h3>YouTube → Notes</h3>
-  <p>Convert educational videos into notes.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">▶️</div>
+
+      <h3>YouTube → Notes</h3>
+
+      <p>
+        Convert educational videos into notes.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">🖼️</div>
-  <h3>Image → Text</h3>
-  <p>Extract text from images using OCR.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">🖼️</div>
+
+      <h3>Image → Text</h3>
+
+      <p>
+        Extract text from images using OCR.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">📷</div>
-  <h3>Question Scanner</h3>
-  <p>Scan questions and get study help.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">📷</div>
+
+      <h3>Question Scanner</h3>
+
+      <p>
+        Scan questions and get study help.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">📝</div>
-  <h3>Notes → Quiz</h3>
-  <p>Create quizzes and MCQs from notes.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">📝</div>
+
+      <h3>Notes → Quiz</h3>
+
+      <p>
+        Create quizzes and MCQs from notes.
+      </p>
+
+      <button
+        class="primary"
+        onclick="goQuiz()"
+      >
+        Use Now
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">📄</div>
-  <h3>PDF Export</h3>
-  <p>Export your study material as PDF.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">📄</div>
+
+      <h3>PDF Export</h3>
+
+      <p>
+        Export your study material as PDF.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">🤖</div>
-  <h3>AI Tutor</h3>
-  <p>Ask questions and learn concepts.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">🤖</div>
+
+      <h3>AI Tutor</h3>
+
+      <p>
+        Ask questions and learn concepts.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">🗺️</div>
-  <h3>Mind Map</h3>
-  <p>Create visual maps for your subjects.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">🗺️</div>
+
+      <h3>Mind Map</h3>
+
+      <p>
+        Create visual maps for your subjects.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">📚</div>
-  <h3>Study Pack</h3>
-  <p>Create a complete study package.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">📚</div>
+
+      <h3>Study Pack</h3>
+
+      <p>
+        Create a complete study package.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">📊</div>
-  <h3>Study Progress</h3>
-  <p>Track your learning and study time.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">📊</div>
+
+      <h3>Study Progress</h3>
+
+      <p>
+        Track your learning and study time.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">⭐</div>
-  <h3>Saved Notes</h3>
-  <p>Save important study material.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
+
+      <div class="icon">⭐</div>
+
+      <h3>Saved Notes</h3>
+
+      <p>
+        Save important study material.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
 
 
-<div class="service">
-  <div class="icon">🔍</div>
-  <h3>Smart Search</h3>
-  <p>Find your study content quickly.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
+    <div class="service">
 
-</div>
+      <div class="icon">🔍</div>
+
+      <h3>Smart Search</h3>
+
+      <p>
+        Find your study content quickly.
+      </p>
+
+      <span class="soon">
+        COMING SOON
+      </span>
+
+      <button
+        class="nav-btn"
+        onclick="soon()"
+      >
+        Open
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- MY DOCUMENTS -->
+
+<section
+  id="documentsSection"
+  style="display:none;"
+>
+
+  <div class="section-title">
+
+    <h2>📁 My Documents</h2>
+
+    <p>
+      Apne documents securely save, view aur download karo.
+    </p>
+
+    <div class="document-info">
+      PDF, DOC, DOCX, PNG, JPG supported.
+    </div>
+
+  </div>
+
+
+  <div class="workspace">
+
+    <input
+      type="file"
+      id="documentInput"
+      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+    >
+
+    <div class="workspace-actions">
+
+      <button
+        class="primary"
+        onclick="uploadDocument()"
+      >
+        ⬆️ Upload Document
+      </button>
+
+    </div>
+
+
+    <div
+      class="loading"
+      id="documentLoading"
+    >
+      ⏳ Uploading...
+    </div>
+
+
+    <div
+      class="flashcards"
+      id="documentList"
+    ></div>
+
+  </div>
 
 </section>
 
@@ -734,35 +1016,107 @@ footer a:hover{
 
 <section id="flashcardSection">
 
-<div class="section-title">
-  <h2>🧠 Text → Flashcards</h2>
-  <p>Paste your notes and generate flashcards using AI.</p>
-</div>
+  <div class="section-title">
 
-<div class="workspace">
+    <h2>🧠 Text → Flashcards</h2>
 
-<textarea
-id="flashInput"
-placeholder="Paste your study notes here..."
-></textarea>
+    <p>
+      Paste your notes and generate flashcards using AI.
+    </p>
 
-<div class="workspace-actions">
+  </div>
 
-<button class="primary" onclick="generateFlashcards()">
-✨ Generate Flashcards
-</button>
 
-</div>
+  <div class="workspace">
 
-<div class="loading" id="loading">
-🤖 AI is creating your flashcards...
-</div>
+    <textarea
+      id="flashInput"
+      placeholder="Paste your study notes here..."
+    ></textarea>
 
-<div class="flashcards" id="flashcards"></div>
 
-</div>
+    <div class="workspace-actions">
+
+      <button
+        class="primary"
+        onclick="generateFlashcards()"
+      >
+        ✨ Generate Flashcards
+      </button>
+
+    </div>
+
+
+    <div
+      class="loading"
+      id="loading"
+    >
+      🤖 AI is creating your flashcards...
+    </div>
+
+
+    <div
+      class="flashcards"
+      id="flashcards"
+    ></div>
+
+  </div>
 
 </section>
+
+
+<!-- QUIZ -->
+
+<section id="quizSection">
+
+  <div class="section-title">
+
+    <h2>📝 Notes → Quiz</h2>
+
+    <p>
+      Paste your notes and generate AI MCQs.
+    </p>
+
+  </div>
+
+
+  <div class="workspace">
+
+    <textarea
+      id="quizInput"
+      placeholder="Paste your study notes here..."
+    ></textarea>
+
+
+    <div class="workspace-actions">
+
+      <button
+        class="primary"
+        onclick="generateQuiz()"
+      >
+        ✨ Generate Quiz
+      </button>
+
+    </div>
+
+
+    <div
+      class="loading"
+      id="quizLoading"
+    >
+      🤖 AI is creating your quiz...
+    </div>
+
+
+    <div
+      class="flashcards"
+      id="quizOutput"
+    ></div>
+
+  </div>
+
+</section>
+
 
 </main>
 
@@ -771,143 +1125,190 @@ placeholder="Paste your study notes here..."
 
 <footer>
 
-<div>
-© 2026 <strong>SKNotes</strong>
-</div>
+  <div>
+    © 2026 <strong>SKNotes</strong>
+  </div>
 
-<div>
-Created by <strong>Sailendra</strong>
-</div>
+  <div>
+    Created by <strong>Sailendra</strong>
+  </div>
 
-<div>
-Instagram:
-<a
-href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
-target="_blank"
-rel="noopener noreferrer"
->
-@also__sk
-</a>
-</div>
+  <div>
+
+    Instagram:
+
+    <a
+      href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      @also__sk
+    </a>
+
+  </div>
 
 </footer>
 
 
 <!-- TIMER -->
 
-<div class="overlay" id="timerOverlay">
+<div
+  class="overlay"
+  id="timerOverlay"
+>
 
-<div class="timer-box">
+  <div class="timer-box">
 
-<h2>⏱️ Study Timer</h2>
+    <h2>⏱️ Study Timer</h2>
 
-<div class="timer" id="timer">
-25:00
-</div>
+    <div
+      class="timer"
+      id="timer"
+    >
+      25:00
+    </div>
 
-<div class="timer-buttons">
+    <div class="timer-buttons">
 
-<button onclick="startTimer()">▶ Start</button>
+      <button onclick="startTimer()">
+        ▶ Start
+      </button>
 
-<button onclick="pauseTimer()">⏸ Pause</button>
+      <button onclick="pauseTimer()">
+        ⏸ Pause
+      </button>
 
-<button onclick="resetTimer()">↻ Reset</button>
+      <button onclick="resetTimer()">
+        ↻ Reset
+      </button>
 
-<button onclick="closeTimer()">✕ Close</button>
+      <button onclick="closeTimer()">
+        ✕ Close
+      </button>
 
-</div>
+    </div>
 
-</div>
+  </div>
 
 </div>
 
 
 <!-- LOGIN -->
 
-<div class="modal" id="authModal">
+<div
+  class="modal"
+  id="authModal"
+>
 
-<div class="auth-box">
+  <div class="auth-box">
 
-<div class="auth-head">
+    <div class="auth-head">
 
-<h2 id="authTitle">
-Login
-</h2>
+      <h2 id="authTitle">
+        Login
+      </h2>
 
-<button class="close" onclick="closeAuth()">
-×
-</button>
+      <button
+        class="close"
+        onclick="closeAuth()"
+      >
+        ×
+      </button>
 
-</div>
-
-
-<form onsubmit="authSubmit(event)">
-
-<div class="field" id="nameBox" style="display:none">
-
-<label>Full Name</label>
-
-<input
-type="text"
-id="name"
-placeholder="Your name"
-/>
-
-</div>
+    </div>
 
 
-<div class="field">
+    <form onsubmit="authSubmit(event)">
 
-<label>Email</label>
+      <div
+        class="field"
+        id="nameBox"
+        style="display:none"
+      >
 
-<input
-type="email"
-id="email"
-placeholder="you@example.com"
-required
-/>
+        <label>
+          Full Name
+        </label>
 
-</div>
+        <input
+          type="text"
+          id="name"
+          placeholder="Your name"
+        >
 
-
-<div class="field">
-
-<label>Password</label>
-
-<input
-type="password"
-id="password"
-placeholder="Minimum 6 characters"
-required
-minlength="6"
-/>
-
-</div>
+      </div>
 
 
-<button class="primary auth-submit" type="submit">
-<span id="submitText">Login</span>
-</button>
+      <div class="field">
 
-</form>
+        <label>
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          required
+        >
+
+      </div>
 
 
-<div class="message" id="message"></div>
+      <div class="field">
+
+        <label>
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Minimum 6 characters"
+          required
+          minlength="6"
+        >
+
+      </div>
 
 
-<div class="switch">
+      <button
+        class="primary auth-submit"
+        type="submit"
+      >
 
-<span id="switchText">
-Don't have an account?
-</span>
+        <span id="submitText">
+          Login
+        </span>
 
-<button onclick="switchMode()" id="switchButton">
-Sign Up
-</button>
+      </button>
 
-</div>
+    </form>
 
-</div>
+
+    <div
+      class="message"
+      id="message"
+    ></div>
+
+
+    <div class="switch">
+
+      <span id="switchText">
+        Don't have an account?
+      </span>
+
+      <button
+        onclick="switchMode()"
+        id="switchButton"
+        type="button"
+      >
+        Sign Up
+      </button>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -929,6 +1330,22 @@ window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
+
+/* =====================================================
+   HELPER
+   ===================================================== */
+
+function safe(value){
+
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
 
 
 /* =====================================================
@@ -965,7 +1382,8 @@ function toggleDark(){
   );
 
   document.getElementById("darkBtn")
-    .textContent = dark ? "☀️" : "🌙";
+    .textContent =
+    dark ? "☀️" : "🌙";
 
 }
 
@@ -1009,7 +1427,8 @@ function switchMode(){
       .style.display = "block";
 
     document.getElementById("switchText")
-      .textContent = "Already have an account?";
+      .textContent =
+      "Already have an account?";
 
     document.getElementById("switchButton")
       .textContent = "Login";
@@ -1028,7 +1447,8 @@ function switchMode(){
       .style.display = "none";
 
     document.getElementById("switchText")
-      .textContent = "Don't have an account?";
+      .textContent =
+      "Don't have an account?";
 
     document.getElementById("switchButton")
       .textContent = "Sign Up";
@@ -1060,7 +1480,8 @@ async function authSubmit(event){
   const message =
     document.getElementById("message");
 
-  message.textContent = "Please wait...";
+  message.textContent =
+    "Please wait...";
 
 
   try{
@@ -1090,7 +1511,10 @@ async function authSubmit(event){
       message.textContent =
         "Account created successfully.";
 
-      setTimeout(closeAuth,1000);
+      setTimeout(
+        closeAuth,
+        1000
+      );
 
 
     }else{
@@ -1151,6 +1575,9 @@ async function updateAccount(){
   const loginBtn =
     document.getElementById("loginBtn");
 
+  const documentsBtn =
+    document.getElementById("documentsBtn");
+
 
   if(session){
 
@@ -1171,15 +1598,35 @@ async function updateAccount(){
       .textContent =
       user.email || "";
 
-    account.style.display = "block";
+    account.style.display =
+      "block";
 
-    loginBtn.textContent = "Account";
+    loginBtn.textContent =
+      "Account";
+
+    documentsBtn.style.display =
+      "block";
 
   }else{
 
-    account.style.display = "none";
+    account.style.display =
+      "none";
 
-    loginBtn.textContent = "Login";
+    loginBtn.textContent =
+      "Login";
+
+    documentsBtn.style.display =
+      "none";
+
+    const section =
+      document.getElementById(
+        "documentsSection"
+      );
+
+    if(section){
+      section.style.display =
+        "none";
+    }
 
   }
 
@@ -1190,6 +1637,9 @@ async function logout(){
 
   await supabaseClient.auth.signOut();
 
+  document.getElementById("documentList")
+    .innerHTML = "";
+
   updateAccount();
 
 }
@@ -1197,20 +1647,398 @@ async function logout(){
 
 supabaseClient.auth.onAuthStateChange(
   function(){
+
     updateAccount();
+
   }
 );
+
+
+/* =====================================================
+   MY DOCUMENTS
+   ===================================================== */
+
+function openDocuments(){
+
+  const section =
+    document.getElementById(
+      "documentsSection"
+    );
+
+  section.style.display =
+    "block";
+
+  section.scrollIntoView({
+    behavior:"smooth"
+  });
+
+  loadDocuments();
+
+}
+
+
+async function uploadDocument(){
+
+  const input =
+    document.getElementById(
+      "documentInput"
+    );
+
+  const file =
+    input.files[0];
+
+
+  if(!file){
+
+    alert(
+      "Pehle document select karo."
+    );
+
+    return;
+
+  }
+
+
+  const { data:{user} } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    alert(
+      "Pehle Login karo."
+    );
+
+    return;
+
+  }
+
+
+  const loading =
+    document.getElementById(
+      "documentLoading"
+    );
+
+  loading.style.display =
+    "block";
+
+
+  try{
+
+    const safeName =
+      file.name.replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_"
+      );
+
+
+    const filePath =
+      user.id +
+      "/" +
+      Date.now() +
+      "_" +
+      safeName;
+
+
+    const { error } =
+      await supabaseClient
+        .storage
+        .from("documents")
+        .upload(
+          filePath,
+          file
+        );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    input.value = "";
+
+
+    alert(
+      "✅ Document save ho gaya."
+    );
+
+
+    await loadDocuments();
+
+
+  }catch(error){
+
+    alert(
+      "Upload failed: " +
+      error.message
+    );
+
+
+  }finally{
+
+    loading.style.display =
+      "none";
+
+  }
+
+}
+
+
+async function loadDocuments(){
+
+  const list =
+    document.getElementById(
+      "documentList"
+    );
+
+
+  const { data:{user} } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    list.innerHTML =
+      "<div class='flashcard'>" +
+      "Pehle Login karo." +
+      "</div>";
+
+    return;
+
+  }
+
+
+  const { data,error } =
+    await supabaseClient
+      .storage
+      .from("documents")
+      .list(
+        user.id,
+        {
+          limit:100,
+          sortBy:{
+            column:"created_at",
+            order:"desc"
+          }
+        }
+      );
+
+
+  if(error){
+
+    list.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
+      "</div>";
+
+    return;
+
+  }
+
+
+  if(!data || data.length === 0){
+
+    list.innerHTML =
+      "<div class='flashcard'>" +
+      "Abhi koi document save nahi hai." +
+      "</div>";
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(function(file){
+
+    if(
+      file.name ===
+      ".emptyFolderPlaceholder"
+    ){
+
+      return;
+
+    }
+
+
+    const div =
+      document.createElement(
+        "div"
+      );
+
+    div.className =
+      "flashcard";
+
+
+    div.innerHTML =
+
+      "<div class='q'>📄 " +
+      safe(file.name) +
+      "</div>" +
+
+      "<div style='margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;'>" +
+
+      "<button class='primary' " +
+      "onclick=\"downloadDocument(" +
+      JSON.stringify(file.name) +
+      ")\">" +
+      "Open / Download" +
+      "</button>" +
+
+      "<button class='nav-btn' " +
+      "onclick=\"deleteDocument(" +
+      JSON.stringify(file.name) +
+      ")\">" +
+      "🗑️ Delete" +
+      "</button>" +
+
+      "</div>";
+
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+async function downloadDocument(
+  fileName
+){
+
+  const { data:{user} } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    alert(
+      "Pehle Login karo."
+    );
+
+    return;
+
+  }
+
+
+  const filePath =
+    user.id +
+    "/" +
+    fileName;
+
+
+  const { data,error } =
+    await supabaseClient
+      .storage
+      .from("documents")
+      .createSignedUrl(
+        filePath,
+        60
+      );
+
+
+  if(error){
+
+    alert(
+      "File open nahi hui: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  window.open(
+    data.signedUrl,
+    "_blank"
+  );
+
+}
+
+
+async function deleteDocument(
+  fileName
+){
+
+  const confirmed =
+    confirm(
+      "Kya aap ye document delete karna chahte hain?"
+    );
+
+
+  if(!confirmed)
+    return;
+
+
+  const { data:{user} } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    alert(
+      "Pehle Login karo."
+    );
+
+    return;
+
+  }
+
+
+  const filePath =
+    user.id +
+    "/" +
+    fileName;
+
+
+  const { error } =
+    await supabaseClient
+      .storage
+      .from("documents")
+      .remove([
+        filePath
+      ]);
+
+
+  if(error){
+
+    alert(
+      "Delete failed: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "🗑️ Document delete ho gaya."
+  );
+
+
+  loadDocuments();
+
+}
 
 
 /* =====================================================
    TIMER
    ===================================================== */
 
-let timerSeconds = 25 * 60;
+let timerSeconds =
+  25 * 60;
 
-let timerInterval = null;
+let timerInterval =
+  null;
 
-let running = false;
+let running =
+  false;
 
 let totalStudy =
   Number(
@@ -1223,15 +2051,20 @@ let totalStudy =
 function timerText(seconds){
 
   const min =
-    Math.floor(seconds / 60);
+    Math.floor(
+      seconds / 60
+    );
 
   const sec =
     seconds % 60;
 
+
   return (
-    String(min).padStart(2,"0") +
+    String(min)
+      .padStart(2,"0") +
     ":" +
-    String(sec).padStart(2,"0")
+    String(sec)
+      .padStart(2,"0")
   );
 
 }
@@ -1240,13 +2073,18 @@ function timerText(seconds){
 function studyText(seconds){
 
   const h =
-    Math.floor(seconds / 3600);
+    Math.floor(
+      seconds / 3600
+    );
 
   const m =
-    Math.floor((seconds % 3600) / 60);
+    Math.floor(
+      (seconds % 3600) / 60
+    );
 
   const s =
     seconds % 60;
+
 
   return (
     String(h).padStart(2,"0") +
@@ -1263,19 +2101,26 @@ function updateTimer(){
 
   document.getElementById("timer")
     .textContent =
-    timerText(timerSeconds);
+    timerText(
+      timerSeconds
+    );
 
-  document.getElementById("studyTime")
-    .textContent =
-    studyText(totalStudy);
+  document.getElementById(
+    "studyTime"
+  ).textContent =
+    studyText(
+      totalStudy
+    );
 
 }
 
 
 function openTimer(){
 
-  document.getElementById("timerOverlay")
-    .style.display = "flex";
+  document.getElementById(
+    "timerOverlay"
+  ).style.display =
+    "flex";
 
   updateTimer();
 
@@ -1284,58 +2129,75 @@ function openTimer(){
 
 function closeTimer(){
 
-  document.getElementById("timerOverlay")
-    .style.display = "none";
+  document.getElementById(
+    "timerOverlay"
+  ).style.display =
+    "none";
 
 }
 
 
 function startTimer(){
 
-  if(running) return;
+  if(running)
+    return;
 
-  running = true;
+  running =
+    true;
+
 
   timerInterval =
-    setInterval(function(){
+    setInterval(
+      function(){
 
-      if(timerSeconds > 0){
+        if(
+          timerSeconds > 0
+        ){
 
-        timerSeconds--;
+          timerSeconds--;
 
-        totalStudy++;
+          totalStudy++;
 
-        localStorage.setItem(
-          "sknotes-study-time",
-          totalStudy
-        );
 
-        updateTimer();
+          localStorage.setItem(
+            "sknotes-study-time",
+            totalStudy
+          );
 
-      }else{
 
-        pauseTimer();
+          updateTimer();
 
-        alert(
-          "🎉 Study session complete!"
-        );
+        }else{
 
-      }
+          pauseTimer();
 
-    },1000);
+          alert(
+            "🎉 Study session complete!"
+          );
+
+        }
+
+      },
+      1000
+    );
 
 }
 
 
 function pauseTimer(){
 
-  running = false;
+  running =
+    false;
+
 
   if(timerInterval){
 
-    clearInterval(timerInterval);
+    clearInterval(
+      timerInterval
+    );
 
-    timerInterval = null;
+    timerInterval =
+      null;
 
   }
 
@@ -1346,7 +2208,8 @@ function resetTimer(){
 
   pauseTimer();
 
-  timerSeconds = 25 * 60;
+  timerSeconds =
+    25 * 60;
 
   updateTimer();
 
@@ -1365,8 +2228,10 @@ let cardCount =
   );
 
 
-document.getElementById("cardCount")
-  .textContent = cardCount;
+document.getElementById(
+  "cardCount"
+).textContent =
+  cardCount;
 
 
 function goFlashcards(){
@@ -1383,14 +2248,21 @@ function goFlashcards(){
 async function generateFlashcards(){
 
   const text =
-    document.getElementById("flashInput")
-      .value.trim();
+    document.getElementById(
+      "flashInput"
+    ).value.trim();
+
 
   const output =
-    document.getElementById("flashcards");
+    document.getElementById(
+      "flashcards"
+    );
+
 
   const loading =
-    document.getElementById("loading");
+    document.getElementById(
+      "loading"
+    );
 
 
   if(!text){
@@ -1404,9 +2276,11 @@ async function generateFlashcards(){
   }
 
 
-  loading.style.display = "block";
+  loading.style.display =
+    "block";
 
-  output.innerHTML = "";
+  output.innerHTML =
+    "";
 
 
   try{
@@ -1444,66 +2318,262 @@ async function generateFlashcards(){
 
 
     const cards =
-      data.flashcards || [];
+      data.flashcards ||
+      [];
 
 
-    cards.forEach(function(card){
+    cards.forEach(
+      function(card){
 
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "flashcard";
-
-      div.innerHTML =
-        "<div class='q'>Q. " +
-        safe(card.question || card.front) +
-        "</div>" +
-
-        "<div class='a'>A. " +
-        safe(card.answer || card.back) +
-        "</div>";
-
-      output.appendChild(div);
-
-    });
+        const div =
+          document.createElement(
+            "div"
+          );
 
 
-    cardCount += cards.length;
+        div.className =
+          "flashcard";
+
+
+        div.innerHTML =
+          "<div class='q'>Q. " +
+          safe(
+            card.question ||
+            card.front
+          ) +
+          "</div>" +
+
+          "<div class='a'>A. " +
+          safe(
+            card.answer ||
+            card.back
+          ) +
+          "</div>";
+
+
+        output.appendChild(
+          div
+        );
+
+      }
+    );
+
+
+    cardCount +=
+      cards.length;
+
 
     localStorage.setItem(
       "sknotes-card-count",
       cardCount
     );
 
-    document.getElementById("cardCount")
-      .textContent = cardCount;
+
+    document.getElementById(
+      "cardCount"
+    ).textContent =
+      cardCount;
 
 
   }catch(error){
 
     output.innerHTML =
       "<div class='flashcard'>❌ " +
-      safe(error.message) +
+      safe(
+        error.message
+      ) +
       "</div>";
+
 
   }finally{
 
-    loading.style.display = "none";
+    loading.style.display =
+      "none";
 
   }
 
 }
 
 
-function safe(value){
+/* =====================================================
+   QUIZ
+   ===================================================== */
 
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+function goQuiz(){
+
+  document.getElementById(
+    "quizSection"
+  ).scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+async function generateQuiz(){
+
+  const text =
+    document.getElementById(
+      "quizInput"
+    ).value.trim();
+
+
+  const output =
+    document.getElementById(
+      "quizOutput"
+    );
+
+
+  const loading =
+    document.getElementById(
+      "quizLoading"
+    );
+
+
+  if(!text){
+
+    alert(
+      "Pehle apne notes paste karo."
+    );
+
+    return;
+
+  }
+
+
+  loading.style.display =
+    "block";
+
+  output.innerHTML =
+    "";
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/quiz",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            text:text
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Quiz generate nahi hua."
+      );
+
+    }
+
+
+    const quiz =
+      data.quiz ||
+      [];
+
+
+    if(
+      quiz.length === 0
+    ){
+
+      throw new Error(
+        "AI ne koi quiz question return nahi kiya."
+      );
+
+    }
+
+
+    quiz.forEach(
+      function(q,index){
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "flashcard";
+
+
+        let options =
+          (q.options || [])
+          .map(
+            function(option){
+
+              return (
+                "<div style='margin:6px 0;'>• " +
+                safe(option) +
+                "</div>"
+              );
+
+            }
+          )
+          .join("");
+
+
+        div.innerHTML =
+
+          "<div class='q'>" +
+          (index + 1) +
+          ". " +
+          safe(
+            q.question
+          ) +
+          "</div>" +
+
+          "<div class='a'>" +
+
+          options +
+
+          "<strong>Answer: " +
+          safe(
+            q.answer
+          ) +
+          "</strong>" +
+
+          "</div>";
+
+
+        output.appendChild(
+          div
+        );
+
+      }
+    );
+
+
+  }catch(error){
+
+    output.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(
+        error.message
+      ) +
+      "</div>";
+
+
+  }finally{
+
+    loading.style.display =
+      "none";
+
+  }
 
 }
 
@@ -1519,88 +2589,81 @@ function soon(){
   );
 
 }
-  function goQuiz(){
-  document.getElementById("quizSection").scrollIntoView({
-    behavior: "smooth"
-  });
+
+
+/* =====================================================
+   PWA
+   ===================================================== */
+
+if(
+  "serviceWorker" in navigator
+){
+
+  window.addEventListener(
+    "load",
+    function(){
+
+      navigator.serviceWorker
+        .register(
+          "/service-worker.js"
+        );
+
+    }
+  );
+
 }
 
-async function generateQuiz(){
 
-  const text = document.getElementById("quizInput").value.trim();
-  const output = document.getElementById("quizOutput");
-  const loading = document.getElementById("quizLoading");
+let deferredPrompt;
 
-  if(!text){
-    alert("Pehle apne notes paste karo.");
-    return;
-  }
 
-  loading.style.display = "block";
-  output.innerHTML = "";
+window.addEventListener(
+  "beforeinstallprompt",
+  function(event){
 
-  try{
+    event.preventDefault();
 
-    const response = await fetch("/api/quiz",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({text:text})
-    });
+    deferredPrompt =
+      event;
 
-    const data = await response.json();
 
-    if(!response.ok){
-      throw new Error(data.error || "Quiz generate nahi hua.");
-    }
+    const installBtn =
+      document.getElementById(
+        "installBtn"
+      );
 
-    const quiz = data.quiz || [];
 
-    quiz.forEach(function(q,index){
+    installBtn.style.display =
+      "block";
 
-      const div = document.createElement("div");
-      div.className = "flashcard";
 
-      let options = (q.options || []).map(function(option){
+    installBtn.onclick =
+      async function(){
 
-        return "<div style='margin:6px 0;'>• " +
-          safe(option) +
-          "</div>";
+        if(
+          !deferredPrompt
+        )
+          return;
 
-      }).join("");
 
-      div.innerHTML =
-        "<div class='q'>" +
-        (index + 1) +
-        ". " +
-        safe(q.question) +
-        "</div>" +
+        deferredPrompt.prompt();
 
-        "<div class='a'>" +
-        options +
-        "<strong>Answer: " +
-        safe(q.answer) +
-        "</strong>" +
-        "</div>";
 
-      output.appendChild(div);
+        await deferredPrompt
+          .userChoice;
 
-    });
 
-  }catch(error){
+        deferredPrompt =
+          null;
 
-    output.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(error.message) +
-      "</div>";
 
-  }finally{
+        installBtn.style.display =
+          "none";
 
-    loading.style.display = "none";
+      };
 
   }
-  }
+);
 
 
 /* =====================================================
@@ -1612,54 +2675,8 @@ loadDark();
 updateTimer();
 
 updateAccount();
-  if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/service-worker.js");
-  });
-  }
-  
-let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", function(event) {
-  event.preventDefault();
-  deferredPrompt = event;
-
-  const installBtn = document.getElementById("installBtn");
-  installBtn.style.display = "block";
-
-  installBtn.onclick = async function() {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-
-    deferredPrompt = null;
-    installBtn.style.display = "none";
-  };
-});
 </script>
 
 </body>
   </html>
-<section id="quizSection">
-  <div class="section-title">
-    <h2>📝 Notes → Quiz</h2>
-    <p>Paste your notes and generate AI MCQs.</p>
-  </div>
-
-  <div class="workspace">
-    <textarea id="quizInput" placeholder="Paste your study notes here..."></textarea>
-
-    <div class="workspace-actions">
-      <button class="primary" onclick="generateQuiz()">
-        ✨ Generate Quiz
-      </button>
-    </div>
-
-    <div class="loading" id="quizLoading">
-      🤖 AI is creating your quiz...
-    </div>
-
-    <div class="flashcards" id="quizOutput"></div>
-  </div>
-</section>
