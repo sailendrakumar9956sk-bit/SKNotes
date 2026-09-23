@@ -149,32 +149,34 @@ You are SKNotes, an AI study assistant.
 
 Create exactly 10 multiple-choice questions from the notes below.
 
-Return a JSON object with this exact structure:
+Your response MUST be ONLY a JSON array.
+Do not use markdown.
+Do not use code fences.
+Do not write anything before or after the JSON.
 
-{
-  "quiz": [
-    {
-      "question": "Question here",
-      "options": [
-        "Option A",
-        "Option B",
-        "Option C",
-        "Option D"
-      ],
-      "answer": "Option A"
-    }
-  ]
-}
+The JSON must look exactly like this:
+
+[
+  {
+    "question": "Question here",
+    "options": [
+      "Option A",
+      "Option B",
+      "Option C",
+      "Option D"
+    ],
+    "answer": "Option A"
+  }
+]
 
 Rules:
-- Create exactly 10 questions.
-- Every question must have exactly 4 options.
+- Exactly 10 questions.
+- Exactly 4 options per question.
 - Only one option is correct.
-- The answer must exactly match one of the four options.
+- The answer must exactly match one option.
 - Use only information from the notes.
 - Do not invent information.
 - Keep questions short and clear.
-- Return JSON only.
 
 NOTES:
 ${text.slice(0, 30000)}
@@ -188,27 +190,39 @@ ${text.slice(0, 30000)}
           content: prompt
         }
       ],
-      temperature: 0.2,
-      response_format: {
-        type: "json_object"
-      }
+      temperature: 0.2
     });
 
-    const raw =
+    let raw =
       completion.choices?.[0]?.message?.content?.trim() || "";
 
     if (!raw) {
       throw new Error("AI ne koi response nahi diya.");
     }
 
-    const parsed = JSON.parse(raw);
+    raw = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
 
-    if (!parsed.quiz || !Array.isArray(parsed.quiz)) {
+    const start = raw.indexOf("[");
+    const end = raw.lastIndexOf("]");
+
+    if (start === -1 || end === -1) {
+      throw new Error("AI ne valid quiz JSON nahi diya.");
+    }
+
+    raw = raw.slice(start, end + 1);
+
+    const quiz = JSON.parse(raw);
+
+    if (!Array.isArray(quiz)) {
       throw new Error("AI quiz format invalid.");
     }
 
     res.json({
-      quiz: parsed.quiz
+      quiz: quiz
     });
 
   } catch (err) {
