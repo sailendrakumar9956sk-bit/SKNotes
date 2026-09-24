@@ -1988,33 +1988,126 @@ async function loadDocuments(){
     div.innerHTML =
 
       "<div class='q'>📄 " +
-      safe(file.name) +
-      "</div>" +
+async function loadDocuments(){
 
-      "<div style='margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;'>" +
+  const list =
+    document.getElementById("documentList");
 
-      "<button class='primary' " +
-      "onclick=\"downloadDocument(" +
-      JSON.stringify(file.name) +
-      ")\">" +
-      "Open / Download" +
-      "</button>" +
+  const {
+    data: { user }
+  } =
+    await supabaseClient.auth.getUser();
 
-      "<button class='nav-btn' " +
-      "onclick=\"deleteDocument(" +
-      JSON.stringify(file.name) +
-      ")\">" +
-      "🗑️ Delete" +
-      "</button>" +
+  if(!user){
+    list.innerHTML =
+      "<div class='flashcard'>Pehle Login karo.</div>";
+    return;
+  }
 
+  const { data, error } =
+    await supabaseClient
+      .storage
+      .from("documents")
+      .list(user.id, {
+        limit: 100,
+        sortBy: {
+          column: "created_at",
+          order: "desc"
+        }
+      });
+
+  if(error){
+    list.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
       "</div>";
+    return;
+  }
 
+  const files =
+    (data || []).filter(function(file){
+      return file.name !== ".emptyFolderPlaceholder";
+    });
+
+  if(files.length === 0){
+    list.innerHTML =
+      "<div class='flashcard'>" +
+      "Abhi koi document save nahi hai." +
+      "</div>";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  files.forEach(function(file){
+
+    const div =
+      document.createElement("div");
+
+    div.className = "flashcard";
+
+    const name =
+      document.createElement("div");
+
+    name.className = "q";
+
+    name.textContent =
+      "📄 " + file.name;
+
+    const actions =
+      document.createElement("div");
+
+    actions.style =
+      "margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;";
+
+    const openBtn =
+      document.createElement("button");
+
+    openBtn.className = "primary";
+
+    openBtn.textContent =
+      "Open / Download";
+
+    openBtn.type =
+      "button";
+
+    openBtn.addEventListener(
+      "click",
+      function(){
+        downloadDocument(file.name);
+      }
+    );
+
+    const deleteBtn =
+      document.createElement("button");
+
+    deleteBtn.className =
+      "nav-btn";
+
+    deleteBtn.textContent =
+      "🗑️ Delete";
+
+    deleteBtn.type =
+      "button";
+
+    deleteBtn.addEventListener(
+      "click",
+      function(){
+        deleteDocument(file.name);
+      }
+    );
+
+    actions.appendChild(openBtn);
+    actions.appendChild(deleteBtn);
+
+    div.appendChild(name);
+    div.appendChild(actions);
 
     list.appendChild(div);
 
   });
 
-}
+  }
 
 
 async function downloadDocument(
