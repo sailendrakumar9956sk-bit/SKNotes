@@ -2723,7 +2723,63 @@ loadDark();
 updateTimer();
 
 updateAccount();
+/* =====================================================
+   IMAGE → TEXT
+   ===================================================== */
 
+async function extractImageText(){
+
+  const input =
+    document.getElementById("imageInput");
+
+  const file =
+    input.files[0];
+
+  if(!file){
+    alert("Pehle image select karo.");
+    return;
+  }
+
+  const loading =
+    document.getElementById("imageLoading");
+
+  const output =
+    document.getElementById("imageTextOutput");
+
+  loading.style.display = "block";
+  output.value = "";
+
+  try{
+
+    const result =
+      await Tesseract.recognize(
+        file,
+        "eng",
+        {
+          logger: function(info){
+            console.log(info);
+          }
+        }
+      );
+
+    output.value =
+      result.data.text.trim();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Image se text nikalne me problem aayi."
+    );
+
+  }finally{
+
+    loading.style.display = "none";
+
+  }
+
+}
 </script>
 
 </body>
