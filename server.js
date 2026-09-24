@@ -1,7 +1,7 @@
 import express from "express";
 import Groq from "groq-sdk";
 import PDFDocument from "pdfkit";
-
+import { createClient } from "@supabase/supabase-js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -425,7 +425,68 @@ app.post("/api/pdf", async (req, res) => {
 /* =========================
    SERVER START
 ========================= */
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
+app.get("/api/admin/users-count", async (req, res) => {
+
+  try {
+
+    const authHeader =
+      req.headers.authorization || "";
+
+    const token =
+      authHeader.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({
+        error: "Login required."
+      });
+    }
+
+    const {
+      data: userData,
+      error: userError
+    } =
+      await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !userData.user) {
+      return res.status(401).json({
+        error: "Invalid login."
+      });
+    }
+
+    const users =
+      await supabaseAdmin.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000
+      });
+
+    if (users.error) {
+      throw users.error;
+    }
+
+    res.json({
+      totalUsers:
+        users.data.users.length
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Users count error:",
+      error
+    );
+
+    res.status(500).json({
+      error: "Users count fetch nahi ho saka."
+    });
+
+  }
+
+});
 app.listen(PORT, () => {
   console.log(
     `SKNotes server running on port ${PORT}`
