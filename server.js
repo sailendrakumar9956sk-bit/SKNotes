@@ -183,15 +183,15 @@ ${text.slice(0, 30000)}
 `;
 
     const completion = await ai.chat.completions.create({
-      model: "openai/gpt-oss-20b",
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.2
-    });
+  model: "openai/gpt-oss-20b",
+  messages: [
+    {
+      role: "user",
+      content: prompt
+    }
+  ],
+  max_completion_tokens: 4096
+});
 console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
     let raw =
       completion.choices?.[0]?.message?.content?.trim() || "";
