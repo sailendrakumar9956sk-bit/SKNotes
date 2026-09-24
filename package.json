@@ -1,17 +1,15 @@
 {
   "name": "sknotes",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.0"
+    "@supabase/supabase-js": "^2.57.0",
     "express": "^5.1.0",
-    "openai": "^5.12.2",
+    "groq-sdk": "^0.30.0",
     "pdfkit": "^0.17.2",
-    "youtubei.js": "^18.0.0",
-    "groq-sdk": "^0.37.0"
+    "youtube-transcript": "^1.2.1"
   }
 }
