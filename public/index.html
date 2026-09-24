@@ -1648,6 +1648,8 @@ async function updateAccount(){
   const documentsBtn =
     document.getElementById("documentsBtn");
 
+  const totalUsersBox =
+    document.getElementById("totalUsersBox");
 
   if(session){
 
@@ -1658,7 +1660,6 @@ async function updateAccount(){
       user.user_metadata?.full_name ||
       user.email?.split("@")[0] ||
       "Student";
-
 
     document.getElementById("accountName")
       .textContent =
@@ -1677,6 +1678,54 @@ async function updateAccount(){
     documentsBtn.style.display =
       "block";
 
+
+    // Total Users
+    try{
+
+      const response =
+        await fetch(
+          "/api/admin/users-count",
+          {
+            headers: {
+              Authorization:
+                "Bearer " +
+                session.access_token
+            }
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if(response.ok){
+
+        document.getElementById(
+          "totalUsers"
+        ).textContent =
+          data.totalUsers;
+
+        totalUsersBox.style.display =
+          "block";
+
+      }else{
+
+        totalUsersBox.style.display =
+          "none";
+
+      }
+
+    }catch(error){
+
+      console.error(
+        "Total users error:",
+        error
+      );
+
+      totalUsersBox.style.display =
+        "none";
+
+    }
+
   }else{
 
     account.style.display =
@@ -1686,7 +1735,14 @@ async function updateAccount(){
       "Login";
 
     documentsBtn.style.display =
-  "block";
+      "block";
+
+    if(totalUsersBox){
+
+      totalUsersBox.style.display =
+        "none";
+
+    }
 
     const section =
       document.getElementById(
@@ -1694,35 +1750,15 @@ async function updateAccount(){
       );
 
     if(section){
+
       section.style.display =
         "none";
+
     }
 
   }
 
-}
-
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
-
-  document.getElementById("documentList")
-    .innerHTML = "";
-
-  updateAccount();
-
-}
-
-
-supabaseClient.auth.onAuthStateChange(
-  function(){
-
-    updateAccount();
-
   }
-);
-
 
 /* =====================================================
    MY DOCUMENTS
