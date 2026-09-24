@@ -1573,20 +1573,23 @@ async function authSubmit(event){
       if(result.error)
         throw result.error;
 
-      message.textContent =
-  "Account created successfully. Ab Login karo.";
+      if(result.data.session){
 
-setTimeout(function(){
+        message.textContent =
+          "Account created. You are logged in.";
 
-  switchMode();
+        await updateAccount();
 
-  document.getElementById("email").value =
-    email;
+        setTimeout(function(){
+          closeAuth();
+        }, 800);
 
-  document.getElementById("password").value =
-    "";
+      }else{
 
-}, 1200);
+        message.textContent =
+          "Account created. Email check karo aur confirmation link par click karo, phir Login karo.";
+
+      }
 
     }else{
 
@@ -1618,13 +1621,18 @@ setTimeout(function(){
 
   }catch(error){
 
+    console.error(
+      "AUTH ERROR:",
+      error
+    );
+
     message.textContent =
       error.message ||
       "Something went wrong.";
 
   }
 
-  }
+        }
 
 
 /* =====================================================
