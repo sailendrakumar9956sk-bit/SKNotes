@@ -1505,12 +1505,19 @@ async function authSubmit(event){
         throw result.error;
 
       message.textContent =
-        "Account created successfully.";
+  "Account created successfully. Ab Login karo.";
 
-      setTimeout(
-        closeAuth,
-        1000
-      );
+setTimeout(function(){
+
+  switchMode();
+
+  document.getElementById("email").value =
+    email;
+
+  document.getElementById("password").value =
+    "";
+
+}, 1200);
 
     }else{
 
