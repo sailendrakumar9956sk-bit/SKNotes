@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="manifest" href="/manifest.json">
+
 <title>SKNotes - AI Study Assistant</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
 :root{
   --bg:#f5f7fb;
-  --card:#fff;
+  --card:#ffffff;
   --text:#111827;
   --muted:#667085;
   --border:#e5e7eb;
@@ -37,8 +42,15 @@ body{
   transition:.25s;
 }
 
-button,input,textarea{font:inherit}
-button{cursor:pointer}
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
 
 .container{
   width:min(1100px,calc(100% - 28px));
@@ -76,6 +88,7 @@ header{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .nav-btn{
@@ -198,7 +211,7 @@ body.dark .badge{
   color:var(--muted);
 }
 
-/* SECTION */
+/* SECTIONS */
 
 .section-title{
   margin:35px 0 17px;
@@ -304,6 +317,8 @@ input:focus{
   margin-top:14px;
 }
 
+/* FLASHCARDS */
+
 .flashcards{
   display:grid;
   gap:12px;
@@ -325,18 +340,6 @@ input:focus{
 .flashcard .a{
   color:var(--muted);
   line-height:1.5;
-}
-
-/* DOCUMENTS */
-
-#documentsSection{
-  margin-top:25px;
-}
-
-.document-info{
-  color:var(--muted);
-  font-size:13px;
-  margin-top:8px;
 }
 
 /* TIMER */
@@ -529,659 +532,623 @@ footer a:hover{
 
 <body>
 
-<!-- HEADER -->
-
 <header>
 
-  <div class="container nav">
+<div class="container nav">
 
-    <div class="logo">
-      SK<span>Notes</span>
-    </div>
+<div class="logo">
+SK<span>Notes</span>
+</div>
 
-    <div class="nav-actions">
+<div class="nav-actions">
 
-      <button class="nav-btn" onclick="openTimer()">
-        ⏱️ Timer
-      </button>
+<button
+class="nav-btn"
+onclick="openTimer()">
+⏱️ Timer
+</button>
 
-      <button class="nav-btn" onclick="toggleDark()" id="darkBtn">
-        🌙
-      </button>
+<button
+class="nav-btn"
+onclick="toggleDark()"
+id="darkBtn">
+🌙
+</button>
 
-      <button class="nav-btn" onclick="openAuth()" id="loginBtn">
-        Login
-      </button>
+<button
+class="nav-btn"
+onclick="openAuth()"
+id="loginBtn">
+Login
+</button>
 
-      <button
-  class="nav-btn"
-  onclick="openDocuments()"
-  id="documentsBtn"
->
-  📁 My Documents
-      </button>
+<button
+class="nav-btn"
+onclick="openDocuments()"
+id="documentsBtn"
+style="display:none;">
+📁 My Documents
+</button>
 
-    </div>
+</div>
 
-  </div>
+</div>
 
 </header>
 
 
 <main class="container">
 
-<!-- HERO -->
 
 <section class="hero">
 
-  <div class="badge">
-    🤖 AI Study Assistant
-  </div>
+<div class="badge">
+🤖 AI Study Assistant
+</div>
 
-  <h1>
-    Study Smarter with
-    <span>SKNotes</span>
-  </h1>
+<h1>
+Study Smarter with <span>SKNotes</span>
+</h1>
 
-  <p>
-    Notes, flashcards, quizzes and powerful study tools
-    designed to make learning easier and faster.
-  </p>
+<p>
+Notes, flashcards, quizzes and powerful study tools designed to make learning easier and faster.
+</p>
 
 </section>
 
 
-<!-- ACCOUNT -->
+<section
+class="account"
+id="account">
 
-<section class="account" id="account">
+<div class="account-inner">
 
-  <div class="account-inner">
+<div>
 
-    <div>
+<div
+class="account-name"
+id="accountName">
+👋 Welcome
+</div>
 
-      <div class="account-name" id="accountName">
-        👋 Welcome
-      </div>
+<div
+class="account-email"
+id="accountEmail">
+</div>
 
-      <div class="account-email" id="accountEmail"></div>
+</div>
 
-      <div
-        id="totalUsersBox"
-        style="margin-top:8px;font-size:14px;font-weight:600;display:none;"
-      >
-        👥 Total Users:
-        <span id="totalUsers">—</span>
-      </div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
 
-    </div>
+<button
+class="nav-btn"
+onclick="logout()">
+Logout
+</button>
 
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button
+class="nav-btn"
+id="installBtn"
+style="display:none;">
+📱 Install App
+</button>
 
-      <button
-        class="nav-btn"
-        onclick="logout()"
-      >
-        Logout
-      </button>
+</div>
 
-      <button
-        class="nav-btn"
-        id="installBtn"
-        style="display:none;"
-      >
-        📱 Install App
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
-        📱 Install App
-      </button>
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
-
-<!-- STATS -->
 
 <section class="stats">
 
-  <div class="stat">
-    <strong id="studyTime">00:00:00</strong>
-    <small>Study Time</small>
-  </div>
+<div class="stat">
 
-  <div class="stat">
-    <strong id="cardCount">0</strong>
-    <small>Flashcards Created</small>
-  </div>
+<strong id="studyTime">
+00:00:00
+</strong>
 
-  <div class="stat">
-    <strong>∞</strong>
-    <small>Learning Potential</small>
-  </div>
+<small>
+Study Time
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="cardCount">
+0
+</strong>
+
+<small>
+Flashcards Created
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong>
+∞
+</strong>
+
+<small>
+Learning Potential
+</small>
+
+</div>
 
 </section>
 
-
-<!-- SERVICES -->
 
 <section>
 
-  <div class="section-title">
+<div class="section-title">
 
-    <h2>📚 Study Tools</h2>
+<h2>
+📚 Study Tools
+</h2>
 
-    <p>
-      Everything you need for smarter studying.
-    </p>
+<p>
+Everything you need for smarter studying.
+</p>
 
-  </div>
+</div>
 
 
-  <div class="services">
+<div class="services">
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">🧠</div>
+<div class="icon">🧠</div>
 
-      <h3>Text → Flashcards</h3>
+<h3>
+Text → Flashcards
+</h3>
 
-      <p>
-        Create AI flashcards from your notes.
-      </p>
+<p>
+Create AI flashcards from your notes.
+</p>
 
-      <button
-        class="primary"
-        onclick="goFlashcards()"
-      >
-        Use Now
-      </button>
+<button
+class="primary"
+onclick="goFlashcards()">
+Use Now
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">▶️</div>
+<div class="icon">▶️</div>
 
-      <h3>YouTube → Notes</h3>
+<h3>
+YouTube → Notes
+</h3>
 
-      <p>
-        Convert educational videos into notes.
-      </p>
+<p>
+Convert educational videos into notes.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">🖼️</div>
+<div class="icon">🖼️</div>
 
-      <h3>Image → Text</h3>
+<h3>
+Image → Text
+</h3>
 
-      <p>
-        Extract text from images using OCR.
-      </p>
+<p>
+Extract text from images using OCR.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">📷</div>
+<div class="icon">📷</div>
 
-      <h3>Question Scanner</h3>
+<h3>
+Question Scanner
+</h3>
 
-      <p>
-        Scan questions and get study help.
-      </p>
+<p>
+Scan questions and get study help.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">📝</div>
+<div class="icon">📝</div>
 
-      <h3>Notes → Quiz</h3>
+<h3>
+Notes → Quiz
+</h3>
 
-      <p>
-        Create quizzes and MCQs from notes.
-      </p>
+<p>
+Create quizzes and MCQs from notes.
+</p>
 
-      <button
-        class="primary"
-        onclick="goQuiz()"
-      >
-        Use Now
-      </button>
+<button
+class="primary"
+onclick="goQuiz()">
+Use Now
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">📄</div>
+<div class="icon">📄</div>
 
-      <h3>PDF Export</h3>
+<h3>
+PDF Export
+</h3>
 
-      <p>
-        Export your study material as PDF.
-      </p>
+<p>
+Export your study material as PDF.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">🤖</div>
+<div class="icon">🤖</div>
 
-      <h3>AI Tutor</h3>
+<h3>
+AI Tutor
+</h3>
 
-      <p>
-        Ask questions and learn concepts.
-      </p>
+<p>
+Ask questions and learn concepts.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">🗺️</div>
+<div class="icon">🗺️</div>
 
-      <h3>Mind Map</h3>
+<h3>
+Mind Map
+</h3>
 
-      <p>
-        Create visual maps for your subjects.
-      </p>
+<p>
+Create visual maps for your subjects.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">📚</div>
+<div class="icon">📚</div>
 
-      <h3>Study Pack</h3>
+<h3>
+Study Pack
+</h3>
 
-      <p>
-        Create a complete study package.
-      </p>
+<p>
+Create a complete study package.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">📊</div>
+<div class="icon">📊</div>
 
-      <h3>Study Progress</h3>
+<h3>
+Study Progress
+</h3>
 
-      <p>
-        Track your learning and study time.
-      </p>
+<p>
+Track your learning and study time.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">⭐</div>
+<div class="icon">⭐</div>
 
-      <h3>Saved Notes</h3>
+<h3>
+Saved Notes
+</h3>
 
-      <p>
-        Save important study material.
-      </p>
+<p>
+Save important study material.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
 
-    <div class="service">
+<div class="service">
 
-      <div class="icon">🔍</div>
+<div class="icon">🔍</div>
 
-      <h3>Smart Search</h3>
+<h3>
+Smart Search
+</h3>
 
-      <p>
-        Find your study content quickly.
-      </p>
+<p>
+Find your study content quickly.
+</p>
 
-      <span class="soon">
-        COMING SOON
-      </span>
+<span class="soon">
+COMING SOON
+</span>
 
-      <button
-        class="nav-btn"
-        onclick="soon()"
-      >
-        Open
-      </button>
+<button
+class="nav-btn"
+onclick="soon()">
+Open
+</button>
 
-    </div>
+</div>
 
-  </div>
+
+</div>
 
 </section>
 
-
-<!-- MY DOCUMENTS -->
 
 <section
-  id="documentsSection"
-  style="display:none;"
->
+id="documentsSection"
+style="display:none;">
 
-  <div class="section-title">
+<div class="section-title">
 
-    <h2>📁 My Documents</h2>
+<h2>
+📁 My Documents
+</h2>
 
-    <p>
-      Apne documents securely save, view aur download karo.
-    </p>
+<p>
+Apne documents securely save, view aur download karo.
+</p>
 
-    <div class="document-info">
-      PDF, DOC, DOCX, PNG, JPG supported.
-    </div>
-
-  </div>
+</div>
 
 
-  <div class="workspace">
+<div class="workspace">
 
-    <input
-      type="file"
-      id="documentInput"
-      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-    >
-
-    <div class="workspace-actions">
-
-      <button
-        class="primary"
-        onclick="uploadDocument()"
-      >
-        ⬆️ Upload Document
-      </button>
-
-    </div>
+<input
+type="file"
+id="documentInput"
+accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
 
 
-    <div
-      class="loading"
-      id="documentLoading"
-    >
-      ⏳ Uploading...
-    </div>
+<div class="workspace-actions">
+
+<button
+class="primary"
+onclick="uploadDocument()">
+⬆️ Upload Document
+</button>
+
+</div>
 
 
-    <div
-      class="flashcards"
-      id="documentList"
-    ></div>
-
-  </div>
-
-</section>
-<!-- IMAGE → TEXT -->
-
-<section id="imageTextSection">
-
-  <div class="section-title">
-
-    <h2>📷 Image → Text</h2>
-
-    <p>
-      Upload an image and extract text from it.
-    </p>
-
-  </div>
-
-  <div class="workspace">
-
-    <input
-      type="file"
-      id="imageInput"
-      accept="image/*"
-    >
-
-    <div class="workspace-actions">
-
-      <button
-        class="primary"
-        onclick="extractImageText()"
-      >
-        ✨ Extract Text
-      </button>
-
-    </div>
-
-    <div
-      class="loading"
-      id="imageLoading"
-      style="display:none"
-    >
-      🔍 Extracting text from image...
-    </div>
-
-    <textarea
-      id="imageTextOutput"
-      placeholder="Extracted text will appear here..."
-      readonly
-    ></textarea>
-
-  </div>
-
-  </section>
-
-<!-- FLASHCARDS -->
-
-<section id="flashcardSection">
-
-  <div class="section-title">
-
-    <h2>🧠 Text → Flashcards</h2>
-
-    <p>
-      Paste your notes and generate flashcards using AI.
-    </p>
-
-  </div>
+<div
+class="loading"
+id="documentLoading">
+Uploading...
+</div>
 
 
-  <div class="workspace">
+<div
+class="flashcards"
+id="documentList">
+</div>
 
-    <textarea
-      id="flashInput"
-      placeholder="Paste your study notes here..."
-    ></textarea>
-
-
-    <div class="workspace-actions">
-
-      <button
-        class="primary"
-        onclick="generateFlashcards()"
-      >
-        ✨ Generate Flashcards
-      </button>
-
-    </div>
-
-
-    <div
-      class="loading"
-      id="loading"
-    >
-      🤖 AI is creating your flashcards...
-    </div>
-
-
-    <div
-      class="flashcards"
-      id="flashcards"
-    ></div>
-
-  </div>
+</div>
 
 </section>
 
 
-<!-- QUIZ -->
+<section
+id="flashcardSection">
 
-<section id="quizSection">
+<div class="section-title">
 
-  <div class="section-title">
+<h2>
+🧠 Text → Flashcards
+</h2>
 
-    <h2>📝 Notes → Quiz</h2>
+<p>
+Paste your notes and generate flashcards using AI.
+</p>
 
-    <p>
-      Paste your notes and generate AI MCQs.
-    </p>
-
-  </div>
-
-
-  <div class="workspace">
-
-    <textarea
-      id="quizInput"
-      placeholder="Paste your study notes here..."
-    ></textarea>
+</div>
 
 
-    <div class="workspace-actions">
+<div class="workspace">
 
-      <button
-        class="primary"
-        onclick="generateQuiz()"
-      >
-        ✨ Generate Quiz
-      </button>
-
-    </div>
+<textarea
+id="flashInput"
+placeholder="Paste your study notes here..."></textarea>
 
 
-    <div
-      class="loading"
-      id="quizLoading"
-    >
-      🤖 AI is creating your quiz...
-    </div>
+<div class="workspace-actions">
+
+<button
+class="primary"
+onclick="generateFlashcards()">
+✨ Generate Flashcards
+</button>
+
+</div>
 
 
-    <div
-      class="flashcards"
-      id="quizOutput"
-    ></div>
+<div
+class="loading"
+id="loading">
+🤖 AI is creating your flashcards...
+</div>
 
-  </div>
+
+<div
+class="flashcards"
+id="flashcards">
+</div>
+
+</div>
+
+</section>
+
+
+<section
+id="quizSection">
+
+<div class="section-title">
+
+<h2>
+📝 Notes → Quiz
+</h2>
+
+<p>
+Paste your notes and generate AI MCQs.
+</p>
+
+</div>
+
+
+<div class="workspace">
+
+<textarea
+id="quizInput"
+placeholder="Paste your notes here..."></textarea>
+
+
+<div class="workspace-actions">
+
+<button
+class="primary"
+onclick="generateQuiz()">
+✨ Generate Quiz
+</button>
+
+</div>
+
+
+<div
+class="loading"
+id="quizLoading">
+🤖 AI is creating your quiz...
+</div>
+
+
+<div
+class="flashcards"
+id="quizOutput">
+</div>
+
+</div>
 
 </section>
 
@@ -1189,31 +1156,25 @@ footer a:hover{
 </main>
 
 
-<!-- FOOTER -->
-
 <footer>
 
-  <div>
-    © 2026 <strong>SKNotes</strong>
-  </div>
+<div>
+© 2026 <strong>SKNotes</strong>
+</div>
 
-  <div>
-    Created by <strong>Sailendra</strong>
-  </div>
+<div>
+Created by <strong>Sailendra</strong>
+</div>
 
-  <div>
-
-    Instagram:
-
-    <a
-      href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      @also__sk
-    </a>
-
-  </div>
+<div>
+Instagram:
+<a
+href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
+target="_blank"
+rel="noopener noreferrer">
+@also__sk
+</a>
+</div>
 
 </footer>
 
@@ -1221,172 +1182,162 @@ footer a:hover{
 <!-- TIMER -->
 
 <div
-  class="overlay"
-  id="timerOverlay"
->
+class="overlay"
+id="timerOverlay">
 
-  <div class="timer-box">
+<div class="timer-box">
 
-    <h2>⏱️ Study Timer</h2>
-
-    <div
-      class="timer"
-      id="timer"
-    >
-      25:00
-    </div>
-
-    <div class="timer-buttons">
-
-      <button onclick="startTimer()">
-        ▶ Start
-      </button>
-
-      <button onclick="pauseTimer()">
-        ⏸ Pause
-      </button>
-
-      <button onclick="resetTimer()">
-        ↻ Reset
-      </button>
-
-      <button onclick="closeTimer()">
-        ✕ Close
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- LOGIN -->
+<h2>
+⏱️ Study Timer
+</h2>
 
 <div
-  class="modal"
-  id="authModal"
->
+class="timer"
+id="timer">
+25:00
+</div>
 
-  <div class="auth-box">
+<div class="timer-buttons">
 
-    <div class="auth-head">
+<button onclick="startTimer()">
+▶ Start
+</button>
 
-      <h2 id="authTitle">
-        Login
-      </h2>
+<button onclick="pauseTimer()">
+⏸ Pause
+</button>
 
-      <button
-        class="close"
-        onclick="closeAuth()"
-      >
-        ×
-      </button>
+<button onclick="resetTimer()">
+↻ Reset
+</button>
 
-    </div>
-
-
-    <form onsubmit="authSubmit(event)">
-
-      <div
-        class="field"
-        id="nameBox"
-        style="display:none"
-      >
-
-        <label>
-          Full Name
-        </label>
-
-        <input
-          type="text"
-          id="name"
-          placeholder="Your name"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Email
-        </label>
-
-        <input
-          type="email"
-          id="email"
-          placeholder="you@example.com"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Password
-        </label>
-
-        <input
-          type="password"
-          id="password"
-          placeholder="Minimum 6 characters"
-          required
-          minlength="6"
-        >
-
-      </div>
-
-
-      <button
-        class="primary auth-submit"
-        type="submit"
-      >
-
-        <span id="submitText">
-          Login
-        </span>
-
-      </button>
-
-    </form>
-
-
-    <div
-      class="message"
-      id="message"
-    ></div>
-
-
-    <div class="switch">
-
-      <span id="switchText">
-        Don't have an account?
-      </span>
-
-      <button
-        onclick="switchMode()"
-        id="switchButton"
-        type="button"
-      >
-        Sign Up
-      </button>
-
-    </div>
-
-  </div>
+<button onclick="closeTimer()">
+✕ Close
+</button>
 
 </div>
+
+</div>
+
+</div>
+
+
+<!-- LOGIN / SIGNUP -->
+
+<div
+class="modal"
+id="authModal">
+
+<div class="auth-box">
+
+<div class="auth-head">
+
+<h2 id="authTitle">
+Login
+</h2>
+
+<button
+class="close"
+onclick="closeAuth()">
+×
+</button>
+
+</div>
+
+
+<form
+onsubmit="authSubmit(event)">
+
+
+<div
+class="field"
+id="nameBox"
+style="display:none;">
+
+<label>
+Full Name
+</label>
+
+<input
+type="text"
+id="name"
+placeholder="Your name">
+
+</div>
+
+
+<div class="field">
+
+<label>
+Email
+</label>
+
+<input
+type="email"
+id="email"
+placeholder="you@example.com"
+required>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Password
+</label>
+
+<input
+type="password"
+id="password"
+placeholder="Minimum 6 characters"
+required
+minlength="6">
+
+</div>
+
+
+<button
+class="primary auth-submit"
+type="submit">
+
+<span id="submitText">
+Login
+</span>
+
+</button>
+
+</form>
+
+
+<div
+class="message"
+id="message">
+</div>
+
+
+<div class="switch">
+
+<span id="switchText">
+Don't have an account?
+</span>
+
+<button
+type="button"
+onclick="switchMode()"
+id="switchButton">
+Sign Up
+</button>
+
+</div>
+
+</div>
+
+</div>
+
 
 
 <script>
-
-/* =====================================================
-   SUPABASE
-   ===================================================== */
-
 const SUPABASE_URL =
 "https://ejwdvlenqdfelmahajct.supabase.co";
 
@@ -1400,25 +1351,23 @@ window.supabase.createClient(
 );
 
 
-/* =====================================================
-   HELPER
-   ===================================================== */
+/* =========================
+   SAFE TEXT
+========================= */
 
 function safe(value){
-
   return String(value || "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
 }
 
 
-/* =====================================================
+/* =========================
    DARK MODE
-   ===================================================== */
+========================= */
 
 function loadDark(){
 
@@ -1450,15 +1399,14 @@ function toggleDark(){
   );
 
   document.getElementById("darkBtn")
-    .textContent =
-    dark ? "☀️" : "🌙";
+    .textContent = dark ? "☀️" : "🌙";
 
 }
 
 
-/* =====================================================
-   AUTH MODAL
-   ===================================================== */
+/* =========================
+   AUTH
+========================= */
 
 let authMode = "login";
 
@@ -1548,8 +1496,8 @@ async function authSubmit(event){
   const message =
     document.getElementById("message");
 
-  message.textContent =
-    "Please wait...";
+  message.textContent = "Please wait...";
+
 
   try{
 
@@ -1557,17 +1505,13 @@ async function authSubmit(event){
 
       const result =
         await supabaseClient.auth.signUp({
-
-          email: email,
-
-          password: password,
-
-          options: {
-            data: {
-              full_name: name
+          email,
+          password,
+          options:{
+            data:{
+              full_name:name
             }
           }
-
         });
 
       if(result.error)
@@ -1580,9 +1524,7 @@ async function authSubmit(event){
 
         await updateAccount();
 
-        setTimeout(function(){
-          closeAuth();
-        }, 800);
+        setTimeout(closeAuth,800);
 
       }else{
 
@@ -1594,14 +1536,10 @@ async function authSubmit(event){
     }else{
 
       const result =
-        await supabaseClient.auth
-          .signInWithPassword({
-
-            email: email,
-
-            password: password
-
-          });
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
       if(result.error)
         throw result.error;
@@ -1611,20 +1549,13 @@ async function authSubmit(event){
 
       await updateAccount();
 
-      setTimeout(function(){
-
-        closeAuth();
-
-      },700);
+      setTimeout(closeAuth,700);
 
     }
 
   }catch(error){
 
-    console.error(
-      "AUTH ERROR:",
-      error
-    );
+    console.error("AUTH ERROR:",error);
 
     message.textContent =
       error.message ||
@@ -1632,12 +1563,12 @@ async function authSubmit(event){
 
   }
 
-        }
+}
 
 
-/* =====================================================
+/* =========================
    ACCOUNT
-   ===================================================== */
+========================= */
 
 async function updateAccount(){
 
@@ -1656,8 +1587,6 @@ async function updateAccount(){
   const documentsBtn =
     document.getElementById("documentsBtn");
 
-  const totalUsersBox =
-    document.getElementById("totalUsersBox");
 
   if(session){
 
@@ -1686,54 +1615,6 @@ async function updateAccount(){
     documentsBtn.style.display =
       "block";
 
-
-    // Total Users
-    try{
-
-      const response =
-        await fetch(
-          "/api/admin/users-count",
-          {
-            headers: {
-              Authorization:
-                "Bearer " +
-                session.access_token
-            }
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if(response.ok){
-
-        document.getElementById(
-          "totalUsers"
-        ).textContent =
-          data.totalUsers;
-
-        totalUsersBox.style.display =
-          "block";
-
-      }else{
-
-        totalUsersBox.style.display =
-          "none";
-
-      }
-
-    }catch(error){
-
-      console.error(
-        "Total users error:",
-        error
-      );
-
-      totalUsersBox.style.display =
-        "none";
-
-    }
-
   }else{
 
     account.style.display =
@@ -1743,44 +1624,524 @@ async function updateAccount(){
       "Login";
 
     documentsBtn.style.display =
-      "block";
-
-    if(totalUsersBox){
-
-      totalUsersBox.style.display =
-        "none";
-
-    }
+      "none";
 
     const section =
       document.getElementById(
         "documentsSection"
       );
 
-    if(section){
-
-      section.style.display =
-        "none";
-
-    }
+    if(section)
+      section.style.display = "none";
 
   }
 
+}
+
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  document.getElementById(
+    "documentsSection"
+  ).style.display = "none";
+
+  await updateAccount();
+
+  alert("Logout ho gaya.");
+
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+let running = false;
+
+let totalStudy =
+  Number(
+    localStorage.getItem(
+      "sknotes-study-time"
+    ) || 0
+  );
+
+
+function timerText(seconds){
+
+  const min =
+    Math.floor(seconds / 60);
+
+  const sec =
+    seconds % 60;
+
+  return (
+    String(min).padStart(2,"0") +
+    ":" +
+    String(sec).padStart(2,"0")
+  );
+
+}
+
+
+function studyText(seconds){
+
+  const h =
+    Math.floor(seconds / 3600);
+
+  const m =
+    Math.floor(
+      (seconds % 3600) / 60
+    );
+
+  const s =
+    seconds % 60;
+
+  return (
+    String(h).padStart(2,"0") +
+    ":" +
+    String(m).padStart(2,"0") +
+    ":" +
+    String(s).padStart(2,"0")
+  );
+
+}
+
+
+function updateTimer(){
+
+  document.getElementById("timer")
+    .textContent =
+    timerText(timerSeconds);
+
+  document.getElementById("studyTime")
+    .textContent =
+    studyText(totalStudy);
+
+}
+
+
+function openTimer(){
+
+  document.getElementById("timerOverlay")
+    .style.display = "flex";
+
+  updateTimer();
+
+}
+
+
+function closeTimer(){
+
+  document.getElementById("timerOverlay")
+    .style.display = "none";
+
+}
+
+
+function startTimer(){
+
+  if(running)
+    return;
+
+  running = true;
+
+  timerInterval =
+    setInterval(function(){
+
+      if(timerSeconds > 0){
+
+        timerSeconds--;
+
+        totalStudy++;
+
+        localStorage.setItem(
+          "sknotes-study-time",
+          totalStudy
+        );
+
+        updateTimer();
+
+      }else{
+
+        pauseTimer();
+
+        alert(
+          "🎉 Study session complete!"
+        );
+
+      }
+
+    },1000);
+
+}
+
+
+function pauseTimer(){
+
+  running = false;
+
+  if(timerInterval){
+
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
   }
 
-/* =====================================================
+}
+
+
+function resetTimer(){
+
+  pauseTimer();
+
+  timerSeconds =
+    25 * 60;
+
+  updateTimer();
+
+}
+
+
+/* =========================
+   FLASHCARDS
+========================= */
+
+let cardCount =
+  Number(
+    localStorage.getItem(
+      "sknotes-card-count"
+    ) || 0
+  );
+
+
+document.getElementById("cardCount")
+  .textContent =
+  cardCount;
+
+
+function goFlashcards(){
+
+  document.getElementById(
+    "flashcardSection"
+  ).scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+async function generateFlashcards(){
+
+  const text =
+    document.getElementById(
+      "flashInput"
+    ).value.trim();
+
+  const output =
+    document.getElementById(
+      "flashcards"
+    );
+
+  const loading =
+    document.getElementById(
+      "loading"
+    );
+
+
+  if(!text){
+
+    alert(
+      "Pehle apne notes paste karo."
+    );
+
+    return;
+
+  }
+
+
+  loading.style.display =
+    "block";
+
+  output.innerHTML = "";
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/flashcards",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            text:text
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok)
+      throw new Error(
+        data.error ||
+        "Flashcards generate nahi hue."
+      );
+
+
+    const cards =
+      data.flashcards || [];
+
+
+    cards.forEach(function(card){
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "flashcard";
+
+      div.innerHTML =
+        "<div class='q'>Q. " +
+        safe(
+          card.question ||
+          card.front
+        ) +
+        "</div>" +
+
+        "<div class='a'>A. " +
+        safe(
+          card.answer ||
+          card.back
+        ) +
+        "</div>";
+
+      output.appendChild(div);
+
+    });
+
+
+    cardCount +=
+      cards.length;
+
+
+    localStorage.setItem(
+      "sknotes-card-count",
+      cardCount
+    );
+
+
+    document.getElementById(
+      "cardCount"
+    ).textContent =
+      cardCount;
+
+
+  }catch(error){
+
+    output.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
+      "</div>";
+
+  }finally{
+
+    loading.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =========================
+   QUIZ
+========================= */
+
+function goQuiz(){
+
+  document.getElementById(
+    "quizSection"
+  ).scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+async function generateQuiz(){
+
+  const text =
+    document.getElementById(
+      "quizInput"
+    ).value.trim();
+
+  const output =
+    document.getElementById(
+      "quizOutput"
+    );
+
+  const loading =
+    document.getElementById(
+      "quizLoading"
+    );
+
+
+  if(!text){
+
+    alert(
+      "Pehle apne notes paste karo."
+    );
+
+    return;
+
+  }
+
+
+  loading.style.display =
+    "block";
+
+  output.innerHTML = "";
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/quiz",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            text:text
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok)
+      throw new Error(
+        data.error ||
+        "Quiz generate nahi hua."
+      );
+
+
+    const quiz =
+      data.quiz || [];
+
+
+    quiz.forEach(function(q,index){
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "flashcard";
+
+
+      let options =
+        (q.options || [])
+        .map(function(option){
+
+          return (
+            "<div style='margin:6px 0;'>• " +
+            safe(option) +
+            "</div>"
+          );
+
+        })
+        .join("");
+
+
+      div.innerHTML =
+        "<div class='q'>" +
+        (index + 1) +
+        ". " +
+        safe(q.question) +
+        "</div>" +
+
+        "<div class='a'>" +
+        options +
+
+        "<strong>Answer: " +
+        safe(q.answer) +
+        "</strong>" +
+
+        "</div>";
+
+
+      output.appendChild(div);
+
+    });
+
+
+  }catch(error){
+
+    output.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
+      "</div>";
+
+  }finally{
+
+    loading.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =========================
+   COMING SOON
+========================= */
+
+function soon(){
+
+  alert(
+    "🚧 Ye feature SKNotes me jaldi aa raha hai."
+  );
+
+}
+
+
+/* =========================
    MY DOCUMENTS
-   ===================================================== */
+========================= */
 
 function openDocuments(){
 
   const section =
-    document.getElementById("documentsSection");
+    document.getElementById(
+      "documentsSection"
+    );
 
-  section.style.display = "block";
+  section.style.display =
+    "block";
 
   section.scrollIntoView({
-    behavior: "smooth"
+    behavior:"smooth"
   });
 
   loadDocuments();
@@ -1810,7 +2171,9 @@ async function uploadDocument(){
   }
 
 
-  const { data:{user} } =
+  const {
+    data:{user}
+  } =
     await supabaseClient.auth.getUser();
 
 
@@ -1851,7 +2214,9 @@ async function uploadDocument(){
       safeName;
 
 
-    const { error } =
+    const {
+      error
+    } =
       await supabaseClient
         .storage
         .from("documents")
@@ -1861,15 +2226,11 @@ async function uploadDocument(){
         );
 
 
-    if(error){
-
+    if(error)
       throw error;
-
-    }
 
 
     input.value = "";
-
 
     alert(
       "✅ Document save ho gaya."
@@ -1886,7 +2247,6 @@ async function uploadDocument(){
       error.message
     );
 
-
   }finally{
 
     loading.style.display =
@@ -1897,6 +2257,10 @@ async function uploadDocument(){
 }
 
 
+/* =========================
+   LOAD DOCUMENTS
+========================= */
+
 async function loadDocuments(){
 
   const list =
@@ -1905,7 +2269,9 @@ async function loadDocuments(){
     );
 
 
-  const { data:{user} } =
+  const {
+    data:{user}
+  } =
     await supabaseClient.auth.getUser();
 
 
@@ -1921,7 +2287,10 @@ async function loadDocuments(){
   }
 
 
-  const { data,error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .storage
       .from("documents")
@@ -1929,6 +2298,7 @@ async function loadDocuments(){
         user.id,
         {
           limit:100,
+
           sortBy:{
             column:"created_at",
             order:"desc"
@@ -1949,7 +2319,18 @@ async function loadDocuments(){
   }
 
 
-  if(!data || data.length === 0){
+  const files =
+    (data || []).filter(function(file){
+
+      return (
+        file.name !==
+        ".emptyFolderPlaceholder"
+      );
+
+    });
+
+
+  if(files.length === 0){
 
     list.innerHTML =
       "<div class='flashcard'>" +
@@ -1964,161 +2345,24 @@ async function loadDocuments(){
   list.innerHTML = "";
 
 
-  data.forEach(function(file){
-
-    if(
-      file.name ===
-      ".emptyFolderPlaceholder"
-    ){
-
-      return;
-
-    }
-
+  files.forEach(function(file){
 
     const div =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     div.className =
       "flashcard";
 
 
-    div.innerHTML =
-
-      "<div class='q'>📄 " +
-async function loadDocuments(){
-
-  const list =
-    document.getElementById("documentList");
-
-  const {
-    data: { user }
-  } =
-    await supabaseClient.auth.getUser();
-
-  if(!user){
-    list.innerHTML =
-      "<div class='flashcard'>Pehle Login karo.</div>";
-    return;
-  }
-
-  const { data, error } =
-    await supabaseClient
-      .storage
-      .from("documents")
-      .list(user.id, {
-        limit: 100,
-        sortBy: {
-          column: "created_at",
-          order: "desc"
-        }
-      });
-
-  if(error){
-    list.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(error.message) +
-      "</div>";
-    return;
-  }
-
-  const files =
-    (data || []).filter(function(file){
-      return file.name !== ".emptyFolderPlaceholder";
-    });
-
-  if(files.length === 0){
-    list.innerHTML =
-      "<div class='flashcard'>" +
-      "Abhi koi document save nahi hai." +
-      "</div>";
-    return;
-  }
-
-  list.innerHTML = "";
-
-  files.forEach(function(file){
-
-    const div =
-      document.createElement("div");
-
-    div.className = "flashcard";
-
     const name =
       document.createElement("div");
 
-    name.className = "q";
+    name.className =
+      "q";
 
     name.textContent =
       "📄 " + file.name;
 
-async function loadDocuments(){
-
-  const list =
-    document.getElementById("documentList");
-
-  const {
-    data: { user }
-  } =
-    await supabaseClient.auth.getUser();
-
-  if(!user){
-    list.innerHTML =
-      "<div class='flashcard'>Pehle Login karo.</div>";
-    return;
-  }
-
-  const { data, error } =
-    await supabaseClient
-      .storage
-      .from("documents")
-      .list(user.id, {
-        limit: 100,
-        sortBy: {
-          column: "created_at",
-          order: "desc"
-        }
-      });
-
-  if(error){
-    list.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(error.message) +
-      "</div>";
-    return;
-  }
-
-  const files =
-    (data || []).filter(function(file){
-      return file.name !== ".emptyFolderPlaceholder";
-    });
-
-  if(files.length === 0){
-    list.innerHTML =
-      "<div class='flashcard'>" +
-      "Abhi koi document save nahi hai." +
-      "</div>";
-    return;
-  }
-
-  list.innerHTML = "";
-
-  files.forEach(function(file){
-
-    const div =
-      document.createElement("div");
-
-    div.className = "flashcard";
-
-    const name =
-      document.createElement("div");
-
-    name.className = "q";
-
-    name.textContent =
-      "📄 " + file.name;
 
     const actions =
       document.createElement("div");
@@ -2126,52 +2370,95 @@ async function loadDocuments(){
     actions.style =
       "margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;";
 
+
     const openBtn =
       document.createElement("button");
 
-    openBtn.className = "primary";
-    openBtn.type = "button";
-    openBtn.textContent = "Open / Download";
+    openBtn.className =
+      "primary";
+
+    openBtn.type =
+      "button";
+
+    openBtn.textContent =
+      "Open / Download";
+
 
     openBtn.addEventListener(
       "click",
       function(){
-        downloadDocument(file.name);
+
+        downloadDocument(
+          file.name
+        );
+
       }
     );
+
 
     const deleteBtn =
       document.createElement("button");
 
-    deleteBtn.className = "nav-btn";
-    deleteBtn.type = "button";
-    deleteBtn.textContent = "🗑️ Delete";
+    deleteBtn.className =
+      "nav-btn";
+
+    deleteBtn.type =
+      "button";
+
+    deleteBtn.textContent =
+      "🗑️ Delete";
+
 
     deleteBtn.addEventListener(
       "click",
       function(){
-        deleteDocument(file.name);
+
+        deleteDocument(
+          file.name
+        );
+
       }
     );
 
-    actions.appendChild(openBtn);
-    actions.appendChild(deleteBtn);
 
-    div.appendChild(name);
-    div.appendChild(actions);
+    actions.appendChild(
+      openBtn
+    );
 
-    list.appendChild(div);
+    actions.appendChild(
+      deleteBtn
+    );
+
+
+    div.appendChild(
+      name
+    );
+
+    div.appendChild(
+      actions
+    );
+
+
+    list.appendChild(
+      div
+    );
 
   });
 
-  }
+}
 
+
+/* =========================
+   DOWNLOAD
+========================= */
 
 async function downloadDocument(
   fileName
 ){
 
-  const { data:{user} } =
+  const {
+    data:{user}
+  } =
     await supabaseClient.auth.getUser();
 
 
@@ -2192,13 +2479,16 @@ async function downloadDocument(
     fileName;
 
 
-  const { data,error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .storage
       .from("documents")
       .createSignedUrl(
         filePath,
-        60
+        300
       );
 
 
@@ -2222,6 +2512,10 @@ async function downloadDocument(
 }
 
 
+/* =========================
+   DELETE
+========================= */
+
 async function deleteDocument(
   fileName
 ){
@@ -2236,7 +2530,9 @@ async function deleteDocument(
     return;
 
 
-  const { data:{user} } =
+  const {
+    data:{user}
+  } =
     await supabaseClient.auth.getUser();
 
 
@@ -2257,7 +2553,9 @@ async function deleteDocument(
     fileName;
 
 
-  const { error } =
+  const {
+    error
+  } =
     await supabaseClient
       .storage
       .from("documents")
@@ -2283,582 +2581,40 @@ async function deleteDocument(
   );
 
 
-  loadDocuments();
+  await loadDocuments();
 
 }
 
 
-/* =====================================================
-   TIMER
-   ===================================================== */
+/* =========================
+   AUTH STATE
+========================= */
 
-let timerSeconds =
-  25 * 60;
+supabaseClient.auth.onAuthStateChange(
+  function(){
 
-let timerInterval =
-  null;
-
-let running =
-  false;
-
-let totalStudy =
-  Number(
-    localStorage.getItem(
-      "sknotes-study-time"
-    ) || 0
-  );
-
-
-function timerText(seconds){
-
-  const min =
-    Math.floor(
-      seconds / 60
-    );
-
-  const sec =
-    seconds % 60;
-
-
-  return (
-    String(min)
-      .padStart(2,"0") +
-    ":" +
-    String(sec)
-      .padStart(2,"0")
-  );
-
-}
-
-
-function studyText(seconds){
-
-  const h =
-    Math.floor(
-      seconds / 3600
-    );
-
-  const m =
-    Math.floor(
-      (seconds % 3600) / 60
-    );
-
-  const s =
-    seconds % 60;
-
-
-  return (
-    String(h).padStart(2,"0") +
-    ":" +
-    String(m).padStart(2,"0") +
-    ":" +
-    String(s).padStart(2,"0")
-  );
-
-}
-
-
-function updateTimer(){
-
-  document.getElementById("timer")
-    .textContent =
-    timerText(
-      timerSeconds
-    );
-
-  document.getElementById(
-    "studyTime"
-  ).textContent =
-    studyText(
-      totalStudy
-    );
-
-}
-
-
-function openTimer(){
-
-  document.getElementById(
-    "timerOverlay"
-  ).style.display =
-    "flex";
-
-  updateTimer();
-
-}
-
-
-function closeTimer(){
-
-  document.getElementById(
-    "timerOverlay"
-  ).style.display =
-    "none";
-
-}
-
-
-function startTimer(){
-
-  if(running)
-    return;
-
-  running =
-    true;
-
-
-  timerInterval =
-    setInterval(
-      function(){
-
-        if(
-          timerSeconds > 0
-        ){
-
-          timerSeconds--;
-
-          totalStudy++;
-
-
-          localStorage.setItem(
-            "sknotes-study-time",
-            totalStudy
-          );
-
-
-          updateTimer();
-
-        }else{
-
-          pauseTimer();
-
-          alert(
-            "🎉 Study session complete!"
-          );
-
-        }
-
-      },
-      1000
-    );
-
-}
-
-
-function pauseTimer(){
-
-  running =
-    false;
-
-
-  if(timerInterval){
-
-    clearInterval(
-      timerInterval
-    );
-
-    timerInterval =
-      null;
+    updateAccount();
 
   }
+);
 
-}
 
+/* =========================
+   START
+========================= */
 
-function resetTimer(){
+loadDark();
 
-  pauseTimer();
+updateTimer();
 
-  timerSeconds =
-    25 * 60;
+updateAccount();
 
-  updateTimer();
 
-}
+/* =========================
+   SERVICE WORKER
+========================= */
 
-
-/* =====================================================
-   FLASHCARDS
-   ===================================================== */
-
-let cardCount =
-  Number(
-    localStorage.getItem(
-      "sknotes-card-count"
-    ) || 0
-  );
-
-
-document.getElementById(
-  "cardCount"
-).textContent =
-  cardCount;
-
-
-function goFlashcards(){
-
-  document.getElementById(
-    "flashcardSection"
-  ).scrollIntoView({
-    behavior:"smooth"
-  });
-
-}
-
-
-async function generateFlashcards(){
-
-  const text =
-    document.getElementById(
-      "flashInput"
-    ).value.trim();
-
-
-  const output =
-    document.getElementById(
-      "flashcards"
-    );
-
-
-  const loading =
-    document.getElementById(
-      "loading"
-    );
-
-
-  if(!text){
-
-    alert(
-      "Pehle apne notes paste karo."
-    );
-
-    return;
-
-  }
-
-
-  loading.style.display =
-    "block";
-
-  output.innerHTML =
-    "";
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/flashcards",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:JSON.stringify({
-            text:text
-          })
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        "Flashcards generate nahi hue."
-      );
-
-    }
-
-
-    const cards =
-      data.flashcards ||
-      [];
-
-
-    cards.forEach(
-      function(card){
-
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "flashcard";
-
-
-        div.innerHTML =
-          "<div class='q'>Q. " +
-          safe(
-            card.question ||
-            card.front
-          ) +
-          "</div>" +
-
-          "<div class='a'>A. " +
-          safe(
-            card.answer ||
-            card.back
-          ) +
-          "</div>";
-
-
-        output.appendChild(
-          div
-        );
-
-      }
-    );
-
-
-    cardCount +=
-      cards.length;
-
-
-    localStorage.setItem(
-      "sknotes-card-count",
-      cardCount
-    );
-
-
-    document.getElementById(
-      "cardCount"
-    ).textContent =
-      cardCount;
-
-
-  }catch(error){
-
-    output.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(
-        error.message
-      ) +
-      "</div>";
-
-
-  }finally{
-
-    loading.style.display =
-      "none";
-
-  }
-
-}
-
-
-/* =====================================================
-   QUIZ
-   ===================================================== */
-
-function goQuiz(){
-
-  document.getElementById(
-    "quizSection"
-  ).scrollIntoView({
-    behavior:"smooth"
-  });
-
-}
-
-
-async function generateQuiz(){
-
-  const text =
-    document.getElementById(
-      "quizInput"
-    ).value.trim();
-
-
-  const output =
-    document.getElementById(
-      "quizOutput"
-    );
-
-
-  const loading =
-    document.getElementById(
-      "quizLoading"
-    );
-
-
-  if(!text){
-
-    alert(
-      "Pehle apne notes paste karo."
-    );
-
-    return;
-
-  }
-
-
-  loading.style.display =
-    "block";
-
-  output.innerHTML =
-    "";
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/quiz",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:JSON.stringify({
-            text:text
-          })
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        "Quiz generate nahi hua."
-      );
-
-    }
-
-
-    const quiz =
-      data.quiz ||
-      [];
-
-
-    if(
-      quiz.length === 0
-    ){
-
-      throw new Error(
-        "AI ne koi quiz question return nahi kiya."
-      );
-
-    }
-
-
-    quiz.forEach(
-      function(q,index){
-
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "flashcard";
-
-
-        let options =
-          (q.options || [])
-          .map(
-            function(option){
-
-              return (
-                "<div style='margin:6px 0;'>• " +
-                safe(option) +
-                "</div>"
-              );
-
-            }
-          )
-          .join("");
-
-
-        div.innerHTML =
-
-          "<div class='q'>" +
-          (index + 1) +
-          ". " +
-          safe(
-            q.question
-          ) +
-          "</div>" +
-
-          "<div class='a'>" +
-
-          options +
-
-          "<strong>Answer: " +
-          safe(
-            q.answer
-          ) +
-          "</strong>" +
-
-          "</div>";
-
-
-        output.appendChild(
-          div
-        );
-
-      }
-    );
-
-
-  }catch(error){
-
-    output.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(
-        error.message
-      ) +
-      "</div>";
-
-
-  }finally{
-
-    loading.style.display =
-      "none";
-
-  }
-
-}
-
-
-/* =====================================================
-   COMING SOON
-   ===================================================== */
-
-function soon(){
-
-  alert(
-    "🚧 Ye feature SKNotes me jaldi aa raha hai."
-  );
-
-}
-
-
-/* =====================================================
-   PWA
-   ===================================================== */
-
-if(
-  "serviceWorker" in navigator
-){
+if("serviceWorker" in navigator){
 
   window.addEventListener(
     "load",
@@ -2867,13 +2623,25 @@ if(
       navigator.serviceWorker
         .register(
           "/service-worker.js"
-        );
+        )
+        .catch(function(error){
+
+          console.log(
+            "Service Worker:",
+            error
+          );
+
+        });
 
     }
   );
 
 }
 
+
+/* =========================
+   INSTALL APP
+========================= */
 
 let deferredPrompt;
 
@@ -2894,6 +2662,10 @@ window.addEventListener(
       );
 
 
+    if(!installBtn)
+      return;
+
+
     installBtn.style.display =
       "block";
 
@@ -2901,9 +2673,7 @@ window.addEventListener(
     installBtn.onclick =
       async function(){
 
-        if(
-          !deferredPrompt
-        )
+        if(!deferredPrompt)
           return;
 
 
@@ -2925,75 +2695,6 @@ window.addEventListener(
 
   }
 );
-
-
-/* =====================================================
-   START
-   ===================================================== */
-
-loadDark();
-
-updateTimer();
-
-updateAccount();
-/* =====================================================
-   IMAGE → TEXT
-   ===================================================== */
-
-async function extractImageText(){
-
-  const input =
-    document.getElementById("imageInput");
-
-  const file =
-    input.files[0];
-
-  if(!file){
-    alert("Pehle image select karo.");
-    return;
-  }
-
-  const loading =
-    document.getElementById("imageLoading");
-
-  const output =
-    document.getElementById("imageTextOutput");
-
-  loading.style.display = "block";
-  output.value = "";
-
-  try{
-
-    const result =
-      await Tesseract.recognize(
-        file,
-        "eng",
-        {
-          logger: function(info){
-            console.log(info);
-          }
-        }
-      );
-
-    output.value =
-      result.data.text.trim();
-
-  }catch(error){
-
-    console.error("OCR ERROR:", error);
-
-    alert(
-      "OCR Error: " +
-      (error?.message || error)
-    );
-
-  }finally{
-
-    loading.style.display = "none";
-
-  }
-
-}
 </script>
 
 </body>
