@@ -2767,11 +2767,14 @@ async function extractImageText(){
 
   }catch(error){
 
-    console.error(error);
+  console.error("OCR ERROR:", error);
 
-    alert(
-      "Image se text nikalne me problem aayi."
-    );
+  alert(
+    "OCR Error: " +
+    (error?.message || error)
+  );
+
+  }
 
   }finally{
 
