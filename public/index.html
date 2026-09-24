@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="/manifest.json">
@@ -1009,7 +1010,56 @@ footer a:hover{
   </div>
 
 </section>
+<!-- IMAGE → TEXT -->
 
+<section id="imageTextSection">
+
+  <div class="section-title">
+
+    <h2>📷 Image → Text</h2>
+
+    <p>
+      Upload an image and extract text from it.
+    </p>
+
+  </div>
+
+  <div class="workspace">
+
+    <input
+      type="file"
+      id="imageInput"
+      accept="image/*"
+    >
+
+    <div class="workspace-actions">
+
+      <button
+        class="primary"
+        onclick="extractImageText()"
+      >
+        ✨ Extract Text
+      </button>
+
+    </div>
+
+    <div
+      class="loading"
+      id="imageLoading"
+      style="display:none"
+    >
+      🔍 Extracting text from image...
+    </div>
+
+    <textarea
+      id="imageTextOutput"
+      placeholder="Extracted text will appear here..."
+      readonly
+    ></textarea>
+
+  </div>
+
+  </section>
 
 <!-- FLASHCARDS -->
 
