@@ -1152,7 +1152,45 @@ id="quizOutput">
 
 </section>
 
+<section id="documentsSection" style="display:none;">
 
+  <div class="section-title">
+    <h2>📁 My Documents</h2>
+    <p>Apne documents securely save, view aur download karo.</p>
+  </div>
+
+  <div class="workspace">
+
+    <input
+      type="file"
+      id="documentInput"
+      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+    >
+
+    <div class="workspace-actions">
+      <button
+        class="primary"
+        onclick="uploadDocument()"
+      >
+        ⬆️ Upload Document
+      </button>
+    </div>
+
+    <div
+      class="loading"
+      id="documentLoading"
+    >
+      Uploading...
+    </div>
+
+    <div
+      class="flashcards"
+      id="documentList"
+    ></div>
+
+  </div>
+
+        </section>
 </main>
 
 
