@@ -2054,6 +2054,72 @@ async function loadDocuments(){
     name.textContent =
       "📄 " + file.name;
 
+async function loadDocuments(){
+
+  const list =
+    document.getElementById("documentList");
+
+  const {
+    data: { user }
+  } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+    list.innerHTML =
+      "<div class='flashcard'>Pehle Login karo.</div>";
+    return;
+  }
+
+  const { data, error } =
+    await supabaseClient
+      .storage
+      .from("documents")
+      .list(user.id, {
+        limit: 100,
+        sortBy: {
+          column: "created_at",
+          order: "desc"
+        }
+      });
+
+  if(error){
+    list.innerHTML =
+      "<div class='flashcard'>❌ " +
+      safe(error.message) +
+      "</div>";
+    return;
+  }
+
+  const files =
+    (data || []).filter(function(file){
+      return file.name !== ".emptyFolderPlaceholder";
+    });
+
+  if(files.length === 0){
+    list.innerHTML =
+      "<div class='flashcard'>" +
+      "Abhi koi document save nahi hai." +
+      "</div>";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  files.forEach(function(file){
+
+    const div =
+      document.createElement("div");
+
+    div.className = "flashcard";
+
+    const name =
+      document.createElement("div");
+
+    name.className = "q";
+
+    name.textContent =
+      "📄 " + file.name;
+
     const actions =
       document.createElement("div");
 
@@ -2098,7 +2164,7 @@ async function loadDocuments(){
 
   });
 
-      }
+  }
 
 
 async function downloadDocument(
