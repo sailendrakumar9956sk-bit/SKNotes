@@ -489,3 +489,6 @@ app.get("/api/admin/users-count", async (req, res) => {
   }
 
 });
+app.listen(PORT, () => {
+  console.log(`SKNotes server running on port ${PORT}`);
+});
