@@ -3,29 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SKNotes - AI Study Assistant</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
 :root{
-  --bg:#f5f7fb;
-  --card:#fff;
-  --text:#111827;
-  --muted:#667085;
+  --bg:#f7f8fc;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#687386;
   --border:#e5e7eb;
-  --primary:#6366f1;
-  --primary2:#4f46e5;
+
+  --saffron:#f97316;
+  --orange:#ea580c;
+  --green:#138a4b;
+  --green-dark:#08733d;
+  --blue:#4f46e5;
+
+  --shadow:0 12px 35px rgba(20,30,50,.08);
 }
 
 body.dark{
-  --bg:#0b1020;
-  --card:#151b2d;
+  --bg:#09111c;
+  --card:#121c2b;
   --text:#f8fafc;
-  --muted:#aab2c0;
-  --border:#293247;
+  --muted:#a9b4c5;
+  --border:#263548;
+  --shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
 body{
@@ -35,12 +47,32 @@ body{
   transition:.25s;
 }
 
-button,input,textarea{font:inherit}
+/* subtle Indian pattern */
+body:before{
+  content:"ॐ  ✦  ॐ  ✦  ॐ";
+  position:fixed;
+  top:90px;
+  right:-35px;
+  font-size:42px;
+  letter-spacing:15px;
+  opacity:.035;
+  pointer-events:none;
+  z-index:-1;
+}
 
-button{cursor:pointer}
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
 
 .container{
-  width:min(1100px,calc(100% - 28px));
+  width:min(1120px,calc(100% - 28px));
   margin:auto;
 }
 
@@ -49,31 +81,44 @@ button{cursor:pointer}
 header{
   position:sticky;
   top:0;
-  z-index:50;
-  background:var(--card);
+  z-index:100;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
+}
+
+body.dark header{
+  background:rgba(18,28,43,.94);
 }
 
 .nav{
   min-height:68px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:10px;
 }
 
 .logo{
-  font-size:24px;
+  font-size:25px;
   font-weight:900;
 }
 
 .logo span{
-  color:var(--primary);
+  color:var(--saffron);
+}
+
+.logo small{
+  display:block;
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--green);
+  margin-top:2px;
 }
 
 .nav-actions{
   display:flex;
-  gap:8px;
+  gap:7px;
 }
 
 .nav-btn{
@@ -86,34 +131,35 @@ header{
 }
 
 .nav-btn:hover{
-  border-color:var(--primary);
-}
-
-.primary{
-  background:var(--primary);
-  color:white;
-  border:0;
-  padding:11px 16px;
-  border-radius:10px;
-  font-weight:800;
-}
-
-.primary:hover{
-  background:var(--primary2);
+  border-color:var(--saffron);
 }
 
 /* HERO */
 
 .hero{
   text-align:center;
-  padding:65px 0 40px;
+  padding:65px 0 45px;
+}
+
+.india-line{
+  width:150px;
+  height:4px;
+  margin:0 auto 22px;
+  border-radius:10px;
+  background:linear-gradient(
+    90deg,
+    var(--saffron) 0 33%,
+    white 33% 66%,
+    var(--green) 66%
+  );
+  border:1px solid rgba(0,0,0,.05);
 }
 
 .badge{
   display:inline-block;
-  background:#eef2ff;
-  color:var(--primary);
-  padding:7px 13px;
+  background:#fff7ed;
+  color:var(--orange);
+  padding:7px 14px;
   border-radius:999px;
   font-size:13px;
   font-weight:800;
@@ -121,7 +167,7 @@ header{
 }
 
 body.dark .badge{
-  background:#20264a;
+  background:#2a1b12;
 }
 
 .hero h1{
@@ -131,11 +177,11 @@ body.dark .badge{
 }
 
 .hero h1 span{
-  color:var(--primary);
+  color:var(--saffron);
 }
 
 .hero p{
-  max-width:650px;
+  max-width:680px;
   margin:auto;
   color:var(--muted);
   line-height:1.7;
@@ -148,8 +194,9 @@ body.dark .badge{
   background:var(--card);
   border:1px solid var(--border);
   padding:18px;
-  border-radius:16px;
+  border-radius:18px;
   margin-bottom:25px;
+  box-shadow:var(--shadow);
 }
 
 .account-inner{
@@ -176,20 +223,22 @@ body.dark .badge{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:14px;
-  margin-bottom:40px;
+  margin-bottom:45px;
 }
 
 .stat{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:16px;
-  padding:20px;
+  border-radius:18px;
+  padding:21px;
   text-align:center;
+  box-shadow:var(--shadow);
 }
 
 .stat strong{
   display:block;
   font-size:25px;
+  color:var(--green);
 }
 
 .stat small{
@@ -199,11 +248,11 @@ body.dark .badge{
 /* SECTION */
 
 .section-title{
-  margin:35px 0 17px;
+  margin:35px 0 18px;
 }
 
 .section-title h2{
-  font-size:26px;
+  font-size:27px;
 }
 
 .section-title p{
@@ -222,17 +271,33 @@ body.dark .badge{
 .service{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:18px;
+  border-radius:20px;
   padding:20px;
+  box-shadow:var(--shadow);
   transition:.2s;
+  position:relative;
+  overflow:hidden;
+}
+
+.service:after{
+  content:"";
+  position:absolute;
+  width:70px;
+  height:70px;
+  right:-25px;
+  top:-25px;
+  border:1px solid var(--saffron);
+  border-radius:50%;
+  opacity:.12;
 }
 
 .service:hover{
-  transform:translateY(-3px);
+  transform:translateY(-4px);
+  border-color:rgba(249,115,22,.4);
 }
 
 .icon{
-  font-size:32px;
+  font-size:31px;
   margin-bottom:12px;
 }
 
@@ -247,20 +312,39 @@ body.dark .badge{
   min-height:42px;
 }
 
-.service button{
-  width:100%;
-  margin-top:14px;
-}
-
 .soon{
   display:inline-block;
   margin-top:12px;
   font-size:10px;
   font-weight:900;
-  color:#d97706;
-  background:#fff7ed;
+  color:var(--green-dark);
+  background:#ecfdf3;
   padding:5px 8px;
   border-radius:20px;
+}
+
+/* BUTTON */
+
+.primary{
+  background:linear-gradient(
+    135deg,
+    var(--saffron),
+    var(--orange)
+  );
+  color:white;
+  border:0;
+  padding:11px 16px;
+  border-radius:11px;
+  font-weight:800;
+}
+
+.primary:hover{
+  opacity:.92;
+}
+
+.service .primary{
+  width:100%;
+  margin-top:14px;
 }
 
 /* WORKSPACE */
@@ -269,13 +353,33 @@ body.dark .badge{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:20px;
-  padding:20px;
-  margin-top:25px;
+  padding:21px;
+  margin-top:28px;
+  box-shadow:var(--shadow);
+}
+
+.workspace-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.workspace-head p{
+  color:var(--muted);
+  margin-top:5px;
+}
+
+.close{
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-size:26px;
 }
 
 textarea{
   width:100%;
-  min-height:190px;
+  min-height:170px;
   resize:vertical;
   padding:15px;
   border:1px solid var(--border);
@@ -285,20 +389,58 @@ textarea{
   outline:none;
 }
 
-textarea:focus,input:focus{
-  border-color:var(--primary);
+input,
+select{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  outline:none;
+  background:var(--bg);
+  color:var(--text);
 }
 
-.workspace-actions{
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--saffron);
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.actions{
   display:flex;
   justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:8px;
   margin-top:12px;
 }
 
 .loading{
   display:none;
   color:var(--muted);
-  margin-top:14px;
+  margin-top:15px;
+}
+
+.result{
+  white-space:pre-wrap;
+  line-height:1.65;
+  margin-top:18px;
 }
 
 .flashcards{
@@ -310,7 +452,7 @@ textarea:focus,input:focus{
 .flashcard{
   background:var(--bg);
   border:1px solid var(--border);
-  border-radius:14px;
+  border-radius:15px;
   padding:16px;
 }
 
@@ -324,32 +466,41 @@ textarea:focus,input:focus{
   line-height:1.5;
 }
 
-/* TIMER */
+/* MODALS */
 
 .overlay{
   display:none;
   position:fixed;
   inset:0;
-  z-index:100;
-  background:rgba(0,0,0,.75);
+  z-index:200;
+  background:rgba(0,0,0,.72);
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:18px;
 }
 
-.timer-box{
-  width:min(470px,100%);
+.modal-box{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
   background:var(--card);
-  color:var(--text);
   border-radius:22px;
-  padding:30px;
-  text-align:center;
+  padding:24px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
 }
 
 .timer{
-  font-size:80px;
+  text-align:center;
+  font-size:78px;
   font-weight:900;
-  margin:25px 0;
+  margin:28px 0;
+  color:var(--green);
 }
 
 .timer-buttons{
@@ -368,78 +519,8 @@ textarea:focus,input:focus{
   font-weight:700;
 }
 
-/* AUTH */
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:120;
-  background:rgba(0,0,0,.7);
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.auth-box{
-  width:min(420px,100%);
-  background:var(--card);
-  color:var(--text);
-  border-radius:20px;
-  padding:25px;
-}
-
-.auth-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
-}
-
-.close{
-  background:none;
-  border:0;
-  color:var(--muted);
-  font-size:25px;
-}
-
-.field{
-  margin-bottom:14px;
-}
-
-.field label{
-  display:block;
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  outline:none;
-  background:var(--bg);
-  color:var(--text);
-}
-
 .auth-submit{
   width:100%;
-}
-
-.switch{
-  text-align:center;
-  margin-top:15px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-.switch button{
-  border:0;
-  background:none;
-  color:var(--primary);
-  font-weight:800;
 }
 
 .message{
@@ -448,12 +529,26 @@ input{
   font-size:13px;
 }
 
+.switch{
+  text-align:center;
+  margin-top:15px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.switch button{
+  border:0;
+  background:none;
+  color:var(--saffron);
+  font-weight:800;
+}
+
 /* FOOTER */
 
 footer{
   text-align:center;
   margin-top:65px;
-  padding:32px 15px;
+  padding:35px 15px;
   border-top:1px solid var(--border);
   color:var(--muted);
   line-height:2;
@@ -465,20 +560,20 @@ footer strong{
 }
 
 footer a{
-  color:var(--primary);
+  color:var(--saffron);
   text-decoration:none;
   font-weight:800;
 }
 
-footer a:hover{
-  text-decoration:underline;
-}
-
 /* MOBILE */
 
-@media(max-width:800px){
+@media(max-width:850px){
   .services{
     grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
   }
 }
 
@@ -492,12 +587,16 @@ footer a:hover{
   }
 
   .account-inner{
-    align-items:flex-start;
     flex-direction:column;
+    align-items:flex-start;
   }
 
   .timer{
-    font-size:60px;
+    font-size:58px;
+  }
+
+  .hero{
+    padding-top:45px;
   }
 
   .nav-btn{
@@ -511,261 +610,207 @@ footer a:hover{
 <body>
 
 <header>
-  <div class="container nav">
+<div class="container nav">
 
-    <div class="logo">
-      SK<span>Notes</span>
-    </div>
+<div class="logo">
+SK<span>Notes</span>
+<small>LEARN • CREATE • GROW</small>
+</div>
 
-    <div class="nav-actions">
+<div class="nav-actions">
+<button class="nav-btn" onclick="openTimer()">⏱️ Timer</button>
+<button class="nav-btn" onclick="toggleDark()" id="darkBtn">🌙</button>
+<button class="nav-btn" onclick="openAuth()" id="loginBtn">Login</button>
+</div>
 
-      <button class="nav-btn" onclick="openTimer()">
-        ⏱️ Timer
-      </button>
-
-      <button class="nav-btn" onclick="toggleDark()" id="darkBtn">
-        🌙
-      </button>
-
-      <button class="nav-btn" onclick="openAuth()" id="loginBtn">
-        Login
-      </button>
-
-    </div>
-  </div>
+</div>
 </header>
-
 
 <main class="container">
 
 <section class="hero">
 
-  <div class="badge">
-    🤖 AI Study Assistant
-  </div>
+<div class="india-line"></div>
 
-  <h1>
-    Study Smarter with
-    <span>SKNotes</span>
-  </h1>
+<div class="badge">
+🇮🇳 Made for Indian Students
+</div>
 
-  <p>
-    Notes, flashcards, quizzes and powerful study tools
-    designed to make learning easier and faster.
-  </p>
+<h1>
+Study Smarter with
+<span>SKNotes</span>
+</h1>
+
+<p>
+AI-powered notes, flashcards, quizzes, study planning and doubt solving —
+designed for students preparing for school and competitive exams.
+</p>
 
 </section>
-
-
-<!-- ACCOUNT -->
 
 <section class="account" id="account">
 
-  <div class="account-inner">
+<div class="account-inner">
 
-    <div>
-      <div class="account-name" id="accountName">
-        👋 Welcome
-      </div>
-
-      <div class="account-email" id="accountEmail"></div>
-    </div>
-
-    <button class="nav-btn" onclick="logout()">
-      Logout
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- STATS -->
-
-<section class="stats">
-
-  <div class="stat">
-    <strong id="studyTime">00:00:00</strong>
-    <small>Study Time</small>
-  </div>
-
-  <div class="stat">
-    <strong id="cardCount">0</strong>
-    <small>Flashcards Created</small>
-  </div>
-
-  <div class="stat">
-    <strong>∞</strong>
-    <small>Learning Potential</small>
-  </div>
-
-</section>
-
-
-<!-- SERVICES -->
-
-<section>
-
-<div class="section-title">
-  <h2>📚 Study Tools</h2>
-  <p>Everything you need for smarter studying.</p>
+<div>
+<div class="account-name" id="accountName">
+👋 Welcome
 </div>
 
-
-<div class="services">
-
-
-<div class="service">
-  <div class="icon">🧠</div>
-  <h3>Text → Flashcards</h3>
-  <p>Create AI flashcards from your notes.</p>
-  <button class="primary" onclick="goFlashcards()">
-    Use Now
-  </button>
+<div class="account-email" id="accountEmail"></div>
 </div>
 
-
-<div class="service">
-  <div class="icon">▶️</div>
-  <h3>YouTube → Notes</h3>
-  <p>Convert educational videos into notes.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">🖼️</div>
-  <h3>Image → Text</h3>
-  <p>Extract text from images using OCR.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">📷</div>
-  <h3>Question Scanner</h3>
-  <p>Scan questions and get study help.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">📝</div>
-  <h3>Notes → Quiz</h3>
-  <p>Create quizzes and MCQs from notes.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">📄</div>
-  <h3>PDF Export</h3>
-  <p>Export your study material as PDF.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">🤖</div>
-  <h3>AI Tutor</h3>
-  <p>Ask questions and learn concepts.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">🗺️</div>
-  <h3>Mind Map</h3>
-  <p>Create visual maps for your subjects.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">📚</div>
-  <h3>Study Pack</h3>
-  <p>Create a complete study package.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">📊</div>
-  <h3>Study Progress</h3>
-  <p>Track your learning and study time.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">⭐</div>
-  <h3>Saved Notes</h3>
-  <p>Save important study material.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-
-<div class="service">
-  <div class="icon">🔍</div>
-  <h3>Smart Search</h3>
-  <p>Find your study content quickly.</p>
-  <span class="soon">COMING SOON</span>
-  <button class="nav-btn" onclick="soon()">Open</button>
-</div>
-
-</div>
-
-</section>
-
-
-<!-- FLASHCARDS -->
-
-<section id="flashcardSection">
-
-<div class="section-title">
-  <h2>🧠 Text → Flashcards</h2>
-  <p>Paste your notes and generate flashcards using AI.</p>
-</div>
-
-<div class="workspace">
-
-<textarea
-id="flashInput"
-placeholder="Paste your study notes here..."
-></textarea>
-
-<div class="workspace-actions">
-
-<button class="primary" onclick="generateFlashcards()">
-✨ Generate Flashcards
+<button class="nav-btn" onclick="logout()">
+Logout
 </button>
 
 </div>
 
-<div class="loading" id="loading">
-🤖 AI is creating your flashcards...
+</section>
+
+<section class="stats">
+
+<div class="stat">
+<strong id="studyTime">00:00:00</strong>
+<small>Study Time</small>
 </div>
 
-<div class="flashcards" id="flashcards"></div>
+<div class="stat">
+<strong id="cardCount">0</strong>
+<small>Flashcards Created</small>
+</div>
 
+<div class="stat">
+<strong id="toolCount">0</strong>
+<small>Tools Used</small>
 </div>
 
 </section>
 
+<div class="section-title">
+<h2>📚 Study Tools</h2>
+<p>Modern AI tools with a touch of Indian learning culture.</p>
+</div>
+
+<section class="services">
+
+<div class="service">
+<div class="icon">🧠</div>
+<h3>Text → Flashcards</h3>
+<p>Create AI flashcards from your notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('flashcards')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">▶️</div>
+<h3>YouTube → Notes</h3>
+<p>Convert educational videos into notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('youtube')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">🖼️</div>
+<h3>Image → Text</h3>
+<p>Extract text from handwritten or printed images.</p>
+<span class="soon">OCR</span>
+<button class="primary" onclick="openFeature('ocr')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📷</div>
+<h3>Question Scanner</h3>
+<p>Scan a question and get an AI explanation.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('scanner')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📝</div>
+<h3>Notes → Quiz</h3>
+<p>Generate MCQs from your notes.</p>
+<span class="soon">10 MCQs</span>
+<button class="primary" onclick="openFeature('quiz')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📄</div>
+<h3>PDF Export</h3>
+<p>Download your notes as a PDF.</p>
+<span class="soon">PDF</span>
+<button class="primary" onclick="openFeature('pdf')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">🤖</div>
+<h3>AI Tutor</h3>
+<p>Ask questions and learn concepts step-by-step.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('tutor')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📚</div>
+<h3>AI Notes Generator</h3>
+<p>Turn raw study material into structured notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('notes')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📅</div>
+<h3>Study Planner</h3>
+<p>Create a practical day-by-day timetable.</p>
+<span class="soon">PLAN</span>
+<button class="primary" onclick="openFeature('planner')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📊</div>
+<h3>Study Progress</h3>
+<p>Track topics, study hours and quiz score.</p>
+<span class="soon">TRACK</span>
+<button class="primary" onclick="openFeature('progress')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">🎙️</div>
+<h3>AI Voice Tutor</h3>
+<p>Generate answers that are easy to listen to.</p>
+<span class="soon">VOICE</span>
+<button class="primary" onclick="openFeature('voice')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">🌐</div>
+<h3>AI Web Research</h3>
+<p>Create structured research answers.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('research')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">📑</div>
+<h3>Exam Paper Generator</h3>
+<p>Generate school-level practice papers.</p>
+<span class="soon">EXAM</span>
+<button class="primary" onclick="openFeature('exam')">Open</button>
+</div>
+
+<div class="service">
+<div class="icon">❓</div>
+<h3>AI Doubt Solver</h3>
+<p>Get simple step-by-step explanations.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('doubt')">Open</button>
+</div>
+
+</section>
+
+<section id="workspaceArea"></section>
+
 </main>
-
-
-<!-- FOOTER -->
 
 <footer>
 
@@ -774,16 +819,14 @@ placeholder="Paste your study notes here..."
 </div>
 
 <div>
-Created by <strong>Sailendra</strong>
+Created with ❤️ for students
 </div>
 
 <div>
 Instagram:
-<a
-href="https://www.instagram.com/also__sk?stkn=emtnZ3FnMXU4Z2Vy"
+<a href="https://www.instagram.com/also__sk"
 target="_blank"
-rel="noopener noreferrer"
->
+rel="noopener">
 @also__sk
 </a>
 </div>
@@ -795,9 +838,12 @@ rel="noopener noreferrer"
 
 <div class="overlay" id="timerOverlay">
 
-<div class="timer-box">
+<div class="modal-box">
 
+<div class="modal-head">
 <h2>⏱️ Study Timer</h2>
+<button class="close" onclick="closeTimer()">×</button>
+</div>
 
 <div class="timer" id="timer">
 25:00
@@ -816,28 +862,24 @@ rel="noopener noreferrer"
 </div>
 
 </div>
-
 </div>
 
 
-<!-- LOGIN -->
+<!-- AUTH -->
 
-<div class="modal" id="authModal">
+<div class="overlay" id="authModal">
 
-<div class="auth-box">
+<div class="modal-box">
 
-<div class="auth-head">
+<div class="modal-head">
 
 <h2 id="authTitle">
 Login
 </h2>
 
-<button class="close" onclick="closeAuth()">
-×
-</button>
+<button class="close" onclick="closeAuth()">×</button>
 
 </div>
-
 
 <form onsubmit="authSubmit(event)">
 
@@ -848,11 +890,9 @@ Login
 <input
 type="text"
 id="name"
-placeholder="Your name"
-/>
+placeholder="Your name">
 
 </div>
-
 
 <div class="field">
 
@@ -862,11 +902,9 @@ placeholder="Your name"
 type="email"
 id="email"
 placeholder="you@example.com"
-required
-/>
+required>
 
 </div>
-
 
 <div class="field">
 
@@ -877,21 +915,23 @@ type="password"
 id="password"
 placeholder="Minimum 6 characters"
 required
-minlength="6"
-/>
+minlength="6">
 
 </div>
 
+<button
+class="primary auth-submit"
+type="submit">
 
-<button class="primary auth-submit" type="submit">
-<span id="submitText">Login</span>
+<span id="submitText">
+Login
+</span>
+
 </button>
 
 </form>
 
-
 <div class="message" id="message"></div>
-
 
 <div class="switch">
 
@@ -899,28 +939,32 @@ minlength="6"
 Don't have an account?
 </span>
 
-<button onclick="switchMode()" id="switchButton">
+<button
+onclick="switchMode()"
+id="switchButton"
+type="button">
+
 Sign Up
+
 </button>
 
 </div>
 
 </div>
-
 </div>
 
 
 <script>
 
-/* =====================================================
+/* =========================================================
    SUPABASE
-   ===================================================== */
+   ========================================================= */
 
 const SUPABASE_URL =
-"YAHAN_APNA_PROJECT_URL_DALO";
+"https://ejwdvlenqdfelmahajct.supabase.co";
 
 const SUPABASE_KEY =
-"YAHAN_APNI_PUBLISHABLE_KEY_DALO";
+"sb_publishable_qy0u-EQxaagkqQioyeNfgA_xvN6amzA";
 
 const supabaseClient =
 window.supabase.createClient(
@@ -929,599 +973,2578 @@ window.supabase.createClient(
 );
 
 
-/* =====================================================
-   DARK MODE
-   ===================================================== */
-
-function loadDark(){
-
-  const saved =
-    localStorage.getItem("sknotes-dark");
-
-  if(saved === "yes"){
-
-    document.body.classList.add("dark");
-
-    document.getElementById("darkBtn")
-      .textContent = "☀️";
-
-  }
-
-}
-
-
-function toggleDark(){
-
-  document.body.classList.toggle("dark");
-
-  const dark =
-    document.body.classList.contains("dark");
-
-  localStorage.setItem(
-    "sknotes-dark",
-    dark ? "yes" : "no"
-  );
-
-  document.getElementById("darkBtn")
-    .textContent = dark ? "☀️" : "🌙";
-
-}
-
-
-/* =====================================================
-   AUTH MODAL
-   ===================================================== */
-
-let authMode = "login";
-
-
-function openAuth(){
-
-  document.getElementById("authModal")
-    .style.display = "flex";
-
-}
-
-
-function closeAuth(){
-
-  document.getElementById("authModal")
-    .style.display = "none";
-
-}
-
-
-function switchMode(){
-
-  if(authMode === "login"){
-
-    authMode = "signup";
-
-    document.getElementById("authTitle")
-      .textContent = "Create Account";
-
-    document.getElementById("submitText")
-      .textContent = "Sign Up";
-
-    document.getElementById("nameBox")
-      .style.display = "block";
-
-    document.getElementById("switchText")
-      .textContent = "Already have an account?";
-
-    document.getElementById("switchButton")
-      .textContent = "Login";
-
-  }else{
-
-    authMode = "login";
-
-    document.getElementById("authTitle")
-      .textContent = "Login";
-
-    document.getElementById("submitText")
-      .textContent = "Login";
-
-    document.getElementById("nameBox")
-      .style.display = "none";
-
-    document.getElementById("switchText")
-      .textContent = "Don't have an account?";
-
-    document.getElementById("switchButton")
-      .textContent = "Sign Up";
-
-  }
-
-  document.getElementById("message")
-    .textContent = "";
-
-}
-
-
-async function authSubmit(event){
-
-  event.preventDefault();
-
-  const email =
-    document.getElementById("email")
-      .value.trim();
-
-  const password =
-    document.getElementById("password")
-      .value;
-
-  const name =
-    document.getElementById("name")
-      .value.trim();
-
-  const message =
-    document.getElementById("message");
-
-  message.textContent = "Please wait...";
-
-
-  try{
-
-    if(authMode === "signup"){
-
-      const result =
-        await supabaseClient.auth.signUp({
-
-          email:email,
-
-          password:password,
-
-          options:{
-            data:{
-              full_name:name
-            }
-          }
-
-        });
-
-
-      if(result.error)
-        throw result.error;
-
-
-      message.textContent =
-        "Account created successfully.";
-
-      setTimeout(closeAuth,1000);
-
-
-    }else{
-
-      const result =
-        await supabaseClient.auth
-          .signInWithPassword({
-
-            email:email,
-
-            password:password
-
-          });
-
-
-      if(result.error)
-        throw result.error;
-
-
-      message.textContent =
-        "Login successful!";
-
-      setTimeout(function(){
-
-        closeAuth();
-        updateAccount();
-
-      },700);
-
-    }
-
-  }catch(error){
-
-    message.textContent =
-      error.message ||
-      "Something went wrong.";
-
-  }
-
-}
-
-
-/* =====================================================
-   ACCOUNT
-   ===================================================== */
-
-async function updateAccount(){
-
-  const result =
-    await supabaseClient.auth.getSession();
-
-  const session =
-    result.data.session;
-
-  const account =
-    document.getElementById("account");
-
-  const loginBtn =
-    document.getElementById("loginBtn");
-
-
-  if(session){
-
-    const user =
-      session.user;
-
-    const name =
-      user.user_metadata?.full_name ||
-      user.email?.split("@")[0] ||
-      "Student";
-
-
-    document.getElementById("accountName")
-      .textContent =
-      "👋 Welcome, " + name;
-
-    document.getElementById("accountEmail")
-      .textContent =
-      user.email || "";
-
-    account.style.display = "block";
-
-    loginBtn.textContent = "Account";
-
-  }else{
-
-    account.style.display = "none";
-
-    loginBtn.textContent = "Login";
-
-  }
-
-}
-
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
-
-  updateAccount();
-
-}
-
-
-supabaseClient.auth.onAuthStateChange(
-  function(){
-    updateAccount();
-  }
-);
-
-
-/* =====================================================
-   TIMER
-   ===================================================== */
-
-let timerSeconds = 25 * 60;
-
-let timerInterval = null;
-
-let running = false;
-
-let totalStudy =
-  Number(
-    localStorage.getItem(
-      "sknotes-study-time"
-    ) || 0
-  );
-
-
-function timerText(seconds){
-
-  const min =
-    Math.floor(seconds / 60);
-
-  const sec =
-    seconds % 60;
-
-  return (
-    String(min).padStart(2,"0") +
-    ":" +
-    String(sec).padStart(2,"0")
-  );
-
-}
-
-
-function studyText(seconds){
-
-  const h =
-    Math.floor(seconds / 3600);
-
-  const m =
-    Math.floor((seconds % 3600) / 60);
-
-  const s =
-    seconds % 60;
-
-  return (
-    String(h).padStart(2,"0") +
-    ":" +
-    String(m).padStart(2,"0") +
-    ":" +
-    String(s).padStart(2,"0")
-  );
-
-}
-
-
-function updateTimer(){
-
-  document.getElementById("timer")
-    .textContent =
-    timerText(timerSeconds);
-
-  document.getElementById("studyTime")
-    .textContent =
-    studyText(totalStudy);
-
-}
-
-
-function openTimer(){
-
-  document.getElementById("timerOverlay")
-    .style.display = "flex";
-
-  updateTimer();
-
-}
-
-
-function closeTimer(){
-
-  document.getElementById("timerOverlay")
-    .style.display = "none";
-
-}
-
-
-function startTimer(){
-
-  if(running) return;
-
-  running = true;
-
-  timerInterval =
-    setInterval(function(){
-
-      if(timerSeconds > 0){
-
-        timerSeconds--;
-
-        totalStudy++;
-
-        localStorage.setItem(
-          "sknotes-study-time",
-          totalStudy
-        );
-
-        updateTimer();
-
-      }else{
-
-        pauseTimer();
-
-        alert(
-          "🎉 Study session complete!"
-        );
-
-      }
-
-    },1000);
-
-}
-
-
-function pauseTimer(){
-
-  running = false;
-
-  if(timerInterval){
-
-    clearInterval(timerInterval);
-
-    timerInterval = null;
-
-  }
-
-}
-
-
-function resetTimer(){
-
-  pauseTimer();
-
-  timerSeconds = 25 * 60;
-
-  updateTimer();
-
-}
-
-
-/* =====================================================
-   FLASHCARDS
-   ===================================================== */
-
-let cardCount =
-  Number(
-    localStorage.getItem(
-      "sknotes-card-count"
-    ) || 0
-  );
-
-
-document.getElementById("cardCount")
-  .textContent = cardCount;
-
-
-function goFlashcards(){
-
-  document.getElementById(
-    "flashcardSection"
-  ).scrollIntoView({
-    behavior:"smooth"
-  });
-
-}
-
-
-async function generateFlashcards(){
-
-  const text =
-    document.getElementById("flashInput")
-      .value.trim();
-
-  const output =
-    document.getElementById("flashcards");
-
-  const loading =
-    document.getElementById("loading");
-
-
-  if(!text){
-
-    alert(
-      "Pehle apne notes paste karo."
-    );
-
-    return;
-
-  }
-
-
-  loading.style.display = "block";
-
-  output.innerHTML = "";
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/flashcards",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:JSON.stringify({
-            text:text
-          })
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        "Flashcards generate nahi hue."
-      );
-
-    }
-
-
-    const cards =
-      data.flashcards || [];
-
-
-    cards.forEach(function(card){
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "flashcard";
-
-      div.innerHTML =
-        "<div class='q'>Q. " +
-        safe(card.question || card.front) +
-        "</div>" +
-
-        "<div class='a'>A. " +
-        safe(card.answer || card.back) +
-        "</div>";
-
-      output.appendChild(div);
-
-    });
-
-
-    cardCount += cards.length;
-
-    localStorage.setItem(
-      "sknotes-card-count",
-      cardCount
-    );
-
-    document.getElementById("cardCount")
-      .textContent = cardCount;
-
-
-  }catch(error){
-
-    output.innerHTML =
-      "<div class='flashcard'>❌ " +
-      safe(error.message) +
-      "</div>";
-
-  }finally{
-
-    loading.style.display = "none";
-
-  }
-
-}
-
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
 function safe(value){
 
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+return String(value || "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+function apiBusy(show){
+
+const loading =
+document.getElementById("featureLoading");
+
+if(loading){
+
+loading.style.display =
+show ? "block" : "none";
+
+}
+
+}
+
+function output(text){
+
+const box =
+document.getElementById("featureOutput");
+
+if(box){
+
+box.innerHTML = text;
+
+}
+
+}
+
+async function api(url,body){
+
+const response =
+await fetch(url,{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify(body)
+
+});
+
+let data={};
+
+try{
+
+data =
+await response.json();
+
+}catch(e){
+
+throw new Error(
+"Server ne valid response nahi diya."
+);
+
+}
+
+if(!response.ok){
+
+throw new Error(
+data.error ||
+"Request failed"
+);
+
+}
+
+return data;
 
 }
 
 
-/* =====================================================
-   COMING SOON
-   ===================================================== */
+/* =========================================================
+   DARK MODE
+   ========================================================= */
 
-function soon(){
+function loadDark(){
 
-  alert(
-    "🚧 Ye feature SKNotes me jaldi aa raha hai."
-  );
+if(
+localStorage.getItem(
+"sknotes-dark"
+)==="yes"
+){
+
+document.body.classList.add("dark");
+
+document.getElementById(
+"darkBtn"
+).textContent="☀️";
+
+}
+
+}
+
+function toggleDark(){
+
+document.body.classList.toggle("dark");
+
+const dark =
+document.body.classList.contains("dark");
+
+localStorage.setItem(
+"sknotes-dark",
+dark ? "yes" : "no"
+);
+
+document.getElementById(
+"darkBtn"
+).textContent =
+dark ? "☀️" : "🌙";
 
 }
 
 
-/* =====================================================
+/* =========================================================
+   AUTH
+   ========================================================= */
+
+let authMode="login";
+
+function openAuth(){
+
+document.getElementById(
+"authModal"
+).style.display="flex";
+
+}
+
+function closeAuth(){
+
+document.getElementById(
+"authModal"
+).style.display="none";
+
+}
+
+function switchMode(){
+
+if(authMode==="login"){
+
+authMode="signup";
+
+document.getElementById(
+"authTitle"
+).textContent="Create Account";
+
+document.getElementById(
+"submitText"
+).textContent="Sign Up";
+
+document.getElementById(
+"nameBox"
+).style.display="block";
+
+document.getElementById(
+"switchText"
+).textContent=
+"Already have an account?";
+
+document.getElementById(
+"switchButton"
+).textContent="Login";
+
+}else{
+
+authMode="login";
+
+document.getElementById(
+"authTitle"
+).textContent="Login";
+
+document.getElementById(
+"submitText"
+).textContent="Login";
+
+document.getElementById(
+"nameBox"
+).style.display="none";
+
+document.getElementById(
+"switchText"
+).textContent=
+"Don't have an account?";
+
+document.getElementById(
+"switchButton"
+).textContent="Sign Up";
+
+}
+
+document.getElementById(
+"message"
+).textContent="";
+
+}
+
+async function authSubmit(event){
+
+event.preventDefault();
+
+const email =
+document.getElementById("email")
+.value.trim();
+
+const password =
+document.getElementById("password")
+.value;
+
+const name =
+document.getElementById("name")
+.value.trim();
+
+const message =
+document.getElementById("message");
+
+message.textContent=
+"Please wait...";
+
+try{
+
+if(authMode==="signup"){
+
+const result =
+await supabaseClient.auth.signUp({
+
+email:email,
+
+password:password,
+
+options:{
+data:{
+full_name:name
+}
+}
+
+});
+
+if(result.error)
+throw result.error;
+
+message.textContent=
+result.data.session
+?
+"Account created successfully."
+:
+"Account created. Email confirmation check karo.";
+
+if(result.data.session){
+
+await updateAccount();
+
+setTimeout(
+closeAuth,
+800
+);
+
+}
+
+}else{
+
+const result =
+await supabaseClient.auth
+.signInWithPassword({
+
+email:email,
+
+password:password
+
+});
+
+if(result.error)
+throw result.error;
+
+message.textContent=
+"Login successful!";
+
+await updateAccount();
+
+setTimeout(
+closeAuth,
+700
+);
+
+}
+
+}catch(error){
+
+message.textContent =
+error.message ||
+"Something went wrong.";
+
+}
+
+}
+
+async function updateAccount(){
+
+try{
+
+const result =
+await supabaseClient.auth
+.getSession();
+
+const session =
+result.data.session;
+
+const account =
+document.getElementById(
+"account"
+);
+
+const loginBtn =
+document.getElementById(
+"loginBtn"
+);
+
+if(session){
+
+const user =
+session.user;
+
+const name =
+user.user_metadata?.full_name ||
+user.email?.split("@")[0] ||
+"Student";
+
+document.getElementById(
+"accountName"
+).textContent=
+"👋 Welcome, "+name;
+
+document.getElementById(
+"accountEmail"
+).textContent=
+user.email || "";
+
+account.style.display="block";
+
+loginBtn.textContent=
+"Account";
+
+}else{
+
+account.style.display="none";
+
+loginBtn.textContent=
+"Login";
+
+}
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+async function logout(){
+
+await supabaseClient.auth.signOut();
+
+updateAccount();
+
+}
+
+supabaseClient.auth.onAuthStateChange(
+function(){
+updateAccount();
+}
+);
+
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+let timerSeconds=
+25*60;
+
+let timerInterval=null;
+
+let running=false;
+
+let totalStudy=
+Number(
+localStorage.getItem(
+"sknotes-study-time"
+)||0
+);
+
+function timerText(seconds){
+
+const min=
+Math.floor(seconds/60);
+
+const sec=
+seconds%60;
+
+return String(min)
+.padStart(2,"0")
++
+":"
++
+String(sec)
+.padStart(2,"0");
+
+}
+
+function studyText(seconds){
+
+const h=
+Math.floor(seconds/3600);
+
+const m=
+Math.floor(
+(seconds%3600)/60
+);
+
+const s=
+seconds%60;
+
+return (
+String(h).padStart(2,"0")
++
+":"
++
+String(m).padStart(2,"0")
++
+":"
++
+String(s).padStart(2,"0")
+);
+
+}
+
+function updateTimer(){
+
+document.getElementById(
+"timer"
+).textContent=
+timerText(timerSeconds);
+
+document.getElementById(
+"studyTime"
+).textContent=
+studyText(totalStudy);
+
+document.getElementById(
+"cardCount"
+).textContent=
+cardCount;
+
+document.getElementById(
+"toolCount"
+).textContent=
+toolCount;
+
+}
+
+function openTimer(){
+
+document.getElementById(
+"timerOverlay"
+).style.display="flex";
+
+updateTimer();
+
+}
+
+function closeTimer(){
+
+document.getElementById(
+"timerOverlay"
+).style.display="none";
+
+}
+
+function startTimer(){
+
+if(running)return;
+
+running=true;
+
+timerInterval=
+setInterval(function(){
+
+if(timerSeconds>0){
+
+timerSeconds--;
+
+totalStudy++;
+
+localStorage.setItem(
+"sknotes-study-time",
+totalStudy
+);
+
+updateTimer();
+
+}else{
+
+pauseTimer();
+
+alert(
+"🎉 Study session complete!"
+);
+
+}
+
+},1000);
+
+}
+
+function pauseTimer(){
+
+running=false;
+
+if(timerInterval){
+
+clearInterval(
+timerInterval
+);
+
+timerInterval=null;
+
+}
+
+}
+
+function resetTimer(){
+
+pauseTimer();
+
+timerSeconds=
+25*60;
+
+updateTimer();
+
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+let cardCount=
+Number(
+localStorage.getItem(
+"sknotes-card-count"
+)||0
+);
+
+let toolCount=
+Number(
+localStorage.getItem(
+"sknotes-tool-count"
+)||0
+);
+
+function useTool(){
+
+toolCount++;
+
+localStorage.setItem(
+"sknotes-tool-count",
+toolCount
+);
+
+updateTimer();
+
+}
+
+
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
+
+function workspace(title,description,html){
+
+document.getElementById(
+"workspaceArea"
+).innerHTML=
+
+`
+<section class="workspace">
+
+<div class="workspace-head">
+
+<div>
+
+<h3>${title}</h3>
+
+<p>${description}</p>
+
+</div>
+
+<button
+class="close"
+onclick="closeWorkspace()">
+
+×
+</button>
+
+</div>
+
+${html}
+
+</section>
+`;
+
+document.getElementById(
+"workspaceArea"
+).scrollIntoView({
+
+behavior:"smooth",
+
+block:"start"
+
+});
+
+}
+
+function closeWorkspace(){
+
+document.getElementById(
+"workspaceArea"
+).innerHTML="";
+
+}
+
+
+/* =========================================================
+   OPEN FEATURES
+   ========================================================= */
+
+function openFeature(type){
+
+useTool();
+
+if(type==="flashcards"){
+
+workspace(
+
+"🧠 Text → Flashcards",
+
+"Paste your notes and create revision flashcards.",
+
+`
+<textarea
+id="featureText"
+placeholder="Paste your notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runFlashcards()">
+
+✨ Generate Flashcards
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🤖 Creating flashcards...
+
+</div>
+
+<div
+id="featureOutput"
+class="flashcards">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="youtube"){
+
+workspace(
+
+"▶️ YouTube → Notes",
+
+"Paste your educational YouTube URL.",
+
+`
+<input
+id="youtubeUrl"
+placeholder="https://youtube.com/watch?v=...">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runYouTube()">
+
+Generate Notes
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🎬 Fetching transcript...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="ocr"){
+
+workspace(
+
+"🖼️ Image → Text",
+
+"Upload an image and extract its text.",
+
+`
+<input
+class="file-input"
+type="file"
+id="imageFile"
+accept="image/*">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runOCR()">
+
+🔎 Extract Text
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Reading image...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="scanner"){
+
+workspace(
+
+"📷 Question Scanner",
+
+"Upload a question image and get an AI solution.",
+
+`
+<input
+class="file-input"
+type="file"
+id="imageFile"
+accept="image/*">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runScanner()">
+
+📷 Scan & Solve
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🔎 Scanning...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="quiz"){
+
+workspace(
+
+"📝 Notes → Quiz",
+
+"Generate 10 MCQs from your notes.",
+
+`
+<textarea
+id="featureText"
+placeholder="Paste your notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runQuiz()">
+
+📝 Generate Quiz
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🤖 Creating quiz...
+
+</div>
+
+<div
+id="featureOutput"
+class="flashcards">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="pdf"){
+
+workspace(
+
+"📄 PDF Export",
+
+"Turn your notes into a downloadable PDF.",
+
+`
+<div class="field">
+
+<label>PDF Title</label>
+
+<input
+id="pdfTitle"
+placeholder="SKNotes - Chemistry Notes">
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Paste notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runPDF()">
+
+📥 Download PDF
+
+</button>
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="tutor"){
+
+workspace(
+
+"🤖 AI Tutor",
+
+"Ask SKNotes to explain your topic simply.",
+
+`
+<textarea
+id="featureText"
+placeholder="Example: Explain Newton's second law in simple language..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runTutor()">
+
+🤖 Ask AI Tutor
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Thinking...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="notes"){
+
+workspace(
+
+"📚 AI Notes Generator",
+
+"Create structured notes from raw study material.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Chemistry">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Paste chapter/content here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runNotes()">
+
+✨ Generate Notes
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Creating notes...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="planner"){
+
+workspace(
+
+"📅 Study Planner",
+
+"Create a practical study timetable.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subjects</label>
+
+<input
+id="subjects"
+placeholder="Physics, Chemistry, Maths">
+
+</div>
+
+<div class="field">
+
+<label>Hours per day</label>
+
+<input
+id="hours"
+type="number"
+value="4"
+min="1"
+max="16">
+
+</div>
+
+<div class="field">
+
+<label>Days</label>
+
+<input
+id="days"
+type="number"
+value="7"
+min="1"
+max="90">
+
+</div>
+
+<div class="field">
+
+<label>Exam Date</label>
+
+<input
+id="examDate"
+type="date">
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runPlanner()">
+
+📅 Create Plan
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Planning...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="progress"){
+
+workspace(
+
+"📊 Study Progress",
+
+"Calculate your current learning progress.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Study Hours</label>
+
+<input
+id="studyHours"
+type="number"
+value="0"
+min="0">
+
+</div>
+
+<div class="field">
+
+<label>Completed Topics</label>
+
+<input
+id="completedTopics"
+type="number"
+value="0"
+min="0">
+
+</div>
+
+<div class="field">
+
+<label>Total Topics</label>
+
+<input
+id="totalTopics"
+type="number"
+value="1"
+min="1">
+
+</div>
+
+<div class="field">
+
+<label>Quiz Score %</label>
+
+<input
+id="quizScore"
+type="number"
+value="0"
+min="0"
+max="100">
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runProgress()">
+
+📊 Calculate
+
+</button>
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="voice"){
+
+workspace(
+
+"🎙️ AI Voice Tutor",
+
+"Generate an answer that is easy to listen to.",
+
+`
+<textarea
+id="featureText"
+placeholder="Ask your question..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runVoice()">
+
+🎙️ Generate Answer
+
+</button>
+
+<button
+class="nav-btn"
+onclick="speakResult()">
+
+🔊 Speak
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Preparing answer...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="research"){
+
+workspace(
+
+"🌐 AI Web Research",
+
+"Create a structured research answer.",
+
+`
+<textarea
+id="featureText"
+placeholder="Example: Explain India's Chandrayaan missions..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runResearch()">
+
+🔎 Research
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Researching...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="exam"){
+
+workspace(
+
+"📑 Exam Paper Generator",
+
+"Generate a school-level practice paper.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+<div class="field">
+
+<label>Total Marks</label>
+
+<input
+id="totalMarks"
+type="number"
+value="50">
+
+</div>
+
+<div class="field">
+
+<label>Difficulty</label>
+
+<select id="difficulty">
+
+<option>easy</option>
+
+<option selected>
+medium
+</option>
+
+<option>hard</option>
+
+</select>
+
+</div>
+
+</div>
+
+<textarea
+id="chapters"
+placeholder="Chapters / topics"></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runExam()">
+
+📑 Generate Paper
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Creating paper...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="doubt"){
+
+workspace(
+
+"❓ AI Doubt Solver",
+
+"Get a simple step-by-step explanation.",
+
+`
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Type your doubt here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runDoubt()">
+
+💡 Solve Doubt
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Solving...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+}
+
+
+/* =========================================================
+   FLASHCARDS
+   ========================================================= */
+
+async function runFlashcards(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Pehle notes paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/flashcards",
+{text:text}
+);
+
+const cards =
+data.flashcards || [];
+
+let html="";
+
+cards.forEach(function(card){
+
+html+=`
+
+<div class="flashcard">
+
+<div class="q">
+Q. ${safe(
+card.question ||
+card.front
+)}
+</div>
+
+<div class="a">
+A. ${safe(
+card.answer ||
+card.back
+)}
+</div>
+
+</div>
+
+`;
+
+});
+
+output(html);
+
+cardCount+=cards.length;
+
+localStorage.setItem(
+"sknotes-card-count",
+cardCount
+);
+
+updateTimer();
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   YOUTUBE NOTES
+   ========================================================= */
+
+async function runYouTube(){
+
+const url =
+document.getElementById(
+"youtubeUrl"
+).value.trim();
+
+if(!url){
+
+alert(
+"YouTube URL paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/notes",
+{
+url:url
+}
+);
+
+output(
+safe(data.notes || "")
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   IMAGE DATA
+   ========================================================= */
+
+function getImageData(){
+
+const file =
+document.getElementById(
+"imageFile"
+).files[0];
+
+if(!file){
+
+throw new Error(
+"Image select karo."
+);
+
+}
+
+return new Promise(
+function(resolve,reject){
+
+const reader =
+new FileReader();
+
+reader.onload=
+function(){
+
+resolve(
+reader.result
+);
+
+};
+
+reader.onerror=
+function(){
+
+reject(
+new Error(
+"Image read nahi hui."
+)
+);
+
+};
+
+reader.readAsDataURL(file);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   IMAGE OCR
+   ========================================================= */
+
+async function runOCR(){
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const image =
+await getImageData();
+
+const data =
+await api(
+"/api/image-to-text",
+{
+image:image
+}
+);
+
+output(
+safe(
+data.text ||
+"Image me text nahi mila."
+)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   QUESTION SCANNER
+   ========================================================= */
+
+async function runScanner(){
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const image =
+await getImageData();
+
+const textData =
+await api(
+"/api/image-to-text",
+{
+image:image
+}
+);
+
+const question =
+textData.text || "";
+
+if(!question){
+
+throw new Error(
+"Question text nahi mila."
+);
+
+}
+
+const solution =
+await api(
+"/api/doubt-solver",
+{
+question:question,
+subject:""
+}
+);
+
+output(
+
+"<strong>Scanned Question</strong>\n\n"
++
+safe(question)
++
+"\n\n<strong>AI Solution</strong>\n\n"
++
+safe(solution.answer)
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+
+async function runQuiz(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Notes paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/quiz",
+{
+text:text
+}
+);
+
+const quiz =
+data.quiz || [];
+
+let html="";
+
+quiz.forEach(
+function(q,index){
+
+html+=`
+
+<div class="flashcard">
+
+<div class="q">
+
+${index+1}.
+${safe(q.question)}
+
+</div>
+
+<div class="a">
+
+${(q.options || [])
+.map(function(option){
+
+return `
+<div>
+• ${safe(option)}
+</div>
+`;
+
+})
+.join("")}
+
+<br>
+
+<strong>
+Answer:
+${safe(q.answer)}
+</strong>
+
+</div>
+
+</div>
+
+`;
+
+}
+);
+
+output(html);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   PDF
+   ========================================================= */
+
+async function runPDF(){
+
+const notes =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!notes){
+
+alert(
+"Content paste karo."
+);
+
+return;
+
+}
+
+try{
+
+const title =
+document.getElementById(
+"pdfTitle"
+).value.trim()
+||
+"SKNotes";
+
+const response =
+await fetch(
+"/api/pdf",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+
+title:title,
+
+notes:notes
+
+})
+
+}
+);
+
+if(!response.ok){
+
+const data =
+await response.json();
+
+throw new Error(
+data.error ||
+"PDF generate failed."
+);
+
+}
+
+const blob =
+await response.blob();
+
+const link =
+document.createElement("a");
+
+link.href =
+URL.createObjectURL(blob);
+
+link.download =
+title+".pdf";
+
+link.click();
+
+setTimeout(
+function(){
+
+URL.revokeObjectURL(
+link.href
+);
+
+},
+1000
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+}
+
+
+/* =========================================================
+   AI TUTOR
+   ========================================================= */
+
+async function runTutor(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Question likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/tutor",
+{
+messages:[
+{
+role:"user",
+content:text
+}
+]
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   NOTES GENERATOR
+   ========================================================= */
+
+async function runNotes(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Content paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/notes-generator",
+{
+
+text:text,
+
+subject:
+document.getElementById(
+"subject"
+).value,
+
+className:
+document.getElementById(
+"className"
+).value
+
+}
+);
+
+output(
+safe(data.notes)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   STUDY PLANNER
+   ========================================================= */
+
+async function runPlanner(){
+
+const subjects =
+document.getElementById(
+"subjects"
+).value
+.split(",")
+.map(x=>x.trim())
+.filter(Boolean);
+
+if(!subjects.length){
+
+alert(
+"Subjects likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/study-planner",
+{
+
+subjects:subjects,
+
+hours:
+Number(
+document.getElementById(
+"hours"
+).value
+),
+
+days:
+Number(
+document.getElementById(
+"days"
+).value
+),
+
+examDate:
+document.getElementById(
+"examDate"
+).value
+
+}
+);
+
+output(
+safe(data.plan)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   STUDY PROGRESS
+   ========================================================= */
+
+async function runProgress(){
+
+try{
+
+const data =
+await api(
+"/api/study-progress",
+{
+
+studyHours:
+Number(
+document.getElementById(
+"studyHours"
+).value
+),
+
+completedTopics:
+Number(
+document.getElementById(
+"completedTopics"
+).value
+),
+
+totalTopics:
+Number(
+document.getElementById(
+"totalTopics"
+).value
+),
+
+quizScore:
+Number(
+document.getElementById(
+"quizScore"
+).value
+)
+
+}
+);
+
+output(
+
+"📊 Progress: "
++
+data.progress
++
+"%\n\n"
+
++
+
+"⏱️ Study Hours: "
++
+data.studyHours
++
+"\n\n"
+
++
+
+"📚 Topics: "
++
+data.completedTopics
++
+"/"
++
+data.totalTopics
++
+"\n\n"
+
++
+
+"📝 Quiz Score: "
++
+data.quizScore
++
+"%"
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+}
+
+
+/* =========================================================
+   VOICE TUTOR
+   ========================================================= */
+
+async function runVoice(){
+
+const question =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!question){
+
+alert(
+"Question likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/voice-tutor",
+{
+question:question
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+function speakResult(){
+
+const text =
+document.getElementById(
+"featureOutput"
+)?.innerText || "";
+
+if(!text){
+
+alert(
+"Pehle answer generate karo."
+);
+
+return;
+
+}
+
+if(
+!("speechSynthesis" in window)
+){
+
+alert(
+"Is browser me voice support nahi hai."
+);
+
+return;
+
+}
+
+speechSynthesis.cancel();
+
+const speech =
+new SpeechSynthesisUtterance(
+text
+);
+
+speech.lang="en-IN";
+
+speech.rate=.9;
+
+speechSynthesis.speak(
+speech
+);
+
+}
+
+
+/* =========================================================
+   RESEARCH
+   ========================================================= */
+
+async function runResearch(){
+
+const query =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!query){
+
+alert(
+"Research topic likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/web-research",
+{
+query:query
+}
+);
+
+output(
+
+safe(data.answer)
+
++
+
+"\n\n────────────────\n"
+
++
+
+"ℹ️ This version uses the SKNotes AI research route. "
++
+
+"Live web browsing is not enabled in the current backend."
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   EXAM PAPER
+   ========================================================= */
+
+async function runExam(){
+
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+if(!subject){
+
+alert(
+"Subject likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/exam-paper",
+{
+
+subject:subject,
+
+className:
+document.getElementById(
+"className"
+).value,
+
+chapters:
+document.getElementById(
+"chapters"
+).value,
+
+totalMarks:
+Number(
+document.getElementById(
+"totalMarks"
+).value
+),
+
+difficulty:
+document.getElementById(
+"difficulty"
+).value
+
+}
+);
+
+output(
+safe(data.paper)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   DOUBT SOLVER
+   ========================================================= */
+
+async function runDoubt(){
+
+const question =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!question){
+
+alert(
+"Doubt likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/doubt-solver",
+{
+
+question:question,
+
+subject:
+document.getElementById(
+"subject"
+).value
+
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
    START
-   ===================================================== */
+   ========================================================= */
 
 loadDark();
 
