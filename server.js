@@ -2,11 +2,13 @@ import express from "express";
 import Groq from "groq-sdk";
 import PDFDocument from "pdfkit";
 import { createClient } from "@supabase/supabase-js";
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.static("public"));
+
 
 /* =========================
    GROQ AI
@@ -123,7 +125,6 @@ ${text.slice(0, 30000)}
 });
 
 
-
 /* =========================
    NOTES → QUIZ / MCQ
 ========================= */
@@ -183,16 +184,21 @@ ${text.slice(0, 30000)}
 `;
 
     const completion = await ai.chat.completions.create({
-  model: "openai/gpt-oss-20b",
-  messages: [
-    {
-      role: "user",
-      content: prompt
-    }
-  ],
-  max_completion_tokens: 4096
-});
-console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
+      model: "openai/gpt-oss-20b",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_completion_tokens: 4096
+    });
+
+    console.log(
+      "QUIZ AI RESPONSE:",
+      JSON.stringify(completion, null, 2)
+    );
+
     let raw =
       completion.choices?.[0]?.message?.content?.trim() || "";
 
@@ -210,7 +216,9 @@ console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
     const end = raw.lastIndexOf("]");
 
     if (start === -1 || end === -1) {
-      throw new Error("AI ne valid quiz JSON nahi diya.");
+      throw new Error(
+        "AI ne valid quiz JSON nahi diya."
+      );
     }
 
     raw = raw.slice(start, end + 1);
@@ -222,17 +230,121 @@ console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
     }
 
     res.json({
-      quiz: quiz
+      quiz
     });
 
   } catch (err) {
     console.error("Quiz error:", err);
 
     res.status(500).json({
-      error: err?.message || "Quiz banane me problem aayi."
+      error:
+        err?.message ||
+        "Quiz banane me problem aayi."
     });
   }
 });
+
+
+/* =========================
+   AI TUTOR
+========================= */
+
+app.post("/api/tutor", async (req, res) => {
+  try {
+
+    const { messages = [] } = req.body || {};
+
+    if (!ai) {
+      return res.status(503).json({
+        error:
+          "Groq AI key configure nahi hui hai."
+      });
+    }
+
+    if (
+      !Array.isArray(messages) ||
+      messages.length === 0
+    ) {
+      return res.status(400).json({
+        error: "Message missing."
+      });
+    }
+
+    const safeMessages = messages
+      .filter(function (m) {
+        return (
+          m &&
+          (m.role === "user" ||
+            m.role === "assistant") &&
+          typeof m.content === "string" &&
+          m.content.trim()
+        );
+      })
+      .slice(-20);
+
+    if (safeMessages.length === 0) {
+      return res.status(400).json({
+        error: "Valid message missing."
+      });
+    }
+
+    const completion =
+      await ai.chat.completions.create({
+
+        model: "openai/gpt-oss-20b",
+
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are SKNotes AI Tutor. " +
+              "Help students understand subjects clearly. " +
+              "Explain difficult topics step by step. " +
+              "Use simple student-friendly language. " +
+              "You can explain Physics, Chemistry, Maths, Biology, " +
+              "Computer Science and other school subjects. " +
+              "When useful, give examples and simple explanations. " +
+              "Do not invent facts."
+          },
+
+          ...safeMessages
+        ],
+
+        temperature: 0.4,
+
+        max_completion_tokens: 2048
+      });
+
+    const answer =
+      completion.choices?.[0]?.message?.content?.trim() ||
+      "";
+
+    if (!answer) {
+      return res.status(500).json({
+        error:
+          "AI ne koi answer nahi diya."
+      });
+    }
+
+    res.json({
+      answer
+    });
+
+  } catch (error) {
+
+    console.error(
+      "AI Tutor error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error?.message ||
+        "AI Tutor me problem aayi."
+    });
+  }
+});
+
 
 /* =========================
    YOUTUBE NOTES
@@ -240,53 +352,64 @@ console.log("QUIZ AI RESPONSE:", JSON.stringify(completion, null, 2));
 
 app.post("/api/notes", async (req, res) => {
   try {
+
     const { url } = req.body || {};
 
     if (!url) {
       return res.status(400).json({
-        error: "YouTube URL missing."
+        error:
+          "YouTube URL missing."
       });
     }
 
     if (!process.env.YOUTUBE_TRANSCRIPT_API_KEY) {
       return res.status(503).json({
-        error: "YouTube Transcript API key configure nahi hui hai."
+        error:
+          "YouTube Transcript API key configure nahi hui hai."
       });
     }
 
     if (!ai) {
       return res.status(503).json({
-        error: "Groq AI key configure nahi hui hai."
+        error:
+          "Groq AI key configure nahi hui hai."
       });
     }
 
     const videoIdMatch =
       url.match(
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?/]+)/
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^&?/]+)/
       );
 
-    const videoId = videoIdMatch?.[1];
+    const videoId =
+      videoIdMatch?.[1];
 
     if (!videoId) {
       return res.status(400).json({
-        error: "Valid YouTube URL nahi hai."
+        error:
+          "Valid YouTube URL nahi hai."
       });
     }
 
-    const transcriptResponse = await fetch(
-      "https://www.youtubetranscript.dev/api/v2/transcribe",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
-        },
-        body: JSON.stringify({
-          video_id: videoId
-        })
-      }
-    );
+    const transcriptResponse =
+      await fetch(
+        "https://www.youtubetranscript.dev/api/v2/transcribe",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            Authorization:
+              `Bearer ${process.env.YOUTUBE_TRANSCRIPT_API_KEY}`
+          },
+
+          body: JSON.stringify({
+            video_id: videoId
+          })
+        }
+      );
 
     const transcriptData =
       await transcriptResponse.json();
@@ -304,7 +427,8 @@ app.post("/api/notes", async (req, res) => {
 
     if (!transcript) {
       return res.status(404).json({
-        error: "Is video ka transcript nahi mila."
+        error:
+          "Is video ka transcript nahi mila."
       });
     }
 
@@ -314,6 +438,7 @@ You are SKNotes, an AI study assistant.
 Convert the following YouTube transcript into clear study notes.
 
 Make:
+
 1. Main topic
 2. Important concepts
 3. Key points
@@ -329,18 +454,23 @@ ${transcript.slice(0, 50000)}
 
     const completion =
       await ai.chat.completions.create({
-        model: "openai/gpt-oss-20b",
+
+        model:
+          "openai/gpt-oss-20b",
+
         messages: [
           {
             role: "user",
             content: prompt
           }
         ],
+
         temperature: 0.3
       });
 
     const notes =
-      completion.choices?.[0]?.message?.content || "";
+      completion.choices?.[0]?.message?.content ||
+      "";
 
     res.json({
       videoId,
@@ -348,7 +478,11 @@ ${transcript.slice(0, 50000)}
     });
 
   } catch (err) {
-    console.error("YouTube Notes error:", err);
+
+    console.error(
+      "YouTube Notes error:",
+      err
+    );
 
     res.status(500).json({
       error:
@@ -365,6 +499,7 @@ ${transcript.slice(0, 50000)}
 
 app.post("/api/pdf", async (req, res) => {
   try {
+
     const {
       title = "SKNotes",
       notes = ""
@@ -372,13 +507,15 @@ app.post("/api/pdf", async (req, res) => {
 
     if (!notes.trim()) {
       return res.status(400).json({
-        error: "Notes missing."
+        error:
+          "Notes missing."
       });
     }
 
-    const doc = new PDFDocument({
-      margin: 50
-    });
+    const doc =
+      new PDFDocument({
+        margin: 50
+      });
 
     res.setHeader(
       "Content-Type",
@@ -409,7 +546,11 @@ app.post("/api/pdf", async (req, res) => {
     doc.end();
 
   } catch (err) {
-    console.error("PDF error:", err);
+
+    console.error(
+      "PDF error:",
+      err
+    );
 
     if (!res.headersSent) {
       res.status(500).json({
@@ -423,72 +564,123 @@ app.post("/api/pdf", async (req, res) => {
 
 
 /* =========================
-   SERVER START
+   SUPABASE ADMIN
 ========================= */
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseAdmin =
+  createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+
+
+/* =========================
+   ADMIN USERS COUNT
+========================= */
+
+app.get(
+  "/api/admin/users-count",
+  async (req, res) => {
+
+    try {
+
+      const authHeader =
+        req.headers.authorization || "";
+
+      const token =
+        authHeader.replace(
+          "Bearer ",
+          ""
+        );
+
+      if (!token) {
+        return res.status(401).json({
+          error:
+            "Login required."
+        });
+      }
+
+      const {
+        data: userData,
+        error: userError
+      } =
+        await supabaseAdmin.auth.getUser(
+          token
+        );
+
+      if (
+        userError ||
+        !userData?.user
+      ) {
+        return res.status(401).json({
+          error:
+            "Invalid login."
+        });
+      }
+
+      const result =
+        await supabaseAdmin.auth.admin.listUsers({
+          page: 1,
+          perPage: 1000
+        });
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      res.json({
+        totalUsers:
+          result.data.users.length
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Users count error:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Users count fetch nahi ho saka."
+      });
+    }
+  }
 );
 
-app.get("/api/admin/users-count", async (req, res) => {
 
-  try {
+/* =========================
+   HEALTH CHECK
+========================= */
 
-    const authHeader =
-      req.headers.authorization || "";
-
-    const token =
-      authHeader.replace("Bearer ", "");
-
-    if (!token) {
-      return res.status(401).json({
-        error: "Login required."
-      });
-    }
-
-    const {
-      data: userData,
-      error: userError
-    } =
-      await supabaseAdmin.auth.getUser(token);
-
-    if (userError || !userData.user) {
-      return res.status(401).json({
-        error: "Invalid login."
-      });
-    }
-
-    const result =
-      await supabaseAdmin.auth.admin.listUsers({
-        page: 1,
-        perPage: 1000
-      });
-
-    if (result.error) {
-      throw result.error;
-    }
+app.get(
+  "/api/health",
+  (req, res) => {
 
     res.json({
-      totalUsers:
-        result.data.users.length
-    });
-
-  } catch (error) {
-
-    console.error(
-      "Users count error:",
-      error
-    );
-
-    res.status(500).json({
-      error:
-        "Users count fetch nahi ho saka."
+      ok: true,
+      aiConfigured:
+        !!process.env.GROQ_API_KEY,
+      transcriptConfigured:
+        !!process.env.YOUTUBE_TRANSCRIPT_API_KEY,
+      supabaseConfigured:
+        !!process.env.SUPABASE_URL &&
+        !!process.env.SUPABASE_SERVICE_ROLE_KEY
     });
 
   }
+);
 
-});
-app.listen(PORT, () => {
-  console.log(`SKNotes server running on port ${PORT}`);
-});
+
+/* =========================
+   SERVER START
+========================= */
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `SKNotes server running on port ${PORT}`
+    );
+  }
+);
