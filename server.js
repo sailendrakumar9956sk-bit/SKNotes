@@ -2,13 +2,17 @@ import express from "express";
 import Groq from "groq-sdk";
 import PDFDocument from "pdfkit";
 import { createClient } from "@supabase/supabase-js";
+import Tesseract from "tesseract.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: "10mb" }));
-app.use(express.static("public"));
+/* =========================
+   APP CONFIG
+========================= */
 
+app.use(express.json({ limit: "15mb" }));
+app.use(express.static("public"));
 
 /* =========================
    GROQ AI
@@ -20,19 +24,122 @@ const ai = process.env.GROQ_API_KEY
     })
   : null;
 
+/* =========================
+   SUPABASE ADMIN
+========================= */
+
+const supabaseAdmin =
+  process.env.SUPABASE_URL &&
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      )
+    : null;
+
+/* =========================
+   HELPERS
+========================= */
+
+function requireAI(res) {
+  if (!ai) {
+    res.status(503).json({
+      error: "Groq AI key configure nahi hui hai."
+    });
+    return false;
+  }
+
+  return true;
+}
+
+function cleanAIJson(raw) {
+  if (!raw) return "";
+
+  raw = raw.trim();
+
+  raw = raw
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  const arrayStart = raw.indexOf("[");
+  const arrayEnd = raw.lastIndexOf("]");
+
+  if (
+    arrayStart !== -1 &&
+    arrayEnd !== -1 &&
+    arrayEnd > arrayStart
+  ) {
+    return raw.slice(arrayStart, arrayEnd + 1);
+  }
+
+  const objectStart = raw.indexOf("{");
+  const objectEnd = raw.lastIndexOf("}");
+
+  if (
+    objectStart !== -1 &&
+    objectEnd !== -1 &&
+    objectEnd > objectStart
+  ) {
+    return raw.slice(objectStart, objectEnd + 1);
+  }
+
+  return raw;
+}
+
+async function askAI(prompt, options = {}) {
+  if (!ai) {
+    throw new Error(
+      "Groq AI key configure nahi hui hai."
+    );
+  }
+
+  const completion =
+    await ai.chat.completions.create({
+      model:
+        options.model ||
+        "openai/gpt-oss-20b",
+
+      messages: [
+        {
+          role: "system",
+          content:
+            options.system ||
+            "You are SKNotes, an AI study assistant. Give accurate, student-friendly answers."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+
+      temperature:
+        options.temperature ?? 0.3,
+
+      max_completion_tokens:
+        options.max_completion_tokens || 4096
+    });
+
+  return (
+    completion.choices?.[0]?.message?.content?.trim() ||
+    ""
+  );
+}
 
 /* =========================
    HOME
 ========================= */
 
 app.get("/", (req, res) => {
-  res.sendFile("index.html", { root: "public" });
+  res.sendFile("index.html", {
+    root: "public"
+  });
 });
 
-
-/* =========================
-   FLASHCARDS
-========================= */
+/* =========================================================
+   1. FLASHCARDS
+========================================================= */
 
 app.post("/api/flashcards", async (req, res) => {
   try {
@@ -44,90 +151,59 @@ app.post("/api/flashcards", async (req, res) => {
       });
     }
 
-    if (!ai) {
-      return res.status(503).json({
-        error: "Groq AI key configure nahi hui hai."
-      });
-    }
+    if (!requireAI(res)) return;
 
     const prompt = `
-You are SKNotes, an AI study assistant.
-
 Create 8-12 useful study flashcards from the notes below.
 
-Return ONLY valid JSON in exactly this format:
+Return ONLY valid JSON:
 
 [
   {
-    "question": "Question here",
-    "answer": "Answer here"
+    "question": "Question",
+    "answer": "Answer"
   }
 ]
 
 Rules:
-- Use only information supported by the notes.
-- Questions should be useful for revision.
-- Answers should be short and clear.
-- Do not add markdown.
-- Do not add explanations outside JSON.
+- Use only information from the notes.
+- Keep answers short and clear.
 - Do not invent information.
+- No markdown.
+- No text outside JSON.
 
 NOTES:
 ${text.slice(0, 30000)}
 `;
 
-    const completion = await ai.chat.completions.create({
-      model: "openai/gpt-oss-20b",
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
+    const raw = await askAI(prompt, {
       temperature: 0.2
     });
 
-    let raw =
-      completion.choices?.[0]?.message?.content?.trim() || "";
-
-    raw = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    const start = raw.indexOf("[");
-    const end = raw.lastIndexOf("]");
-
-    if (start !== -1 && end !== -1) {
-      raw = raw.slice(start, end + 1);
-    }
-
-    const flashcards = JSON.parse(raw);
-
-    if (!Array.isArray(flashcards)) {
-      throw new Error("AI response format invalid.");
-    }
+    const flashcards =
+      JSON.parse(cleanAIJson(raw));
 
     res.json({
       flashcards
     });
 
-  } catch (err) {
-    console.error("Flashcards error:", err);
+  } catch (error) {
+    console.error(
+      "Flashcards error:",
+      error
+    );
 
     res.status(500).json({
       error:
-        err?.message ||
+        error.message ||
         "Flashcards banane me problem aayi."
     });
   }
 });
 
-
-/* =========================
-   NOTES → QUIZ / MCQ
-========================= */
+/* =========================================================
+   2. NOTES → QUIZ
+========================================================= */
 
 app.post("/api/quiz", async (req, res) => {
   try {
@@ -139,27 +215,16 @@ app.post("/api/quiz", async (req, res) => {
       });
     }
 
-    if (!ai) {
-      return res.status(503).json({
-        error: "Groq AI key configure nahi hui hai."
-      });
-    }
+    if (!requireAI(res)) return;
 
     const prompt = `
-You are SKNotes, an AI study assistant.
+Create exactly 10 multiple-choice questions from these notes.
 
-Create exactly 10 multiple-choice questions from the notes below.
-
-Your response MUST be ONLY a JSON array.
-Do not use markdown.
-Do not use code fences.
-Do not write anything before or after the JSON.
-
-The JSON must look exactly like this:
+Return ONLY JSON:
 
 [
   {
-    "question": "Question here",
+    "question": "Question",
     "options": [
       "Option A",
       "Option B",
@@ -172,94 +237,54 @@ The JSON must look exactly like this:
 
 Rules:
 - Exactly 10 questions.
-- Exactly 4 options per question.
-- Only one option is correct.
-- The answer must exactly match one option.
+- Exactly 4 options.
+- Only one correct answer.
+- Answer must exactly match one option.
 - Use only information from the notes.
-- Do not invent information.
-- Keep questions short and clear.
+- No markdown.
+- No explanation outside JSON.
 
 NOTES:
 ${text.slice(0, 30000)}
 `;
 
-    const completion = await ai.chat.completions.create({
-      model: "openai/gpt-oss-20b",
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
+    const raw = await askAI(prompt, {
+      temperature: 0.2,
       max_completion_tokens: 4096
     });
 
-    console.log(
-      "QUIZ AI RESPONSE:",
-      JSON.stringify(completion, null, 2)
-    );
-
-    let raw =
-      completion.choices?.[0]?.message?.content?.trim() || "";
-
-    if (!raw) {
-      throw new Error("AI ne koi response nahi diya.");
-    }
-
-    raw = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    const start = raw.indexOf("[");
-    const end = raw.lastIndexOf("]");
-
-    if (start === -1 || end === -1) {
-      throw new Error(
-        "AI ne valid quiz JSON nahi diya."
-      );
-    }
-
-    raw = raw.slice(start, end + 1);
-
-    const quiz = JSON.parse(raw);
-
-    if (!Array.isArray(quiz)) {
-      throw new Error("AI quiz format invalid.");
-    }
+    const quiz =
+      JSON.parse(cleanAIJson(raw));
 
     res.json({
       quiz
     });
 
-  } catch (err) {
-    console.error("Quiz error:", err);
+  } catch (error) {
+    console.error(
+      "Quiz error:",
+      error
+    );
 
     res.status(500).json({
       error:
-        err?.message ||
+        error.message ||
         "Quiz banane me problem aayi."
     });
   }
 });
 
-
-/* =========================
-   AI TUTOR
-========================= */
+/* =========================================================
+   3. AI TUTOR
+========================================================= */
 
 app.post("/api/tutor", async (req, res) => {
   try {
+    const {
+      messages = []
+    } = req.body || {};
 
-    const { messages = [] } = req.body || {};
-
-    if (!ai) {
-      return res.status(503).json({
-        error:
-          "Groq AI key configure nahi hui hai."
-      });
-    }
+    if (!requireAI(res)) return;
 
     if (
       !Array.isArray(messages) ||
@@ -270,43 +295,37 @@ app.post("/api/tutor", async (req, res) => {
       });
     }
 
-    const safeMessages = messages
-      .filter(function (m) {
-        return (
-          m &&
-          (m.role === "user" ||
-            m.role === "assistant") &&
-          typeof m.content === "string" &&
-          m.content.trim()
-        );
-      })
-      .slice(-20);
+    const safeMessages =
+      messages
+        .filter((m) => {
+          return (
+            m &&
+            (m.role === "user" ||
+              m.role === "assistant") &&
+            typeof m.content === "string" &&
+            m.content.trim()
+          );
+        })
+        .slice(-20);
 
-    if (safeMessages.length === 0) {
+    if (!safeMessages.length) {
       return res.status(400).json({
-        error: "Valid message missing."
+        error:
+          "Valid message missing."
       });
     }
 
     const completion =
       await ai.chat.completions.create({
-
-        model: "openai/gpt-oss-20b",
+        model:
+          "openai/gpt-oss-20b",
 
         messages: [
           {
             role: "system",
             content:
-              "You are SKNotes AI Tutor. " +
-              "Help students understand subjects clearly. " +
-              "Explain difficult topics step by step. " +
-              "Use simple student-friendly language. " +
-              "You can explain Physics, Chemistry, Maths, Biology, " +
-              "Computer Science and other school subjects. " +
-              "When useful, give examples and simple explanations. " +
-              "Do not invent facts."
+              "You are SKNotes AI Tutor. Help students understand Physics, Chemistry, Maths, Biology, Computer Science and other school subjects. Explain step by step using simple student-friendly language. Do not invent facts."
           },
-
           ...safeMessages
         ],
 
@@ -331,7 +350,6 @@ app.post("/api/tutor", async (req, res) => {
     });
 
   } catch (error) {
-
     console.error(
       "AI Tutor error:",
       error
@@ -339,20 +357,18 @@ app.post("/api/tutor", async (req, res) => {
 
     res.status(500).json({
       error:
-        error?.message ||
+        error.message ||
         "AI Tutor me problem aayi."
     });
   }
 });
 
-
-/* =========================
-   YOUTUBE NOTES
-========================= */
+/* =========================================================
+   4. YOUTUBE → AI NOTES
+========================================================= */
 
 app.post("/api/notes", async (req, res) => {
   try {
-
     const { url } = req.body || {};
 
     if (!url) {
@@ -362,19 +378,16 @@ app.post("/api/notes", async (req, res) => {
       });
     }
 
-    if (!process.env.YOUTUBE_TRANSCRIPT_API_KEY) {
+    if (
+      !process.env.YOUTUBE_TRANSCRIPT_API_KEY
+    ) {
       return res.status(503).json({
         error:
           "YouTube Transcript API key configure nahi hui hai."
       });
     }
 
-    if (!ai) {
-      return res.status(503).json({
-        error:
-          "Groq AI key configure nahi hui hai."
-      });
-    }
+    if (!requireAI(res)) return;
 
     const videoIdMatch =
       url.match(
@@ -433,73 +446,55 @@ app.post("/api/notes", async (req, res) => {
     }
 
     const prompt = `
-You are SKNotes, an AI study assistant.
+Convert this YouTube lecture transcript into clear study notes.
 
-Convert the following YouTube transcript into clear study notes.
-
-Make:
+Include:
 
 1. Main topic
 2. Important concepts
 3. Key points
 4. Definitions
-5. Examples where available
-6. Short revision summary
+5. Examples
+6. Important formulas if present
+7. Common mistakes if supported
+8. Quick revision summary
 
 Use simple student-friendly language.
 
-Transcript:
+TRANSCRIPT:
 ${transcript.slice(0, 50000)}
 `;
 
-    const completion =
-      await ai.chat.completions.create({
-
-        model:
-          "openai/gpt-oss-20b",
-
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-
+    const notes =
+      await askAI(prompt, {
         temperature: 0.3
       });
-
-    const notes =
-      completion.choices?.[0]?.message?.content ||
-      "";
 
     res.json({
       videoId,
       notes
     });
 
-  } catch (err) {
-
+  } catch (error) {
     console.error(
       "YouTube Notes error:",
-      err
+      error
     );
 
     res.status(500).json({
       error:
-        err?.message ||
+        error.message ||
         "YouTube notes banane me problem aayi."
     });
   }
 });
 
-
-/* =========================
-   PDF EXPORT
-========================= */
+/* =========================================================
+   5. PDF EXPORT
+========================================================= */
 
 app.post("/api/pdf", async (req, res) => {
   try {
-
     const {
       title = "SKNotes",
       notes = ""
@@ -545,44 +540,626 @@ app.post("/api/pdf", async (req, res) => {
 
     doc.end();
 
-  } catch (err) {
-
+  } catch (error) {
     console.error(
       "PDF error:",
-      err
+      error
     );
 
     if (!res.headersSent) {
       res.status(500).json({
         error:
-          err?.message ||
+          error.message ||
           "PDF banane me problem aayi."
       });
     }
   }
 });
 
+/* =========================================================
+   6. IMAGE → TEXT / OCR
+========================================================= */
 
-/* =========================
-   SUPABASE ADMIN
-========================= */
+app.post("/api/image-to-text", async (req, res) => {
+  try {
+    const {
+      image = ""
+    } = req.body || {};
 
-const supabaseAdmin =
-  createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+    if (!image) {
+      return res.status(400).json({
+        error:
+          "Image missing."
+      });
+    }
 
+    if (
+      !image.startsWith("data:image/")
+    ) {
+      return res.status(400).json({
+        error:
+          "Valid image data nahi mili."
+      });
+    }
 
-/* =========================
-   ADMIN USERS COUNT
-========================= */
+    console.log(
+      "Starting OCR..."
+    );
+
+    const result =
+      await Tesseract.recognize(
+        image,
+        "eng",
+        {
+          logger: (info) => {
+            if (
+              info.status === "recognizing text"
+            ) {
+              console.log(
+                `OCR progress: ${Math.round(
+                  (info.progress || 0) * 100
+                )}%`
+              );
+            }
+          }
+        }
+      );
+
+    const text =
+      result?.data?.text?.trim() || "";
+
+    res.json({
+      text
+    });
+
+  } catch (error) {
+    console.error(
+      "OCR error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Image se text read nahi ho paya."
+    });
+  }
+});
+
+/* =========================================================
+   7. AI PDF SUMMARIZER
+========================================================= */
+
+app.post("/api/pdf-summarize", async (req, res) => {
+  try {
+    const {
+      text = ""
+    } = req.body || {};
+
+    if (!text.trim()) {
+      return res.status(400).json({
+        error:
+          "PDF text missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const prompt = `
+Summarize the following PDF content for a student.
+
+Create:
+
+1. Short summary
+2. Main concepts
+3. Important definitions
+4. Important facts
+5. Important formulas
+6. Quick revision points
+
+Do not invent information.
+
+CONTENT:
+${text.slice(0, 50000)}
+`;
+
+    const summary =
+      await askAI(prompt, {
+        temperature: 0.2
+      });
+
+    res.json({
+      summary
+    });
+
+  } catch (error) {
+    console.error(
+      "PDF summarizer error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "PDF summarize nahi ho paya."
+    });
+  }
+});
+
+/* =========================================================
+   8. AI NOTES GENERATOR
+========================================================= */
+
+app.post("/api/notes-generator", async (req, res) => {
+  try {
+    const {
+      text = "",
+      subject = "General",
+      className = "Class 11-12"
+    } = req.body || {};
+
+    if (!text.trim()) {
+      return res.status(400).json({
+        error:
+          "Content missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const prompt = `
+Create high-quality study notes.
+
+Subject:
+${subject}
+
+Class:
+${className}
+
+Content:
+${text.slice(0, 40000)}
+
+Format:
+
+TITLE
+
+1. Main Concepts
+2. Definitions
+3. Important Points
+4. Detailed Explanation
+5. Examples
+6. Formulas
+7. Common Mistakes
+8. Quick Revision
+9. Exam Questions
+
+Use simple student-friendly language.
+Do not invent information.
+`;
+
+    const notes =
+      await askAI(prompt, {
+        temperature: 0.3
+      });
+
+    res.json({
+      notes
+    });
+
+  } catch (error) {
+    console.error(
+      "Notes generator error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Notes generate nahi ho paye."
+    });
+  }
+});
+
+/* =========================================================
+   9. STUDY PLANNER
+========================================================= */
+
+app.post("/api/study-planner", async (req, res) => {
+  try {
+    const {
+      subjects = [],
+      hours = 4,
+      days = 7,
+      examDate = ""
+    } = req.body || {};
+
+    if (
+      !Array.isArray(subjects) ||
+      subjects.length === 0
+    ) {
+      return res.status(400).json({
+        error:
+          "Subjects missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const prompt = `
+Create a practical study timetable.
+
+Subjects:
+${subjects.join(", ")}
+
+Study hours per day:
+${hours}
+
+Number of days:
+${days}
+
+Exam date:
+${examDate || "Not provided"}
+
+Create a day-by-day plan.
+
+Include:
+- Subject
+- Study topic
+- Time
+- Revision
+- Practice/questions
+- Breaks
+
+Keep the plan realistic for a student.
+`;
+
+    const plan =
+      await askAI(prompt, {
+        temperature: 0.4
+      });
+
+    res.json({
+      plan
+    });
+
+  } catch (error) {
+    console.error(
+      "Study planner error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Study planner me problem aayi."
+    });
+  }
+});
+
+/* =========================================================
+   10. STUDY PROGRESS
+========================================================= */
+
+app.post("/api/study-progress", async (req, res) => {
+  try {
+    const {
+      subjects = [],
+      studyHours = 0,
+      completedTopics = 0,
+      totalTopics = 0,
+      quizScore = 0
+    } = req.body || {};
+
+    const progress =
+      totalTopics > 0
+        ? Math.round(
+            (completedTopics /
+              totalTopics) *
+              100
+          )
+        : 0;
+
+    res.json({
+      progress,
+      studyHours,
+      completedTopics,
+      totalTopics,
+      quizScore,
+      subjects
+    });
+
+  } catch (error) {
+    console.error(
+      "Study progress error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        "Study progress calculate nahi ho paya."
+    });
+  }
+});
+
+/* =========================================================
+   11. AI VOICE TUTOR TEXT ENGINE
+========================================================= */
+
+app.post("/api/voice-tutor", async (req, res) => {
+  try {
+    const {
+      question = ""
+    } = req.body || {};
+
+    if (!question.trim()) {
+      return res.status(400).json({
+        error:
+          "Question missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const answer =
+      await askAI(
+        `
+Answer this student's question
+in a way that is easy to listen to.
+
+Keep sentences natural and clear.
+Avoid unnecessary formatting.
+
+QUESTION:
+${question.slice(0, 10000)}
+`,
+        {
+          temperature: 0.4,
+          max_completion_tokens: 2048
+        }
+      );
+
+    res.json({
+      answer
+    });
+
+  } catch (error) {
+    console.error(
+      "Voice tutor error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Voice Tutor me problem aayi."
+    });
+  }
+});
+
+/* =========================================================
+   12. AI WEB RESEARCH
+========================================================= */
+
+app.post("/api/web-research", async (req, res) => {
+  try {
+    const {
+      query = ""
+    } = req.body || {};
+
+    if (!query.trim()) {
+      return res.status(400).json({
+        error:
+          "Research query missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    /*
+      NOTE:
+      This route currently creates a research-style
+      answer from the supplied query.
+
+      Real live web search requires a search provider/API.
+    */
+
+    const answer =
+      await askAI(
+        `
+You are an educational research assistant.
+
+Explain the following research topic clearly.
+
+TOPIC:
+${query.slice(0, 10000)}
+
+Include:
+- Overview
+- Important points
+- Key facts
+- Explanation
+- Conclusion
+
+Do not pretend that you performed live web browsing.
+`,
+        {
+          temperature: 0.3
+        }
+      );
+
+    res.json({
+      answer,
+      liveSearch: false
+    });
+
+  } catch (error) {
+    console.error(
+      "Web research error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Web research me problem aayi."
+    });
+  }
+});
+
+/* =========================================================
+   13. EXAM PAPER GENERATOR
+========================================================= */
+
+app.post("/api/exam-paper", async (req, res) => {
+  try {
+    const {
+      subject = "",
+      className = "",
+      chapters = "",
+      totalMarks = 50,
+      difficulty = "medium"
+    } = req.body || {};
+
+    if (!subject.trim()) {
+      return res.status(400).json({
+        error:
+          "Subject missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const prompt = `
+Create a school-level exam paper.
+
+Subject:
+${subject}
+
+Class:
+${className || "Not specified"}
+
+Chapters:
+${chapters || "All provided chapters"}
+
+Total marks:
+${totalMarks}
+
+Difficulty:
+${difficulty}
+
+Create:
+- Instructions
+- Section A
+- Section B
+- Section C
+- Appropriate marks
+- Questions suitable for the class
+
+Do not invent syllabus-specific facts that are not reasonably supported.
+`;
+
+    const paper =
+      await askAI(prompt, {
+        temperature: 0.4,
+        max_completion_tokens: 5000
+      });
+
+    res.json({
+      paper
+    });
+
+  } catch (error) {
+    console.error(
+      "Exam paper error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Exam paper generate nahi hua."
+    });
+  }
+});
+
+/* =========================================================
+   14. AI DOUBT SOLVER
+========================================================= */
+
+app.post("/api/doubt-solver", async (req, res) => {
+  try {
+    const {
+      question = "",
+      subject = ""
+    } = req.body || {};
+
+    if (!question.trim()) {
+      return res.status(400).json({
+        error:
+          "Question missing."
+      });
+    }
+
+    if (!requireAI(res)) return;
+
+    const prompt = `
+Solve this student's doubt.
+
+Subject:
+${subject || "General"}
+
+Question:
+${question.slice(0, 15000)}
+
+Explain:
+1. What the question asks
+2. Concept required
+3. Step-by-step solution
+4. Final answer
+5. One quick tip
+
+Use simple student-friendly language.
+Do not invent information.
+`;
+
+    const answer =
+      await askAI(prompt, {
+        temperature: 0.25,
+        max_completion_tokens: 3000
+      });
+
+    res.json({
+      answer
+    });
+
+  } catch (error) {
+    console.error(
+      "Doubt solver error:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        error.message ||
+        "Doubt solve nahi ho paya."
+    });
+  }
+});
+
+/* =========================================================
+   15. SUPABASE ADMIN USERS COUNT
+========================================================= */
 
 app.get(
   "/api/admin/users-count",
   async (req, res) => {
-
     try {
+      if (!supabaseAdmin) {
+        return res.status(503).json({
+          error:
+            "Supabase admin configuration missing."
+        });
+      }
 
       const authHeader =
         req.headers.authorization || "";
@@ -634,7 +1211,6 @@ app.get(
       });
 
     } catch (error) {
-
       console.error(
         "Users count error:",
         error
@@ -648,33 +1224,62 @@ app.get(
   }
 );
 
-
-/* =========================
-   HEALTH CHECK
-========================= */
+/* =========================================================
+   16. HEALTH CHECK
+========================================================= */
 
 app.get(
   "/api/health",
   (req, res) => {
-
     res.json({
       ok: true,
+
       aiConfigured:
         !!process.env.GROQ_API_KEY,
+
       transcriptConfigured:
         !!process.env.YOUTUBE_TRANSCRIPT_API_KEY,
-      supabaseConfigured:
-        !!process.env.SUPABASE_URL &&
-        !!process.env.SUPABASE_SERVICE_ROLE_KEY
-    });
 
+      supabaseConfigured:
+        !!(
+          process.env.SUPABASE_URL &&
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        ),
+
+      features: {
+        flashcards: true,
+        quiz: true,
+        tutor: true,
+        youtubeNotes: true,
+        pdfExport: true,
+        imageToText: true,
+        pdfSummarizer: true,
+        notesGenerator: true,
+        studyPlanner: true,
+        studyProgress: true,
+        voiceTutor: true,
+        webResearch: true,
+        examPaper: true,
+        doubtSolver: true
+      }
+    });
   }
 );
 
+/* =========================================================
+   404 API HANDLER
+========================================================= */
 
-/* =========================
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    error:
+      "API route nahi mila."
+  });
+});
+
+/* =========================================================
    SERVER START
-========================= */
+========================================================= */
 
 app.listen(
   PORT,
