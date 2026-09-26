@@ -2,272 +2,253 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SKNotes — Indian AI Study Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SKNotes - AI Study Assistant</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root{
-  --saffron:#ff7a00;
-  --deep-saffron:#e85d04;
-  --green:#138a45;
-  --deep-green:#08783b;
-  --cream:#fffaf2;
-  --white:#ffffff;
-  --ink:#172019;
-  --muted:#66706a;
-  --line:#eadfd2;
-  --soft:#fff3e6;
-  --softgreen:#eaf7ef;
-  --danger:#c62828;
-  --shadow:0 12px 35px rgba(52,38,20,.10);
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f8fc;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#687386;
+  --border:#e5e7eb;
 
-html{scroll-behavior:smooth}
+  --saffron:#f97316;
+  --orange:#ea580c;
+  --green:#138a4b;
+  --green-dark:#08733d;
+  --blue:#4f46e5;
+
+  --shadow:0 12px 35px rgba(20,30,50,.08);
+}
+
+body.dark{
+  --bg:#09111c;
+  --card:#121c2b;
+  --text:#f8fafc;
+  --muted:#a9b4c5;
+  --border:#263548;
+  --shadow:0 12px 35px rgba(0,0,0,.25);
+}
 
 body{
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(circle at 10% 10%,rgba(255,122,0,.08),transparent 22%),
-    radial-gradient(circle at 90% 20%,rgba(19,138,69,.08),transparent 24%),
-    var(--cream);
-  min-height:100vh;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.25s;
 }
 
-button,input,textarea,select{font:inherit}
-
-button{cursor:pointer}
-
-a{text-decoration:none;color:inherit}
-
-.top-tricolor{
-  height:5px;
-  background:linear-gradient(
-    to right,
-    #ff9933 0 33.33%,
-    #ffffff 33.33% 66.66%,
-    #138808 66.66% 100%
-  );
-}
-
-.pattern{
+/* subtle Indian pattern */
+body:before{
+  content:"ॐ  ✦  ॐ  ✦  ॐ";
   position:fixed;
-  inset:0;
-  pointer-events:none;
+  top:90px;
+  right:-35px;
+  font-size:42px;
+  letter-spacing:15px;
   opacity:.035;
+  pointer-events:none;
   z-index:-1;
-  background-image:
-    radial-gradient(circle at 20px 20px,#ff7a00 1px,transparent 1.5px),
-    radial-gradient(circle at 70px 70px,#138a45 1px,transparent 1.5px);
-  background-size:90px 90px;
 }
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.container{
+  width:min(1120px,calc(100% - 28px));
+  margin:auto;
+}
+
+/* HEADER */
 
 header{
   position:sticky;
   top:0;
-  z-index:50;
-  background:rgba(255,250,242,.94);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--line);
+  z-index:100;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+
+body.dark header{
+  background:rgba(18,28,43,.94);
 }
 
 .nav{
-  max-width:1180px;
-  margin:auto;
-  min-height:70px;
-  padding:10px 18px;
+  min-height:68px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:15px;
+  align-items:center;
+  gap:10px;
 }
 
 .logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  font-size:25px;
   font-weight:900;
-  font-size:21px;
 }
 
-.logo-mark{
-  width:42px;
-  height:42px;
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  color:#fff;
-  font-size:20px;
-  background:linear-gradient(135deg,var(--saffron),var(--green));
-  box-shadow:0 8px 20px rgba(19,138,69,.18);
+.logo span{
+  color:var(--saffron);
+}
+
+.logo small{
+  display:block;
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--green);
+  margin-top:2px;
 }
 
 .nav-actions{
   display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
+  gap:7px;
 }
 
-.btn{
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--ink);
-  border-radius:12px;
-  padding:10px 14px;
-  font-weight:700;
-  transition:.2s;
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 7px 18px rgba(0,0,0,.07);
-}
-
-.btn.primary{
-  color:#fff;
-  border:0;
-  background:linear-gradient(135deg,var(--saffron),var(--deep-saffron));
-}
-
-.btn.green{
-  color:#fff;
-  border:0;
-  background:linear-gradient(135deg,var(--green),var(--deep-green));
-}
-
-.btn.small{
-  padding:8px 11px;
+.nav-btn{
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  padding:9px 13px;
   border-radius:10px;
-  font-size:13px;
+  font-weight:700;
 }
 
-.user-name{
-  display:none;
-  padding:8px 12px;
-  border-radius:999px;
-  background:linear-gradient(90deg,#fff0df,#edf8f0);
-  border:1px solid var(--line);
-  font-size:13px;
-  font-weight:800;
+.nav-btn:hover{
+  border-color:var(--saffron);
 }
+
+/* HERO */
 
 .hero{
-  max-width:1180px;
-  margin:0 auto;
-  padding:55px 18px 25px;
+  text-align:center;
+  padding:65px 0 45px;
 }
 
-.hero-box{
-  position:relative;
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:30px;
-  padding:48px 35px;
-  background:
-    linear-gradient(120deg,rgba(255,153,51,.13),transparent 40%),
-    linear-gradient(300deg,rgba(19,136,8,.11),transparent 45%),
-    #fff;
-  box-shadow:var(--shadow);
-}
-
-.hero-box:before{
-  content:"ॐ";
-  position:absolute;
-  right:35px;
-  top:15px;
-  font-size:110px;
-  color:var(--saffron);
-  opacity:.055;
+.india-line{
+  width:150px;
+  height:4px;
+  margin:0 auto 22px;
+  border-radius:10px;
+  background:linear-gradient(
+    90deg,
+    var(--saffron) 0 33%,
+    white 33% 66%,
+    var(--green) 66%
+  );
+  border:1px solid rgba(0,0,0,.05);
 }
 
 .badge{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:8px 13px;
+  display:inline-block;
+  background:#fff7ed;
+  color:var(--orange);
+  padding:7px 14px;
   border-radius:999px;
-  background:#fff3e6;
-  color:#b94f00;
-  border:1px solid #ffd4ad;
   font-size:13px;
   font-weight:800;
+  margin-bottom:18px;
+}
+
+body.dark .badge{
+  background:#2a1b12;
 }
 
 .hero h1{
-  max-width:780px;
-  margin-top:18px;
-  font-size:clamp(34px,6vw,65px);
-  line-height:1.03;
-  letter-spacing:-2.5px;
+  font-size:clamp(38px,7vw,65px);
+  line-height:1.05;
+  margin-bottom:18px;
 }
 
 .hero h1 span{
-  background:linear-gradient(90deg,var(--saffron),var(--green));
-  -webkit-background-clip:text;
-  color:transparent;
+  color:var(--saffron);
 }
 
 .hero p{
-  max-width:720px;
-  margin-top:17px;
+  max-width:680px;
+  margin:auto;
   color:var(--muted);
-  font-size:17px;
   line-height:1.7;
 }
 
-.hero-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:25px;
+/* ACCOUNT */
+
+.account{
+  display:none;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:25px;
+  box-shadow:var(--shadow);
 }
 
+.account-inner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.account-name{
+  font-size:18px;
+  font-weight:800;
+}
+
+.account-email{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+/* STATS */
+
 .stats{
-  max-width:1180px;
-  margin:10px auto 25px;
-  padding:0 18px;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:14px;
+  margin-bottom:45px;
 }
 
 .stat{
-  background:#fff;
-  border:1px solid var(--line);
+  background:var(--card);
+  border:1px solid var(--border);
   border-radius:18px;
-  padding:18px;
+  padding:21px;
+  text-align:center;
+  box-shadow:var(--shadow);
 }
 
-.stat-label{
+.stat strong{
+  display:block;
+  font-size:25px;
+  color:var(--green);
+}
+
+.stat small{
   color:var(--muted);
-  font-size:13px;
-  font-weight:700;
 }
 
-.stat-value{
-  font-size:26px;
-  font-weight:900;
-  margin-top:5px;
-}
-
-.section{
-  max-width:1180px;
-  margin:0 auto;
-  padding:20px 18px 45px;
-}
+/* SECTION */
 
 .section-title{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:15px;
-  margin-bottom:18px;
+  margin:35px 0 18px;
 }
 
 .section-title h2{
@@ -276,689 +257,708 @@ header{
 
 .section-title p{
   color:var(--muted);
-  font-size:14px;
+  margin-top:5px;
 }
 
-.tools{
+/* SERVICES */
+
+.services{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:15px;
 }
 
-.tool{
-  position:relative;
-  background:#fff;
-  border:1px solid var(--line);
+.service{
+  background:var(--card);
+  border:1px solid var(--border);
   border-radius:20px;
-  padding:21px;
-  box-shadow:0 5px 18px rgba(50,30,10,.045);
-  transition:.22s;
-  min-height:180px;
-}
-
-.tool:hover{
-  transform:translateY(-4px);
+  padding:20px;
   box-shadow:var(--shadow);
-  border-color:#e5cdb7;
+  transition:.2s;
+  position:relative;
+  overflow:hidden;
 }
 
-.tool-icon{
-  width:45px;
-  height:45px;
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  font-size:21px;
-  background:var(--soft);
+.service:after{
+  content:"";
+  position:absolute;
+  width:70px;
+  height:70px;
+  right:-25px;
+  top:-25px;
+  border:1px solid var(--saffron);
+  border-radius:50%;
+  opacity:.12;
 }
 
-.tool:nth-child(even) .tool-icon{
-  background:var(--softgreen);
+.service:hover{
+  transform:translateY(-4px);
+  border-color:rgba(249,115,22,.4);
 }
 
-.tool h3{
-  margin-top:14px;
-  font-size:18px;
+.icon{
+  font-size:31px;
+  margin-bottom:12px;
 }
 
-.tool p{
-  margin-top:7px;
+.service h3{
+  margin-bottom:7px;
+}
+
+.service p{
   color:var(--muted);
-  font-size:13px;
-  line-height:1.55;
+  font-size:14px;
+  line-height:1.5;
+  min-height:42px;
 }
 
-.tool button{
-  margin-top:15px;
-  width:100%;
+.soon{
+  display:inline-block;
+  margin-top:12px;
+  font-size:10px;
+  font-weight:900;
+  color:var(--green-dark);
+  background:#ecfdf3;
+  padding:5px 8px;
+  border-radius:20px;
 }
+
+/* BUTTON */
+
+.primary{
+  background:linear-gradient(
+    135deg,
+    var(--saffron),
+    var(--orange)
+  );
+  color:white;
+  border:0;
+  padding:11px 16px;
+  border-radius:11px;
+  font-weight:800;
+}
+
+.primary:hover{
+  opacity:.92;
+}
+
+.service .primary{
+  width:100%;
+  margin-top:14px;
+}
+
+/* WORKSPACE */
 
 .workspace{
-  display:none;
-  max-width:1180px;
-  margin:0 auto 40px;
-  padding:0 18px;
-}
-
-.workspace.show{display:block}
-
-.workspace-box{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:22px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:21px;
+  margin-top:28px;
   box-shadow:var(--shadow);
 }
 
 .workspace-head{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   gap:15px;
   margin-bottom:18px;
 }
 
-.workspace-head h2{
-  font-size:23px;
+.workspace-head p{
+  color:var(--muted);
+  margin-top:5px;
 }
 
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:13px;
-}
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.field.full{
-  grid-column:1/-1;
-}
-
-.field label{
-  font-size:13px;
-  font-weight:800;
-}
-
-input,textarea,select{
-  width:100%;
-  border:1px solid var(--line);
-  background:#fffdfa;
-  color:var(--ink);
-  border-radius:12px;
-  padding:12px 13px;
-  outline:none;
+.close{
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-size:26px;
 }
 
 textarea{
+  width:100%;
   min-height:170px;
   resize:vertical;
+  padding:15px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
 }
 
-input:focus,textarea:focus,select:focus{
+input,
+select{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  outline:none;
+  background:var(--bg);
+  color:var(--text);
+}
+
+input:focus,
+textarea:focus,
+select:focus{
   border-color:var(--saffron);
-  box-shadow:0 0 0 3px rgba(255,122,0,.10);
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
 
 .actions{
   display:flex;
+  justify-content:flex-end;
   flex-wrap:wrap;
-  gap:9px;
+  gap:8px;
+  margin-top:12px;
+}
+
+.loading{
+  display:none;
+  color:var(--muted);
   margin-top:15px;
 }
 
 .result{
+  white-space:pre-wrap;
+  line-height:1.65;
   margin-top:18px;
-  display:none;
 }
 
-.result.show{display:block}
+.flashcards{
+  display:grid;
+  gap:12px;
+  margin-top:18px;
+}
 
-.result-title{
-  font-weight:900;
+.flashcard{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:16px;
+}
+
+.flashcard .q{
+  font-weight:800;
   margin-bottom:8px;
 }
 
-.result-content{
-  white-space:pre-wrap;
-  background:#faf7f2;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:16px;
-  line-height:1.65;
-  max-height:550px;
-  overflow:auto;
+.flashcard .a{
+  color:var(--muted);
+  line-height:1.5;
 }
 
-.loading{
-  padding:18px;
-  border-radius:14px;
-  background:#fff5e9;
-  color:#9c4b00;
-  font-weight:700;
-}
+/* MODALS */
 
-.error{
-  padding:14px;
-  border-radius:13px;
-  background:#fff0f0;
-  color:var(--danger);
-  border:1px solid #ffd0d0;
-}
-
-.success{
-  padding:14px;
-  border-radius:13px;
-  background:#edf9f1;
-  color:#146b38;
-  border:1px solid #c8ebd5;
-}
-
-.modal{
+.overlay{
+  display:none;
   position:fixed;
   inset:0;
-  background:rgba(10,15,12,.48);
-  backdrop-filter:blur(5px);
-  display:none;
+  z-index:200;
+  background:rgba(0,0,0,.72);
   align-items:center;
   justify-content:center;
-  z-index:100;
-  padding:15px;
+  padding:18px;
 }
 
-.modal.show{display:flex}
-
 .modal-box{
-  width:min(480px,100%);
+  width:min(650px,100%);
   max-height:90vh;
   overflow:auto;
-  background:#fff;
-  border-radius:24px;
-  padding:25px;
-  box-shadow:0 25px 70px rgba(0,0,0,.22);
+  background:var(--card);
+  border-radius:22px;
+  padding:24px;
 }
 
 .modal-head{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:18px;
+  margin-bottom:20px;
 }
-
-.close{
-  width:38px;
-  height:38px;
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:10px;
-}
-
-.auth-tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-bottom:17px;
-}
-
-.auth-tab{
-  padding:11px;
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:11px;
-  font-weight:800;
-}
-
-.auth-tab.active{
-  background:#fff1e3;
-  border-color:#ffc48d;
-  color:#b94f00;
-}
-
-.auth-form{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.hidden{display:none!important}
 
 .timer{
   text-align:center;
-  padding:20px;
-}
-
-.timer-display{
-  font-size:60px;
+  font-size:78px;
   font-weight:900;
-  letter-spacing:2px;
-  margin:15px 0;
-  background:linear-gradient(90deg,var(--saffron),var(--green));
-  -webkit-background-clip:text;
-  color:transparent;
+  margin:28px 0;
+  color:var(--green);
 }
 
-.timer-inputs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.creator{
-  max-width:1180px;
-  margin:5px auto 35px;
-  padding:0 18px;
-}
-
-.creator-box{
-  border-radius:25px;
-  overflow:hidden;
-  border:1px solid var(--line);
-  background:#fff;
-  box-shadow:var(--shadow);
-}
-
-.creator-top{
-  height:7px;
-  background:linear-gradient(
-    90deg,
-    #ff9933 0 33.33%,
-    #fff 33.33% 66.66%,
-    #138808 66.66%
-  );
-}
-
-.creator-content{
-  padding:28px;
+.timer-buttons{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:25px;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
 }
 
-.creator-content h2{
-  margin-top:7px;
-  font-size:29px;
+.timer-buttons button{
+  padding:10px 14px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+  border-radius:10px;
+  font-weight:700;
 }
 
-.creator-content p{
-  margin-top:8px;
-  color:var(--muted);
-  line-height:1.6;
+.auth-submit{
+  width:100%;
 }
 
-.creator-symbol{
-  font-size:62px;
-}
-
-footer{
-  border-top:1px solid var(--line);
-  padding:25px 18px 35px;
+.message{
   text-align:center;
+  margin-top:12px;
+  font-size:13px;
+}
+
+.switch{
+  text-align:center;
+  margin-top:15px;
   color:var(--muted);
   font-size:13px;
 }
 
+.switch button{
+  border:0;
+  background:none;
+  color:var(--saffron);
+  font-weight:800;
+}
+
+/* FOOTER */
+
+footer{
+  text-align:center;
+  margin-top:65px;
+  padding:35px 15px;
+  border-top:1px solid var(--border);
+  color:var(--muted);
+  line-height:2;
+  font-size:14px;
+}
+
 footer strong{
-  color:var(--ink);
+  color:var(--text);
 }
 
-.dark{
-  --cream:#101512;
-  --white:#171d19;
-  --ink:#edf5ef;
-  --muted:#aeb9b1;
-  --line:#2d3931;
-  --soft:#2a2118;
-  --softgreen:#172a1e;
-  background:#101512;
+footer a{
+  color:var(--saffron);
+  text-decoration:none;
+  font-weight:800;
 }
 
-.dark header{
-  background:rgba(16,21,18,.94);
+/* MOBILE */
+
+@media(max-width:850px){
+  .services{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
 }
 
-.dark .hero-box,
-.dark .tool,
-.dark .stat,
-.dark .workspace-box,
-.dark .creator-box,
-.dark .modal-box{
-  background:#171d19;
-}
+@media(max-width:600px){
+  .services{
+    grid-template-columns:1fr;
+  }
 
-.dark input,
-.dark textarea,
-.dark select,
-.dark .btn,
-.dark .auth-tab,
-.dark .close{
-  background:#111612;
-  color:var(--ink);
-  border-color:var(--line);
-}
+  .stats{
+    grid-template-columns:1fr;
+  }
 
-.dark .result-content{
-  background:#111612;
-}
+  .account-inner{
+    flex-direction:column;
+    align-items:flex-start;
+  }
 
-@media(max-width:900px){
-  .tools{grid-template-columns:repeat(2,1fr)}
-}
+  .timer{
+    font-size:58px;
+  }
 
-@media(max-width:650px){
-  .nav{align-items:flex-start}
-  .nav-actions{max-width:65%}
-  .user-name{font-size:11px}
-  .hero{padding-top:25px}
-  .hero-box{padding:32px 22px;border-radius:23px}
-  .hero h1{font-size:39px;letter-spacing:-1.5px}
-  .stats{grid-template-columns:1fr}
-  .tools{grid-template-columns:1fr}
-  .form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .creator-content{flex-direction:column;text-align:center}
-  .creator-symbol{font-size:45px}
-}
+  .hero{
+    padding-top:45px;
+  }
 
-@media(max-width:430px){
-  .logo span{font-size:18px}
-  .nav-actions .btn{padding:8px 9px;font-size:12px}
-  .hero-actions .btn{width:100%}
+  .nav-btn{
+    padding:8px 9px;
+    font-size:12px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-tricolor"></div>
-<div class="pattern"></div>
-
 <header>
-  <div class="nav">
-    <a href="#" class="logo">
-      <div class="logo-mark">ॐ</div>
-      <span>SKNotes</span>
-    </a>
+<div class="container nav">
 
-    <div class="nav-actions">
-      <span id="userName" class="user-name"></span>
-      <button class="btn small" id="timerBtn">⏱ Timer</button>
-      <button class="btn small" id="darkBtn">🌙</button>
-      <button class="btn small primary" id="loginBtn">Login</button>
-      <button class="btn small hidden" id="logoutBtn">Logout</button>
-    </div>
-  </div>
+<div class="logo">
+SK<span>Notes</span>
+<small>LEARN • CREATE • GROW</small>
+</div>
+
+<div class="nav-actions">
+<button class="nav-btn" onclick="openTimer()">⏱️ Timer</button>
+<button class="nav-btn" onclick="toggleDark()" id="darkBtn">🌙</button>
+<button class="nav-btn" onclick="openAuth()" id="loginBtn">Login</button>
+</div>
+
+</div>
 </header>
 
+<main class="container">
+
 <section class="hero">
-  <div class="hero-box">
-    <div class="badge">🇮🇳 Made for Indian Students</div>
 
-    <h1>
-      पढ़ो smarter.<br>
-      Learn <span>better.</span>
-    </h1>
+<div class="india-line"></div>
 
-    <p>
-      SKNotes is your AI-powered study companion for notes, flashcards,
-      quizzes, doubts, planning and exam preparation — built with Indian
-      students in mind.
-    </p>
+<div class="badge">
+🇮🇳 Made for Indian Students
+</div>
 
-    <div class="hero-actions">
-      <button class="btn primary" onclick="openTool('flashcards')">
-        ✨ Start Learning
-      </button>
-      <button class="btn green" onclick="scrollToTools()">
-        📚 Explore Tools
-      </button>
-    </div>
-  </div>
+<h1>
+Study Smarter with
+<span>SKNotes</span>
+</h1>
+
+<p>
+AI-powered notes, flashcards, quizzes, study planning and doubt solving —
+designed for students preparing for school and competitive exams.
+</p>
+
+</section>
+
+<section class="account" id="account">
+
+<div class="account-inner">
+
+<div>
+<div class="account-name" id="accountName">
+👋 Welcome
+</div>
+
+<div class="account-email" id="accountEmail"></div>
+</div>
+
+<button class="nav-btn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
 </section>
 
 <section class="stats">
-  <div class="stat">
-    <div class="stat-label">Study Time</div>
-    <div class="stat-value" id="studyStat">0h 0m</div>
-  </div>
 
-  <div class="stat">
-    <div class="stat-label">Flashcards Created</div>
-    <div class="stat-value" id="cardsStat">0</div>
-  </div>
+<div class="stat">
+<strong id="studyTime">00:00:00</strong>
+<small>Study Time</small>
+</div>
 
-  <div class="stat">
-    <div class="stat-label">Tools Used</div>
-    <div class="stat-value" id="toolsStat">0</div>
-  </div>
+<div class="stat">
+<strong id="cardCount">0</strong>
+<small>Flashcards Created</small>
+</div>
+
+<div class="stat">
+<strong id="toolCount">0</strong>
+<small>Tools Used</small>
+</div>
+
 </section>
 
-<section class="section" id="toolsSection">
+<div class="section-title">
+<h2>📚 Study Tools</h2>
+<p>Modern AI tools with a touch of Indian learning culture.</p>
+</div>
 
-  <div class="section-title">
-    <div>
-      <h2>Study Tools</h2>
-      <p>एक जगह पर आपकी पूरी study toolkit</p>
-    </div>
-  </div>
+<section class="services">
 
-  <div class="tools">
+<div class="service">
+<div class="icon">🧠</div>
+<h3>Text → Flashcards</h3>
+<p>Create AI flashcards from your notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('flashcards')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">🃏</div>
-      <h3>Text → Flashcards</h3>
-      <p>Notes ko smart revision flashcards mein convert karo.</p>
-      <button class="btn primary" onclick="openTool('flashcards')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">▶️</div>
+<h3>YouTube → Notes</h3>
+<p>Convert educational videos into notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('youtube')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">▶️</div>
-      <h3>YouTube → Notes</h3>
-      <p>YouTube lecture se structured AI notes generate karo.</p>
-      <button class="btn primary" onclick="openTool('youtube')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">🖼️</div>
+<h3>Image → Text</h3>
+<p>Extract text from handwritten or printed images.</p>
+<span class="soon">OCR</span>
+<button class="primary" onclick="openFeature('ocr')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">🖼️</div>
-      <h3>Image → Text</h3>
-      <p>Photo se readable text extract karo.</p>
-      <button class="btn primary" onclick="openTool('ocr')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📷</div>
+<h3>Question Scanner</h3>
+<p>Scan a question and get an AI explanation.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('scanner')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📷</div>
-      <h3>Question Scanner</h3>
-      <p>Question ki photo upload karke AI explanation pao.</p>
-      <button class="btn primary" onclick="openTool('scanner')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📝</div>
+<h3>Notes → Quiz</h3>
+<p>Generate MCQs from your notes.</p>
+<span class="soon">10 MCQs</span>
+<button class="primary" onclick="openFeature('quiz')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📝</div>
-      <h3>Notes → Quiz</h3>
-      <p>Notes ko practice quiz mein convert karo.</p>
-      <button class="btn primary" onclick="openTool('quiz')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📄</div>
+<h3>PDF Export</h3>
+<p>Download your notes as a PDF.</p>
+<span class="soon">PDF</span>
+<button class="primary" onclick="openFeature('pdf')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📄</div>
-      <h3>PDF Export</h3>
-      <p>Apne notes ko downloadable PDF mein convert karo.</p>
-      <button class="btn primary" onclick="openTool('pdf')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">🤖</div>
+<h3>AI Tutor</h3>
+<p>Ask questions and learn concepts step-by-step.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('tutor')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">🤖</div>
-      <h3>AI Tutor</h3>
-      <p>Concepts ko simple student-friendly language mein samjho.</p>
-      <button class="btn primary" onclick="openTool('tutor')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📚</div>
+<h3>AI Notes Generator</h3>
+<p>Turn raw study material into structured notes.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('notes')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">✨</div>
-      <h3>AI Notes Generator</h3>
-      <p>Topic, subject aur class ke according notes banao.</p>
-      <button class="btn primary" onclick="openTool('notes-generator')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📅</div>
+<h3>Study Planner</h3>
+<p>Create a practical day-by-day timetable.</p>
+<span class="soon">PLAN</span>
+<button class="primary" onclick="openFeature('planner')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📅</div>
-      <h3>Study Planner</h3>
-      <p>Exam date ke according study schedule banao.</p>
-      <button class="btn primary" onclick="openTool('planner')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📊</div>
+<h3>Study Progress</h3>
+<p>Track topics, study hours and quiz score.</p>
+<span class="soon">TRACK</span>
+<button class="primary" onclick="openFeature('progress')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📊</div>
-      <h3>Study Progress</h3>
-      <p>Study hours aur quiz performance track karo.</p>
-      <button class="btn primary" onclick="openTool('progress')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">🎙️</div>
+<h3>AI Voice Tutor</h3>
+<p>Generate answers that are easy to listen to.</p>
+<span class="soon">VOICE</span>
+<button class="primary" onclick="openFeature('voice')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">🎙️</div>
-      <h3>AI Voice Tutor</h3>
-      <p>Question poochho aur AI answer ko voice mein suno.</p>
-      <button class="btn primary" onclick="openTool('voice')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">🌐</div>
+<h3>AI Web Research</h3>
+<p>Create structured research answers.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('research')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">🌐</div>
-      <h3>AI Web Research</h3>
-      <p>Research-style AI answer generate karo.</p>
-      <button class="btn primary" onclick="openTool('research')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">📑</div>
+<h3>Exam Paper Generator</h3>
+<p>Generate school-level practice papers.</p>
+<span class="soon">EXAM</span>
+<button class="primary" onclick="openFeature('exam')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">📚</div>
-      <h3>Exam Paper Generator</h3>
-      <p>Subject aur marks ke according practice paper banao.</p>
-      <button class="btn primary" onclick="openTool('exam')">Open</button>
-    </div>
+<div class="service">
+<div class="icon">❓</div>
+<h3>AI Doubt Solver</h3>
+<p>Get simple step-by-step explanations.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('doubt')">Open</button>
+</div>
 
-    <div class="tool">
-      <div class="tool-icon">💡</div>
-      <h3>AI Doubt Solver</h3>
-      <p>Apna doubt likho aur step-by-step explanation pao.</p>
-      <button class="btn primary" onclick="openTool('doubt')">Open</button>
-    </div>
-
-  </div>
 </section>
 
-<section class="workspace" id="workspace">
-  <div class="workspace-box">
-    <div class="workspace-head">
-      <h2 id="workspaceTitle">SKNotes</h2>
-      <button class="btn small" onclick="closeWorkspace()">✕ Close</button>
-    </div>
+<section id="workspaceArea"></section>
 
-    <div id="workspaceBody"></div>
-  </div>
-</section>
-
-<section class="creator">
-  <div class="creator-box">
-    <div class="creator-top"></div>
-
-    <div class="creator-content">
-      <div>
-        <div class="badge">🇮🇳 Proudly made for Indian learners</div>
-        <h2>Created by Shailendra</h2>
-        <p>
-          “पढ़ो, सीखो और अपने सपनों को सच करने की दिशा में आगे बढ़ो।”
-          <br>
-          SKNotes — आपकी पढ़ाई, आपकी मेहनत, आपका future.
-        </p>
-      </div>
-
-      <div class="creator-symbol">🇮🇳</div>
-    </div>
-  </div>
-</section>
+</main>
 
 <footer>
-  <strong>SKNotes</strong> · Created with ❤️ by <strong>Shailendra</strong>
-  · Made for students in India 🇮🇳
+
+<div>
+© 2026 <strong>SKNotes</strong>
+</div>
+
+<div>
+Created with ❤️ for students
+</div>
+
+<div>
+Instagram:
+<a href="https://www.instagram.com/also__sk"
+target="_blank"
+rel="noopener">
+@also__sk
+</a>
+</div>
+
 </footer>
 
-<!-- AUTH MODAL -->
-<div class="modal" id="authModal">
-  <div class="modal-box">
-
-    <div class="modal-head">
-      <h2>Welcome to SKNotes</h2>
-      <button class="close" onclick="closeAuth()">✕</button>
-    </div>
-
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="loginTab">Login</button>
-      <button class="auth-tab" id="signupTab">Sign Up</button>
-    </div>
-
-    <form class="auth-form" id="authForm">
-
-      <div class="field" id="nameField">
-        <label>Your name</label>
-        <input id="authName" type="text" placeholder="Enter your name">
-      </div>
-
-      <div class="field">
-        <label>Email</label>
-        <input id="authEmail" type="email" placeholder="you@example.com" required>
-      </div>
-
-      <div class="field">
-        <label>Password</label>
-        <input id="authPassword" type="password" placeholder="Password" required>
-      </div>
-
-      <button class="btn primary" type="submit" id="authSubmit">
-        Login
-      </button>
-
-      <div id="authMessage"></div>
-    </form>
-  </div>
-</div>
 
 <!-- TIMER -->
-<div class="modal" id="timerModal">
-  <div class="modal-box timer">
 
-    <div class="modal-head">
-      <h2>Study Timer</h2>
-      <button class="close" onclick="closeTimer()">✕</button>
-    </div>
+<div class="overlay" id="timerOverlay">
 
-    <div class="timer-inputs">
-      <div class="field">
-        <label>Minutes</label>
-        <input id="timerMinutes" type="number" min="1" max="180" value="25">
-      </div>
+<div class="modal-box">
 
-      <div class="field">
-        <label>Seconds</label>
-        <input id="timerSeconds" type="number" min="0" max="59" value="0">
-      </div>
-    </div>
-
-    <div class="timer-display" id="timerDisplay">25:00</div>
-
-    <div class="actions">
-      <button class="btn primary" id="timerStart">Start</button>
-      <button class="btn green" id="timerPause">Pause</button>
-      <button class="btn" id="timerReset">Reset</button>
-    </div>
-  </div>
+<div class="modal-head">
+<h2>⏱️ Study Timer</h2>
+<button class="close" onclick="closeTimer()">×</button>
 </div>
 
+<div class="timer" id="timer">
+25:00
+</div>
+
+<div class="timer-buttons">
+
+<button onclick="startTimer()">▶ Start</button>
+
+<button onclick="pauseTimer()">⏸ Pause</button>
+
+<button onclick="resetTimer()">↻ Reset</button>
+
+<button onclick="closeTimer()">✕ Close</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- AUTH -->
+
+<div class="overlay" id="authModal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h2 id="authTitle">
+Login
+</h2>
+
+<button class="close" onclick="closeAuth()">×</button>
+
+</div>
+
+<form onsubmit="authSubmit(event)">
+
+<div class="field" id="nameBox" style="display:none">
+
+<label>Full Name</label>
+
+<input
+type="text"
+id="name"
+placeholder="Your name">
+
+</div>
+
+<div class="field">
+
+<label>Email</label>
+
+<input
+type="email"
+id="email"
+placeholder="you@example.com"
+required>
+
+</div>
+
+<div class="field">
+
+<label>Password</label>
+
+<input
+type="password"
+id="password"
+placeholder="Minimum 6 characters"
+required
+minlength="6">
+
+</div>
+
+<button
+class="primary auth-submit"
+type="submit">
+
+<span id="submitText">
+Login
+</span>
+
+</button>
+
+</form>
+
+<div class="message" id="message"></div>
+
+<div class="switch">
+
+<span id="switchText">
+Don't have an account?
+</span>
+
+<button
+onclick="switchMode()"
+id="switchButton"
+type="button">
+
+Sign Up
+
+</button>
+
+</div>
+
+</div>
+</div>
+
+
 <script>
-/* =========================
+
+/* =========================================================
    SUPABASE
-========================= */
+   ========================================================= */
 
 const SUPABASE_URL =
 "https://ejwdvlenqdfelmahajct.supabase.co";
@@ -972,1355 +972,2585 @@ window.supabase.createClient(
   SUPABASE_KEY
 );
 
-/* =========================
+
+/* =========================================================
    BASIC HELPERS
-========================= */
+   ========================================================= */
 
-const $ = id => document.getElementById(id);
+function safe(value){
 
-let currentUser = null;
-let authMode = "login";
-let timerInterval = null;
-let timerSecondsLeft = 1500;
-let timerStartedAt = null;
+return String(value || "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
-function scrollToTools(){
-  $("toolsSection").scrollIntoView({behavior:"smooth"});
 }
 
-function closeWorkspace(){
-  $("workspace").classList.remove("show");
-  $("workspaceBody").innerHTML = "";
+function apiBusy(show){
+
+const loading =
+document.getElementById("featureLoading");
+
+if(loading){
+
+loading.style.display =
+show ? "block" : "none";
+
 }
 
-function showWorkspace(title, html){
-  $("workspaceTitle").textContent = title;
-  $("workspaceBody").innerHTML = html;
-  $("workspace").classList.add("show");
-  $("workspace").scrollIntoView({behavior:"smooth"});
 }
 
-function escapeHTML(text){
-  return String(text ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+function output(text){
+
+const box =
+document.getElementById("featureOutput");
+
+if(box){
+
+box.innerHTML = text;
+
 }
 
-async function api(url, options={}){
-  const response = await fetch(url,{
-    headers:{
-      "Content-Type":"application/json",
-      ...(options.headers || {})
-    },
-    ...options
-  });
-
-  const contentType =
-    response.headers.get("content-type") || "";
-
-  if(!response.ok){
-    let message = "Something went wrong.";
-
-    try{
-      if(contentType.includes("application/json")){
-        const data = await response.json();
-        message = data.error || data.message || message;
-      }else{
-        message = await response.text();
-      }
-    }catch{}
-
-    throw new Error(message);
-  }
-
-  if(contentType.includes("application/json")){
-    return response.json();
-  }
-
-  return response;
 }
 
-function loading(){
-  return `<div class="loading">⏳ AI is working...</div>`;
+async function api(url,body){
+
+const response =
+await fetch(url,{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify(body)
+
+});
+
+let data={};
+
+try{
+
+data =
+await response.json();
+
+}catch(e){
+
+throw new Error(
+"Server ne valid response nahi diya."
+);
+
 }
 
-function errorBox(error){
-  return `<div class="error">❌ ${escapeHTML(error.message || error)}</div>`;
+if(!response.ok){
+
+throw new Error(
+data.error ||
+"Request failed"
+);
+
 }
 
-function resultBox(title, text){
-  return `
-    <div class="result show">
-      <div class="result-title">${escapeHTML(title)}</div>
-      <div class="result-content">${escapeHTML(text)}</div>
-    </div>
-  `;
+return data;
+
 }
 
-function incrementTool(){
-  const n =
-    Number(localStorage.getItem("sknotes_tools") || 0) + 1;
 
-  localStorage.setItem("sknotes_tools",n);
-  updateStats();
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+function loadDark(){
+
+if(
+localStorage.getItem(
+"sknotes-dark"
+)==="yes"
+){
+
+document.body.classList.add("dark");
+
+document.getElementById(
+"darkBtn"
+).textContent="☀️";
+
 }
 
-function updateStats(){
-  const cards =
-    Number(localStorage.getItem("sknotes_cards") || 0);
-
-  const tools =
-    Number(localStorage.getItem("sknotes_tools") || 0);
-
-  const study =
-    Number(localStorage.getItem("sknotes_study_seconds") || 0);
-
-  const h = Math.floor(study / 3600);
-  const m = Math.floor((study % 3600) / 60);
-
-  $("cardsStat").textContent = cards;
-  $("toolsStat").textContent = tools;
-  $("studyStat").textContent = `${h}h ${m}m`;
 }
 
-/* =========================
-   TOOL OPENING
-========================= */
+function toggleDark(){
 
-function openTool(tool){
-  incrementTool();
+document.body.classList.toggle("dark");
 
-  const tools = {
+const dark =
+document.body.classList.contains("dark");
 
-    flashcards:{
-      title:"🃏 Text → Flashcards",
-      html:`
-        <div class="field">
-          <label>Paste your notes</label>
-          <textarea id="flashText" placeholder="Paste your chapter notes here..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateFlashcards()">Generate Flashcards</button>
-        </div>
-        <div id="flashResult"></div>
-      `
-    },
+localStorage.setItem(
+"sknotes-dark",
+dark ? "yes" : "no"
+);
 
-    youtube:{
-      title:"▶️ YouTube → Notes",
-      html:`
-        <div class="field">
-          <label>YouTube video URL</label>
-          <input id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateYouTubeNotes()">Generate Notes</button>
-        </div>
-        <div id="youtubeResult"></div>
-      `
-    },
+document.getElementById(
+"darkBtn"
+).textContent =
+dark ? "☀️" : "🌙";
 
-    ocr:{
-      title:"🖼️ Image → Text",
-      html:`
-        <div class="field">
-          <label>Select image</label>
-          <input id="ocrImage" type="file" accept="image/*">
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="imageToText()">Extract Text</button>
-        </div>
-        <div id="ocrResult"></div>
-      `
-    },
-
-    scanner:{
-      title:"📷 Question Scanner",
-      html:`
-        <div class="field">
-          <label>Question image</label>
-          <input id="scanImage" type="file" accept="image/*">
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="scanQuestion()">Solve Question</button>
-        </div>
-        <div id="scanResult"></div>
-      `
-    },
-
-    quiz:{
-      title:"📝 Notes → Quiz",
-      html:`
-        <div class="field">
-          <label>Paste notes</label>
-          <textarea id="quizText" placeholder="Paste your notes..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateQuiz()">Generate Quiz</button>
-        </div>
-        <div id="quizResult"></div>
-      `
-    },
-
-    pdf:{
-      title:"📄 PDF Export",
-      html:`
-        <div class="field">
-          <label>PDF title</label>
-          <input id="pdfTitle" value="SKNotes">
-        </div>
-        <div class="field" style="margin-top:12px">
-          <label>Notes</label>
-          <textarea id="pdfNotes" placeholder="Paste notes to export..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="exportPDF()">Download PDF</button>
-        </div>
-        <div id="pdfResult"></div>
-      `
-    },
-
-    tutor:{
-      title:"🤖 AI Tutor",
-      html:`
-        <div class="field">
-          <label>Ask your tutor</label>
-          <textarea id="tutorText" placeholder="Explain this concept..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="askTutor()">Ask AI Tutor</button>
-        </div>
-        <div id="tutorResult"></div>
-      `
-    },
-
-    "notes-generator":{
-      title:"✨ AI Notes Generator",
-      html:`
-        <div class="form-grid">
-          <div class="field">
-            <label>Subject</label>
-            <input id="ngSubject" placeholder="Chemistry">
-          </div>
-          <div class="field">
-            <label>Class</label>
-            <input id="ngClass" placeholder="12">
-          </div>
-          <div class="field full">
-            <label>Topic / Text</label>
-            <textarea id="ngText" placeholder="Chapter or topic..."></textarea>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateNotes()">Generate Notes</button>
-        </div>
-        <div id="ngResult"></div>
-      `
-    },
-
-    planner:{
-      title:"📅 Study Planner",
-      html:`
-        <div class="form-grid">
-          <div class="field">
-            <label>Subjects</label>
-            <input id="planSubjects" placeholder="Physics, Chemistry, Maths">
-          </div>
-          <div class="field">
-            <label>Daily study hours</label>
-            <input id="planHours" type="number" value="4">
-          </div>
-          <div class="field">
-            <label>Days</label>
-            <input id="planDays" type="number" value="30">
-          </div>
-          <div class="field">
-            <label>Exam date</label>
-            <input id="planExam" type="date">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generatePlanner()">Create Plan</button>
-        </div>
-        <div id="planResult"></div>
-      `
-    },
-
-    progress:{
-      title:"📊 Study Progress",
-      html:`
-        <div class="form-grid">
-          <div class="field">
-            <label>Study hours</label>
-            <input id="progHours" type="number" value="2">
-          </div>
-          <div class="field">
-            <label>Completed topics</label>
-            <input id="progCompleted" type="number" value="5">
-          </div>
-          <div class="field">
-            <label>Total topics</label>
-            <input id="progTotal" type="number" value="10">
-          </div>
-          <div class="field">
-            <label>Quiz score (%)</label>
-            <input id="progScore" type="number" value="80">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateProgress()">Analyze Progress</button>
-        </div>
-        <div id="progResult"></div>
-      `
-    },
-
-    voice:{
-      title:"🎙️ AI Voice Tutor",
-      html:`
-        <div class="field">
-          <label>Your question</label>
-          <textarea id="voiceQuestion" placeholder="Ask something..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="voiceTutor()">Ask & Speak</button>
-          <button class="btn" onclick="stopVoice()">Stop Voice</button>
-        </div>
-        <div id="voiceResult"></div>
-      `
-    },
-
-    research:{
-      title:"🌐 AI Web Research",
-      html:`
-        <div class="field">
-          <label>Research topic</label>
-          <textarea id="researchQuery" placeholder="Enter a topic..."></textarea>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="webResearch()">Research</button>
-        </div>
-        <div id="researchResult"></div>
-      `
-    },
-
-    exam:{
-      title:"📚 Exam Paper Generator",
-      html:`
-        <div class="form-grid">
-          <div class="field">
-            <label>Subject</label>
-            <input id="examSubject" placeholder="Physics">
-          </div>
-          <div class="field">
-            <label>Class</label>
-            <input id="examClass" placeholder="12">
-          </div>
-          <div class="field full">
-            <label>Chapters</label>
-            <textarea id="examChapters" placeholder="Chapters/topics..."></textarea>
-          </div>
-          <div class="field">
-            <label>Total marks</label>
-            <input id="examMarks" type="number" value="50">
-          </div>
-          <div class="field">
-            <label>Difficulty</label>
-            <select id="examDifficulty">
-              <option>Easy</option>
-              <option selected>Medium</option>
-              <option>Hard</option>
-            </select>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="generateExam()">Generate Paper</button>
-        </div>
-        <div id="examResult"></div>
-      `
-    },
-
-    doubt:{
-      title:"💡 AI Doubt Solver",
-      html:`
-        <div class="field">
-          <label>Your doubt</label>
-          <textarea id="doubtQuestion" placeholder="Write your question..."></textarea>
-        </div>
-        <div class="field" style="margin-top:12px">
-          <label>Subject (optional)</label>
-          <input id="doubtSubject" placeholder="Physics / Chemistry / Maths">
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="solveDoubt()">Solve Doubt</button>
-        </div>
-        <div id="doubtResult"></div>
-      `
-    }
-  };
-
-  const item = tools[tool];
-
-  if(!item){
-    showWorkspace(
-      "SKNotes",
-      `<div class="error">This tool is not available.</div>`
-    );
-    return;
-  }
-
-  showWorkspace(item.title,item.html);
 }
 
-/* =========================
-   FLASHCARDS
-========================= */
 
-async function generateFlashcards(){
-  const text = $("flashText").value.trim();
-
-  if(!text){
-    $("flashResult").innerHTML =
-      `<div class="error">Please paste some notes first.</div>`;
-    return;
-  }
-
-  $("flashResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/flashcards",{
-      method:"POST",
-      body:JSON.stringify({text})
-    });
-
-    const output =
-      typeof data === "string"
-        ? data
-        : data.flashcards || data.cards || JSON.stringify(data,null,2);
-
-    $("flashResult").innerHTML =
-      resultBox("Generated Flashcards",output);
-
-    localStorage.setItem(
-      "sknotes_cards",
-      Number(localStorage.getItem("sknotes_cards") || 0) + 10
-    );
-
-    updateStats();
-
-  }catch(error){
-    $("flashResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   YOUTUBE
-========================= */
-
-async function generateYouTubeNotes(){
-  const url = $("youtubeUrl").value.trim();
-
-  if(!url){
-    $("youtubeResult").innerHTML =
-      `<div class="error">Please enter a YouTube URL.</div>`;
-    return;
-  }
-
-  $("youtubeResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/notes",{
-      method:"POST",
-      body:JSON.stringify({url})
-    });
-
-    const output =
-      data.notes ||
-      data.text ||
-      data.transcript ||
-      JSON.stringify(data,null,2);
-
-    $("youtubeResult").innerHTML =
-      resultBox("AI Notes",output);
-
-  }catch(error){
-    $("youtubeResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   IMAGE HELPERS
-========================= */
-
-function fileToDataURL(file){
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-
-    reader.readAsDataURL(file);
-  });
-}
-
-/* =========================
-   OCR
-========================= */
-
-async function imageToText(){
-  const file = $("ocrImage").files[0];
-
-  if(!file){
-    $("ocrResult").innerHTML =
-      `<div class="error">Please select an image.</div>`;
-    return;
-  }
-
-  $("ocrResult").innerHTML = loading();
-
-  try{
-    const image = await fileToDataURL(file);
-
-    const data = await api("/api/image-to-text",{
-      method:"POST",
-      body:JSON.stringify({image})
-    });
-
-    const output =
-      data.text ||
-      data.result ||
-      JSON.stringify(data,null,2);
-
-    $("ocrResult").innerHTML =
-      resultBox("Extracted Text",output);
-
-  }catch(error){
-    $("ocrResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   QUESTION SCANNER
-========================= */
-
-async function scanQuestion(){
-  const file = $("scanImage").files[0];
-
-  if(!file){
-    $("scanResult").innerHTML =
-      `<div class="error">Please select a question image.</div>`;
-    return;
-  }
-
-  $("scanResult").innerHTML = loading();
-
-  try{
-    const image = await fileToDataURL(file);
-
-    const ocr = await api("/api/image-to-text",{
-      method:"POST",
-      body:JSON.stringify({image})
-    });
-
-    const question =
-      ocr.text || "";
-
-    if(!question.trim()){
-      throw new Error("Question text could not be detected.");
-    }
-
-    const answer = await api("/api/doubt-solver",{
-      method:"POST",
-      body:JSON.stringify({
-        question,
-        subject:""
-      })
-    });
-
-    const output =
-      answer.answer ||
-      answer.result ||
-      answer.text ||
-      JSON.stringify(answer,null,2);
-
-    $("scanResult").innerHTML =
-      resultBox("AI Solution",output);
-
-  }catch(error){
-    $("scanResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   QUIZ
-========================= */
-
-async function generateQuiz(){
-  const text = $("quizText").value.trim();
-
-  if(!text){
-    $("quizResult").innerHTML =
-      `<div class="error">Please paste notes first.</div>`;
-    return;
-  }
-
-  $("quizResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/quiz",{
-      method:"POST",
-      body:JSON.stringify({text})
-    });
-
-    const output =
-      data.quiz ||
-      data.questions ||
-      data.result ||
-      JSON.stringify(data,null,2);
-
-    $("quizResult").innerHTML =
-      resultBox("Practice Quiz",output);
-
-  }catch(error){
-    $("quizResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   PDF
-========================= */
-
-async function exportPDF(){
-  const title = $("pdfTitle").value.trim() || "SKNotes";
-  const notes = $("pdfNotes").value.trim();
-
-  if(!notes){
-    $("pdfResult").innerHTML =
-      `<div class="error">Please enter notes first.</div>`;
-    return;
-  }
-
-  $("pdfResult").innerHTML = loading();
-
-  try{
-    const response = await fetch("/api/pdf",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({title,notes})
-    });
-
-    if(!response.ok){
-      throw new Error(await response.text());
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "SKNotes.pdf";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
-
-    $("pdfResult").innerHTML =
-      `<div class="success">✅ PDF downloaded successfully.</div>`;
-
-  }catch(error){
-    $("pdfResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   AI TUTOR
-========================= */
-
-async function askTutor(){
-  const text = $("tutorText").value.trim();
-
-  if(!text){
-    $("tutorResult").innerHTML =
-      `<div class="error">Please ask a question.</div>`;
-    return;
-  }
-
-  $("tutorResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/tutor",{
-      method:"POST",
-      body:JSON.stringify({
-        messages:[
-          {
-            role:"user",
-            content:text
-          }
-        ]
-      })
-    });
-
-    const output =
-      data.answer ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("tutorResult").innerHTML =
-      resultBox("AI Tutor",output);
-
-  }catch(error){
-    $("tutorResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   NOTES GENERATOR
-========================= */
-
-async function generateNotes(){
-  const text = $("ngText").value.trim();
-  const subject = $("ngSubject").value.trim();
-  const className = $("ngClass").value.trim();
-
-  if(!text){
-    $("ngResult").innerHTML =
-      `<div class="error">Please enter a topic or text.</div>`;
-    return;
-  }
-
-  $("ngResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/notes-generator",{
-      method:"POST",
-      body:JSON.stringify({
-        text,
-        subject,
-        className
-      })
-    });
-
-    const output =
-      data.notes ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("ngResult").innerHTML =
-      resultBox("Generated Notes",output);
-
-  }catch(error){
-    $("ngResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   PLANNER
-========================= */
-
-async function generatePlanner(){
-  const subjects = $("planSubjects").value.trim();
-  const hours = $("planHours").value;
-  const days = $("planDays").value;
-  const examDate = $("planExam").value;
-
-  if(!subjects){
-    $("planResult").innerHTML =
-      `<div class="error">Please enter subjects.</div>`;
-    return;
-  }
-
-  $("planResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/study-planner",{
-      method:"POST",
-      body:JSON.stringify({
-        subjects,
-        hours,
-        days,
-        examDate
-      })
-    });
-
-    const output =
-      data.plan ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("planResult").innerHTML =
-      resultBox("Study Plan",output);
-
-  }catch(error){
-    $("planResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   PROGRESS
-========================= */
-
-async function generateProgress(){
-  const studyHours = $("progHours").value;
-  const completedTopics = $("progCompleted").value;
-  const totalTopics = $("progTotal").value;
-  const quizScore = $("progScore").value;
-
-  $("progResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/study-progress",{
-      method:"POST",
-      body:JSON.stringify({
-        studyHours,
-        completedTopics,
-        totalTopics,
-        quizScore
-      })
-    });
-
-    const output =
-      data.progress ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("progResult").innerHTML =
-      resultBox("Study Progress",output);
-
-  }catch(error){
-    $("progResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   VOICE TUTOR
-========================= */
-
-async function voiceTutor(){
-  const question = $("voiceQuestion").value.trim();
-
-  if(!question){
-    $("voiceResult").innerHTML =
-      `<div class="error">Please ask a question.</div>`;
-    return;
-  }
-
-  $("voiceResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/voice-tutor",{
-      method:"POST",
-      body:JSON.stringify({question})
-    });
-
-    const output =
-      data.answer ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("voiceResult").innerHTML =
-      resultBox("AI Voice Tutor",output);
-
-    if("speechSynthesis" in window){
-      speechSynthesis.cancel();
-
-      const utterance =
-        new SpeechSynthesisUtterance(output);
-
-      utterance.lang = "en-IN";
-      utterance.rate = .95;
-
-      speechSynthesis.speak(utterance);
-    }
-
-  }catch(error){
-    $("voiceResult").innerHTML = errorBox(error);
-  }
-}
-
-function stopVoice(){
-  if("speechSynthesis" in window){
-    speechSynthesis.cancel();
-  }
-}
-
-/* =========================
-   WEB RESEARCH
-========================= */
-
-async function webResearch(){
-  const query = $("researchQuery").value.trim();
-
-  if(!query){
-    $("researchResult").innerHTML =
-      `<div class="error">Please enter a topic.</div>`;
-    return;
-  }
-
-  $("researchResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/web-research",{
-      method:"POST",
-      body:JSON.stringify({query})
-    });
-
-    const output =
-      data.answer ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("researchResult").innerHTML =
-      resultBox("Research Result",output);
-
-  }catch(error){
-    $("researchResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   EXAM PAPER
-========================= */
-
-async function generateExam(){
-  const subject = $("examSubject").value.trim();
-  const className = $("examClass").value.trim();
-  const chapters = $("examChapters").value.trim();
-  const totalMarks = $("examMarks").value;
-  const difficulty = $("examDifficulty").value;
-
-  if(!subject || !chapters){
-    $("examResult").innerHTML =
-      `<div class="error">Please enter subject and chapters.</div>`;
-    return;
-  }
-
-  $("examResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/exam-paper",{
-      method:"POST",
-      body:JSON.stringify({
-        subject,
-        className,
-        chapters,
-        totalMarks,
-        difficulty
-      })
-    });
-
-    const output =
-      data.paper ||
-      data.exam ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("examResult").innerHTML =
-      resultBox("Generated Exam Paper",output);
-
-  }catch(error){
-    $("examResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
-   DOUBT SOLVER
-========================= */
-
-async function solveDoubt(){
-  const question = $("doubtQuestion").value.trim();
-  const subject = $("doubtSubject").value.trim();
-
-  if(!question){
-    $("doubtResult").innerHTML =
-      `<div class="error">Please enter your doubt.</div>`;
-    return;
-  }
-
-  $("doubtResult").innerHTML = loading();
-
-  try{
-    const data = await api("/api/doubt-solver",{
-      method:"POST",
-      body:JSON.stringify({
-        question,
-        subject
-      })
-    });
-
-    const output =
-      data.answer ||
-      data.result ||
-      data.text ||
-      JSON.stringify(data,null,2);
-
-    $("doubtResult").innerHTML =
-      resultBox("AI Doubt Solution",output);
-
-  }catch(error){
-    $("doubtResult").innerHTML = errorBox(error);
-  }
-}
-
-/* =========================
+/* =========================================================
    AUTH
-========================= */
+   ========================================================= */
+
+let authMode="login";
 
 function openAuth(){
-  $("authModal").classList.add("show");
+
+document.getElementById(
+"authModal"
+).style.display="flex";
+
 }
 
 function closeAuth(){
-  $("authModal").classList.remove("show");
-  $("authMessage").innerHTML = "";
+
+document.getElementById(
+"authModal"
+).style.display="none";
+
 }
 
-$("loginBtn").addEventListener("click",openAuth);
+function switchMode(){
 
-$("loginTab").addEventListener("click",()=>{
-  authMode = "login";
+if(authMode==="login"){
 
-  $("loginTab").classList.add("active");
-  $("signupTab").classList.remove("active");
+authMode="signup";
 
-  $("nameField").classList.add("hidden");
-  $("authSubmit").textContent = "Login";
-});
+document.getElementById(
+"authTitle"
+).textContent="Create Account";
 
-$("signupTab").addEventListener("click",()=>{
-  authMode = "signup";
+document.getElementById(
+"submitText"
+).textContent="Sign Up";
 
-  $("signupTab").classList.add("active");
-  $("loginTab").classList.remove("active");
+document.getElementById(
+"nameBox"
+).style.display="block";
 
-  $("nameField").classList.remove("hidden");
-  $("authSubmit").textContent = "Create Account";
-});
+document.getElementById(
+"switchText"
+).textContent=
+"Already have an account?";
 
-$("authForm").addEventListener("submit",async e=>{
-  e.preventDefault();
+document.getElementById(
+"switchButton"
+).textContent="Login";
 
-  const email = $("authEmail").value.trim();
-  const password = $("authPassword").value;
-  const name = $("authName").value.trim();
+}else{
 
-  $("authMessage").innerHTML = loading();
+authMode="login";
 
-  try{
+document.getElementById(
+"authTitle"
+).textContent="Login";
 
-    if(authMode === "signup"){
+document.getElementById(
+"submitText"
+).textContent="Login";
 
-      if(!name){
-        throw new Error("Please enter your name.");
-      }
+document.getElementById(
+"nameBox"
+).style.display="none";
 
-      const {data,error} =
-        await supabaseClient.auth.signUp({
-          email,
-          password,
-          options:{
-            data:{
-              full_name:name,
-              name:name
-            }
-          }
-        });
+document.getElementById(
+"switchText"
+).textContent=
+"Don't have an account?";
 
-      if(error) throw error;
+document.getElementById(
+"switchButton"
+).textContent="Sign Up";
 
-      if(data.session){
-        await updateUserUI(data.user);
-      }
-
-      $("authMessage").innerHTML =
-        `<div class="success">
-          Account created successfully.
-        </div>`;
-
-    }else{
-
-      const {data,error} =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if(error) throw error;
-
-      await updateUserUI(data.user);
-
-      $("authMessage").innerHTML =
-        `<div class="success">
-          Login successful. Welcome back!
-        </div>`;
-
-      setTimeout(closeAuth,700);
-    }
-
-  }catch(error){
-    $("authMessage").innerHTML = errorBox(error);
-  }
-});
-
-$("logoutBtn").addEventListener("click",async()=>{
-  await supabaseClient.auth.signOut();
-  currentUser = null;
-  updateUserUI(null);
-});
-
-function getUserDisplayName(user){
-  if(!user) return "";
-
-  return (
-    user.user_metadata?.full_name ||
-    user.user_metadata?.name ||
-    user.email?.split("@")[0] ||
-    "Student"
-  );
 }
 
-async function updateUserUI(user){
-  currentUser = user;
+document.getElementById(
+"message"
+).textContent="";
 
-  if(user){
-
-    const name = getUserDisplayName(user);
-
-    $("userName").textContent = `👋 ${name}`;
-    $("userName").style.display = "inline-flex";
-
-    $("loginBtn").classList.add("hidden");
-    $("logoutBtn").classList.remove("hidden");
-
-  }else{
-
-    $("userName").style.display = "none";
-
-    $("loginBtn").classList.remove("hidden");
-    $("logoutBtn").classList.add("hidden");
-  }
 }
 
-async function checkAuth(){
+async function authSubmit(event){
 
-  try{
-    const {data} =
-      await supabaseClient.auth.getSession();
+event.preventDefault();
 
-    await updateUserUI(data.session?.user || null);
+const email =
+document.getElementById("email")
+.value.trim();
 
-  }catch(error){
-    console.log("Auth check:",error);
-  }
+const password =
+document.getElementById("password")
+.value;
+
+const name =
+document.getElementById("name")
+.value.trim();
+
+const message =
+document.getElementById("message");
+
+message.textContent=
+"Please wait...";
+
+try{
+
+if(authMode==="signup"){
+
+const result =
+await supabaseClient.auth.signUp({
+
+email:email,
+
+password:password,
+
+options:{
+data:{
+full_name:name
+}
+}
+
+});
+
+if(result.error)
+throw result.error;
+
+message.textContent=
+result.data.session
+?
+"Account created successfully."
+:
+"Account created. Email confirmation check karo.";
+
+if(result.data.session){
+
+await updateAccount();
+
+setTimeout(
+closeAuth,
+800
+);
+
+}
+
+}else{
+
+const result =
+await supabaseClient.auth
+.signInWithPassword({
+
+email:email,
+
+password:password
+
+});
+
+if(result.error)
+throw result.error;
+
+message.textContent=
+"Login successful!";
+
+await updateAccount();
+
+setTimeout(
+closeAuth,
+700
+);
+
+}
+
+}catch(error){
+
+message.textContent =
+error.message ||
+"Something went wrong.";
+
+}
+
+}
+
+async function updateAccount(){
+
+try{
+
+const result =
+await supabaseClient.auth
+.getSession();
+
+const session =
+result.data.session;
+
+const account =
+document.getElementById(
+"account"
+);
+
+const loginBtn =
+document.getElementById(
+"loginBtn"
+);
+
+if(session){
+
+const user =
+session.user;
+
+const name =
+user.user_metadata?.full_name ||
+user.email?.split("@")[0] ||
+"Student";
+
+document.getElementById(
+"accountName"
+).textContent=
+"👋 Welcome, "+name;
+
+document.getElementById(
+"accountEmail"
+).textContent=
+user.email || "";
+
+account.style.display="block";
+
+loginBtn.textContent=
+"Account";
+
+}else{
+
+account.style.display="none";
+
+loginBtn.textContent=
+"Login";
+
+}
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+async function logout(){
+
+await supabaseClient.auth.signOut();
+
+updateAccount();
+
 }
 
 supabaseClient.auth.onAuthStateChange(
-  async (_event,session)=>{
-    await updateUserUI(session?.user || null);
-  }
+function(){
+updateAccount();
+}
 );
 
-/* =========================
+
+/* =========================================================
    TIMER
-========================= */
+   ========================================================= */
+
+let timerSeconds=
+25*60;
+
+let timerInterval=null;
+
+let running=false;
+
+let totalStudy=
+Number(
+localStorage.getItem(
+"sknotes-study-time"
+)||0
+);
+
+function timerText(seconds){
+
+const min=
+Math.floor(seconds/60);
+
+const sec=
+seconds%60;
+
+return String(min)
+.padStart(2,"0")
++
+":"
++
+String(sec)
+.padStart(2,"0");
+
+}
+
+function studyText(seconds){
+
+const h=
+Math.floor(seconds/3600);
+
+const m=
+Math.floor(
+(seconds%3600)/60
+);
+
+const s=
+seconds%60;
+
+return (
+String(h).padStart(2,"0")
++
+":"
++
+String(m).padStart(2,"0")
++
+":"
++
+String(s).padStart(2,"0")
+);
+
+}
+
+function updateTimer(){
+
+document.getElementById(
+"timer"
+).textContent=
+timerText(timerSeconds);
+
+document.getElementById(
+"studyTime"
+).textContent=
+studyText(totalStudy);
+
+document.getElementById(
+"cardCount"
+).textContent=
+cardCount;
+
+document.getElementById(
+"toolCount"
+).textContent=
+toolCount;
+
+}
 
 function openTimer(){
-  $("timerModal").classList.add("show");
+
+document.getElementById(
+"timerOverlay"
+).style.display="flex";
+
+updateTimer();
+
 }
 
 function closeTimer(){
-  $("timerModal").classList.remove("show");
+
+document.getElementById(
+"timerOverlay"
+).style.display="none";
+
 }
 
-$("timerBtn").addEventListener("click",openTimer);
+function startTimer(){
 
-function formatTimer(seconds){
-  const m = Math.floor(seconds / 60)
-    .toString()
-    .padStart(2,"0");
+if(running)return;
 
-  const s = (seconds % 60)
-    .toString()
-    .padStart(2,"0");
+running=true;
 
-  return `${m}:${s}`;
+timerInterval=
+setInterval(function(){
+
+if(timerSeconds>0){
+
+timerSeconds--;
+
+totalStudy++;
+
+localStorage.setItem(
+"sknotes-study-time",
+totalStudy
+);
+
+updateTimer();
+
+}else{
+
+pauseTimer();
+
+alert(
+"🎉 Study session complete!"
+);
+
 }
 
-function updateTimerDisplay(){
-  $("timerDisplay").textContent =
-    formatTimer(timerSecondsLeft);
+},1000);
+
 }
 
-$("timerStart").addEventListener("click",()=>{
+function pauseTimer(){
 
-  if(timerInterval) return;
+running=false;
 
-  if(timerSecondsLeft <= 0){
-    const minutes =
-      Math.max(
-        1,
-        Number($("timerMinutes").value || 25)
-      );
+if(timerInterval){
 
-    const seconds =
-      Math.min(
-        59,
-        Math.max(
-          0,
-          Number($("timerSeconds").value || 0)
-        )
-      );
+clearInterval(
+timerInterval
+);
 
-    timerSecondsLeft =
-      minutes * 60 + seconds;
-  }
+timerInterval=null;
 
-  timerStartedAt = Date.now();
-
-  timerInterval = setInterval(()=>{
-
-    if(timerSecondsLeft <= 0){
-
-      clearInterval(timerInterval);
-      timerInterval = null;
-
-      if(timerStartedAt){
-        const elapsed =
-          Math.max(
-            0,
-            Math.round(
-              (Date.now()-timerStartedAt)/1000
-            )
-          );
-
-        const old =
-          Number(
-            localStorage.getItem(
-              "sknotes_study_seconds"
-            ) || 0
-          );
-
-        localStorage.setItem(
-          "sknotes_study_seconds",
-          old + elapsed
-        );
-
-        timerStartedAt = null;
-        updateStats();
-      }
-
-      alert("Study session complete! 🇮🇳");
-      return;
-    }
-
-    timerSecondsLeft--;
-    updateTimerDisplay();
-
-  },1000);
-});
-
-$("timerPause").addEventListener("click",()=>{
-
-  if(!timerInterval) return;
-
-  clearInterval(timerInterval);
-  timerInterval = null;
-
-  if(timerStartedAt){
-
-    const elapsed =
-      Math.max(
-        0,
-        Math.round(
-          (Date.now()-timerStartedAt)/1000
-        )
-      );
-
-    const old =
-      Number(
-        localStorage.getItem(
-          "sknotes_study_seconds"
-        ) || 0
-      );
-
-    localStorage.setItem(
-      "sknotes_study_seconds",
-      old + elapsed
-    );
-
-    timerStartedAt = null;
-    updateStats();
-  }
-});
-
-$("timerReset").addEventListener("click",()=>{
-
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timerStartedAt = null;
-
-  const minutes =
-    Math.max(
-      1,
-      Number($("timerMinutes").value || 25)
-    );
-
-  const seconds =
-    Math.min(
-      59,
-      Math.max(
-        0,
-        Number($("timerSeconds").value || 0)
-      )
-    );
-
-  timerSecondsLeft =
-    minutes * 60 + seconds;
-
-  updateTimerDisplay();
-});
-
-/* =========================
-   DARK MODE
-========================= */
-
-$("darkBtn").addEventListener("click",()=>{
-  document.body.classList.toggle("dark");
-
-  localStorage.setItem(
-    "sknotes_dark",
-    document.body.classList.contains("dark")
-      ? "1"
-      : "0"
-  );
-
-  $("darkBtn").textContent =
-    document.body.classList.contains("dark")
-      ? "☀️"
-      : "🌙";
-});
-
-if(localStorage.getItem("sknotes_dark") === "1"){
-  document.body.classList.add("dark");
-  $("darkBtn").textContent = "☀️";
 }
 
-/* =========================
+}
+
+function resetTimer(){
+
+pauseTimer();
+
+timerSeconds=
+25*60;
+
+updateTimer();
+
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+let cardCount=
+Number(
+localStorage.getItem(
+"sknotes-card-count"
+)||0
+);
+
+let toolCount=
+Number(
+localStorage.getItem(
+"sknotes-tool-count"
+)||0
+);
+
+function useTool(){
+
+toolCount++;
+
+localStorage.setItem(
+"sknotes-tool-count",
+toolCount
+);
+
+updateTimer();
+
+}
+
+
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
+
+function workspace(title,description,html){
+
+document.getElementById(
+"workspaceArea"
+).innerHTML=
+
+`
+<section class="workspace">
+
+<div class="workspace-head">
+
+<div>
+
+<h3>${title}</h3>
+
+<p>${description}</p>
+
+</div>
+
+<button
+class="close"
+onclick="closeWorkspace()">
+
+×
+</button>
+
+</div>
+
+${html}
+
+</section>
+`;
+
+document.getElementById(
+"workspaceArea"
+).scrollIntoView({
+
+behavior:"smooth",
+
+block:"start"
+
+});
+
+}
+
+function closeWorkspace(){
+
+document.getElementById(
+"workspaceArea"
+).innerHTML="";
+
+}
+
+
+/* =========================================================
+   OPEN FEATURES
+   ========================================================= */
+
+function openFeature(type){
+
+useTool();
+
+if(type==="flashcards"){
+
+workspace(
+
+"🧠 Text → Flashcards",
+
+"Paste your notes and create revision flashcards.",
+
+`
+<textarea
+id="featureText"
+placeholder="Paste your notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runFlashcards()">
+
+✨ Generate Flashcards
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🤖 Creating flashcards...
+
+</div>
+
+<div
+id="featureOutput"
+class="flashcards">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="youtube"){
+
+workspace(
+
+"▶️ YouTube → Notes",
+
+"Paste your educational YouTube URL.",
+
+`
+<input
+id="youtubeUrl"
+placeholder="https://youtube.com/watch?v=...">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runYouTube()">
+
+Generate Notes
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🎬 Fetching transcript...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="ocr"){
+
+workspace(
+
+"🖼️ Image → Text",
+
+"Upload an image and extract its text.",
+
+`
+<input
+class="file-input"
+type="file"
+id="imageFile"
+accept="image/*">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runOCR()">
+
+🔎 Extract Text
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Reading image...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="scanner"){
+
+workspace(
+
+"📷 Question Scanner",
+
+"Upload a question image and get an AI solution.",
+
+`
+<input
+class="file-input"
+type="file"
+id="imageFile"
+accept="image/*">
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runScanner()">
+
+📷 Scan & Solve
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🔎 Scanning...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="quiz"){
+
+workspace(
+
+"📝 Notes → Quiz",
+
+"Generate 10 MCQs from your notes.",
+
+`
+<textarea
+id="featureText"
+placeholder="Paste your notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runQuiz()">
+
+📝 Generate Quiz
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🤖 Creating quiz...
+
+</div>
+
+<div
+id="featureOutput"
+class="flashcards">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="pdf"){
+
+workspace(
+
+"📄 PDF Export",
+
+"Turn your notes into a downloadable PDF.",
+
+`
+<div class="field">
+
+<label>PDF Title</label>
+
+<input
+id="pdfTitle"
+placeholder="SKNotes - Chemistry Notes">
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Paste notes here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runPDF()">
+
+📥 Download PDF
+
+</button>
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="tutor"){
+
+workspace(
+
+"🤖 AI Tutor",
+
+"Ask SKNotes to explain your topic simply.",
+
+`
+<textarea
+id="featureText"
+placeholder="Example: Explain Newton's second law in simple language..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runTutor()">
+
+🤖 Ask AI Tutor
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Thinking...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="notes"){
+
+workspace(
+
+"📚 AI Notes Generator",
+
+"Create structured notes from raw study material.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Chemistry">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Paste chapter/content here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runNotes()">
+
+✨ Generate Notes
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Creating notes...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="planner"){
+
+workspace(
+
+"📅 Study Planner",
+
+"Create a practical study timetable.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subjects</label>
+
+<input
+id="subjects"
+placeholder="Physics, Chemistry, Maths">
+
+</div>
+
+<div class="field">
+
+<label>Hours per day</label>
+
+<input
+id="hours"
+type="number"
+value="4"
+min="1"
+max="16">
+
+</div>
+
+<div class="field">
+
+<label>Days</label>
+
+<input
+id="days"
+type="number"
+value="7"
+min="1"
+max="90">
+
+</div>
+
+<div class="field">
+
+<label>Exam Date</label>
+
+<input
+id="examDate"
+type="date">
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runPlanner()">
+
+📅 Create Plan
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Planning...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="progress"){
+
+workspace(
+
+"📊 Study Progress",
+
+"Calculate your current learning progress.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Study Hours</label>
+
+<input
+id="studyHours"
+type="number"
+value="0"
+min="0">
+
+</div>
+
+<div class="field">
+
+<label>Completed Topics</label>
+
+<input
+id="completedTopics"
+type="number"
+value="0"
+min="0">
+
+</div>
+
+<div class="field">
+
+<label>Total Topics</label>
+
+<input
+id="totalTopics"
+type="number"
+value="1"
+min="1">
+
+</div>
+
+<div class="field">
+
+<label>Quiz Score %</label>
+
+<input
+id="quizScore"
+type="number"
+value="0"
+min="0"
+max="100">
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runProgress()">
+
+📊 Calculate
+
+</button>
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="voice"){
+
+workspace(
+
+"🎙️ AI Voice Tutor",
+
+"Generate an answer that is easy to listen to.",
+
+`
+<textarea
+id="featureText"
+placeholder="Ask your question..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runVoice()">
+
+🎙️ Generate Answer
+
+</button>
+
+<button
+class="nav-btn"
+onclick="speakResult()">
+
+🔊 Speak
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Preparing answer...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="research"){
+
+workspace(
+
+"🌐 AI Web Research",
+
+"Create a structured research answer.",
+
+`
+<textarea
+id="featureText"
+placeholder="Example: Explain India's Chandrayaan missions..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runResearch()">
+
+🔎 Research
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Researching...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="exam"){
+
+workspace(
+
+"📑 Exam Paper Generator",
+
+"Generate a school-level practice paper.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+<div class="field">
+
+<label>Total Marks</label>
+
+<input
+id="totalMarks"
+type="number"
+value="50">
+
+</div>
+
+<div class="field">
+
+<label>Difficulty</label>
+
+<select id="difficulty">
+
+<option>easy</option>
+
+<option selected>
+medium
+</option>
+
+<option>hard</option>
+
+</select>
+
+</div>
+
+</div>
+
+<textarea
+id="chapters"
+placeholder="Chapters / topics"></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runExam()">
+
+📑 Generate Paper
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Creating paper...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+
+if(type==="doubt"){
+
+workspace(
+
+"❓ AI Doubt Solver",
+
+"Get a simple step-by-step explanation.",
+
+`
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Type your doubt here..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runDoubt()">
+
+💡 Solve Doubt
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+Solving...
+
+</div>
+
+<div
+id="featureOutput"
+class="result">
+
+</div>
+`
+
+);
+
+}
+
+}
+
+
+/* =========================================================
+   FLASHCARDS
+   ========================================================= */
+
+async function runFlashcards(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Pehle notes paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/flashcards",
+{text:text}
+);
+
+const cards =
+data.flashcards || [];
+
+let html="";
+
+cards.forEach(function(card){
+
+html+=`
+
+<div class="flashcard">
+
+<div class="q">
+Q. ${safe(
+card.question ||
+card.front
+)}
+</div>
+
+<div class="a">
+A. ${safe(
+card.answer ||
+card.back
+)}
+</div>
+
+</div>
+
+`;
+
+});
+
+output(html);
+
+cardCount+=cards.length;
+
+localStorage.setItem(
+"sknotes-card-count",
+cardCount
+);
+
+updateTimer();
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   YOUTUBE NOTES
+   ========================================================= */
+
+async function runYouTube(){
+
+const url =
+document.getElementById(
+"youtubeUrl"
+).value.trim();
+
+if(!url){
+
+alert(
+"YouTube URL paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/notes",
+{
+url:url
+}
+);
+
+output(
+safe(data.notes || "")
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   IMAGE DATA
+   ========================================================= */
+
+function getImageData(){
+
+const file =
+document.getElementById(
+"imageFile"
+).files[0];
+
+if(!file){
+
+throw new Error(
+"Image select karo."
+);
+
+}
+
+return new Promise(
+function(resolve,reject){
+
+const reader =
+new FileReader();
+
+reader.onload=
+function(){
+
+resolve(
+reader.result
+);
+
+};
+
+reader.onerror=
+function(){
+
+reject(
+new Error(
+"Image read nahi hui."
+)
+);
+
+};
+
+reader.readAsDataURL(file);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   IMAGE OCR
+   ========================================================= */
+
+async function runOCR(){
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const image =
+await getImageData();
+
+const data =
+await api(
+"/api/image-to-text",
+{
+image:image
+}
+);
+
+output(
+safe(
+data.text ||
+"Image me text nahi mila."
+)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   QUESTION SCANNER
+   ========================================================= */
+
+async function runScanner(){
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const image =
+await getImageData();
+
+const textData =
+await api(
+"/api/image-to-text",
+{
+image:image
+}
+);
+
+const question =
+textData.text || "";
+
+if(!question){
+
+throw new Error(
+"Question text nahi mila."
+);
+
+}
+
+const solution =
+await api(
+"/api/doubt-solver",
+{
+question:question,
+subject:""
+}
+);
+
+output(
+
+"<strong>Scanned Question</strong>\n\n"
++
+safe(question)
++
+"\n\n<strong>AI Solution</strong>\n\n"
++
+safe(solution.answer)
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+
+async function runQuiz(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Notes paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/quiz",
+{
+text:text
+}
+);
+
+const quiz =
+data.quiz || [];
+
+let html="";
+
+quiz.forEach(
+function(q,index){
+
+html+=`
+
+<div class="flashcard">
+
+<div class="q">
+
+${index+1}.
+${safe(q.question)}
+
+</div>
+
+<div class="a">
+
+${(q.options || [])
+.map(function(option){
+
+return `
+<div>
+• ${safe(option)}
+</div>
+`;
+
+})
+.join("")}
+
+<br>
+
+<strong>
+Answer:
+${safe(q.answer)}
+</strong>
+
+</div>
+
+</div>
+
+`;
+
+}
+);
+
+output(html);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   PDF
+   ========================================================= */
+
+async function runPDF(){
+
+const notes =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!notes){
+
+alert(
+"Content paste karo."
+);
+
+return;
+
+}
+
+try{
+
+const title =
+document.getElementById(
+"pdfTitle"
+).value.trim()
+||
+"SKNotes";
+
+const response =
+await fetch(
+"/api/pdf",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+
+title:title,
+
+notes:notes
+
+})
+
+}
+);
+
+if(!response.ok){
+
+const data =
+await response.json();
+
+throw new Error(
+data.error ||
+"PDF generate failed."
+);
+
+}
+
+const blob =
+await response.blob();
+
+const link =
+document.createElement("a");
+
+link.href =
+URL.createObjectURL(blob);
+
+link.download =
+title+".pdf";
+
+link.click();
+
+setTimeout(
+function(){
+
+URL.revokeObjectURL(
+link.href
+);
+
+},
+1000
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+}
+
+
+/* =========================================================
+   AI TUTOR
+   ========================================================= */
+
+async function runTutor(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Question likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/tutor",
+{
+messages:[
+{
+role:"user",
+content:text
+}
+]
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   NOTES GENERATOR
+   ========================================================= */
+
+async function runNotes(){
+
+const text =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!text){
+
+alert(
+"Content paste karo."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/notes-generator",
+{
+
+text:text,
+
+subject:
+document.getElementById(
+"subject"
+).value,
+
+className:
+document.getElementById(
+"className"
+).value
+
+}
+);
+
+output(
+safe(data.notes)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   STUDY PLANNER
+   ========================================================= */
+
+async function runPlanner(){
+
+const subjects =
+document.getElementById(
+"subjects"
+).value
+.split(",")
+.map(x=>x.trim())
+.filter(Boolean);
+
+if(!subjects.length){
+
+alert(
+"Subjects likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/study-planner",
+{
+
+subjects:subjects,
+
+hours:
+Number(
+document.getElementById(
+"hours"
+).value
+),
+
+days:
+Number(
+document.getElementById(
+"days"
+).value
+),
+
+examDate:
+document.getElementById(
+"examDate"
+).value
+
+}
+);
+
+output(
+safe(data.plan)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   STUDY PROGRESS
+   ========================================================= */
+
+async function runProgress(){
+
+try{
+
+const data =
+await api(
+"/api/study-progress",
+{
+
+studyHours:
+Number(
+document.getElementById(
+"studyHours"
+).value
+),
+
+completedTopics:
+Number(
+document.getElementById(
+"completedTopics"
+).value
+),
+
+totalTopics:
+Number(
+document.getElementById(
+"totalTopics"
+).value
+),
+
+quizScore:
+Number(
+document.getElementById(
+"quizScore"
+).value
+)
+
+}
+);
+
+output(
+
+"📊 Progress: "
++
+data.progress
++
+"%\n\n"
+
++
+
+"⏱️ Study Hours: "
++
+data.studyHours
++
+"\n\n"
+
++
+
+"📚 Topics: "
++
+data.completedTopics
++
+"/"
++
+data.totalTopics
++
+"\n\n"
+
++
+
+"📝 Quiz Score: "
++
+data.quizScore
++
+"%"
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+}
+
+
+/* =========================================================
+   VOICE TUTOR
+   ========================================================= */
+
+async function runVoice(){
+
+const question =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!question){
+
+alert(
+"Question likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/voice-tutor",
+{
+question:question
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+function speakResult(){
+
+const text =
+document.getElementById(
+"featureOutput"
+)?.innerText || "";
+
+if(!text){
+
+alert(
+"Pehle answer generate karo."
+);
+
+return;
+
+}
+
+if(
+!("speechSynthesis" in window)
+){
+
+alert(
+"Is browser me voice support nahi hai."
+);
+
+return;
+
+}
+
+speechSynthesis.cancel();
+
+const speech =
+new SpeechSynthesisUtterance(
+text
+);
+
+speech.lang="en-IN";
+
+speech.rate=.9;
+
+speechSynthesis.speak(
+speech
+);
+
+}
+
+
+/* =========================================================
+   RESEARCH
+   ========================================================= */
+
+async function runResearch(){
+
+const query =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!query){
+
+alert(
+"Research topic likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/web-research",
+{
+query:query
+}
+);
+
+output(
+
+safe(data.answer)
+
++
+
+"\n\n────────────────\n"
+
++
+
+"ℹ️ This version uses the SKNotes AI research route. "
++
+
+"Live web browsing is not enabled in the current backend."
+
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   EXAM PAPER
+   ========================================================= */
+
+async function runExam(){
+
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+if(!subject){
+
+alert(
+"Subject likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/exam-paper",
+{
+
+subject:subject,
+
+className:
+document.getElementById(
+"className"
+).value,
+
+chapters:
+document.getElementById(
+"chapters"
+).value,
+
+totalMarks:
+Number(
+document.getElementById(
+"totalMarks"
+).value
+),
+
+difficulty:
+document.getElementById(
+"difficulty"
+).value
+
+}
+);
+
+output(
+safe(data.paper)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
+   DOUBT SOLVER
+   ========================================================= */
+
+async function runDoubt(){
+
+const question =
+document.getElementById(
+"featureText"
+).value.trim();
+
+if(!question){
+
+alert(
+"Doubt likho."
+);
+
+return;
+
+}
+
+apiBusy(true);
+
+output("");
+
+try{
+
+const data =
+await api(
+"/api/doubt-solver",
+{
+
+question:question,
+
+subject:
+document.getElementById(
+"subject"
+).value
+
+}
+);
+
+output(
+safe(data.answer)
+);
+
+}catch(error){
+
+output(
+"❌ "+safe(error.message)
+);
+
+}
+
+apiBusy(false);
+
+}
+
+
+/* =========================================================
    START
-========================= */
+   ========================================================= */
 
-updateStats();
-updateTimerDisplay();
-checkAuth();
+loadDark();
+
+updateTimer();
+
+updateAccount();
 
 </script>
 
