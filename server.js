@@ -179,7 +179,7 @@ app.get("/", (req, res) => {
    1. FLASHCARDS
 ========================================================= */
 
-app.post("/api/flashcards", async (req, res) => {
+app.post("/api/flashcards", async (req, res) => {await trackActivity(req, "tool_used", "flashcards");
   try {
     const { text = "" } = req.body || {};
 
