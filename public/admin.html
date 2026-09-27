@@ -8,9 +8,9 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>SKNotes Admin</title>
+  <title>SKNotes Admin Dashboard</title>
 
-  <!-- Supabase -->
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -43,6 +43,7 @@
 
     header p {
       margin: 7px 0 0;
+      color: #333;
     }
 
     .container {
@@ -116,6 +117,7 @@
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 4px 18px rgba(0,0,0,.07);
+      border: 1px solid #e5e5e5;
     }
 
     .icon {
@@ -148,8 +150,13 @@
     .tool-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: 13px 0;
       border-bottom: 1px solid #eee;
+    }
+
+    .tool-row:last-child {
+      border-bottom: 0;
     }
 
     .tool-count {
@@ -158,6 +165,7 @@
       padding: 6px 10px;
       border-radius: 20px;
       font-weight: bold;
+      font-size: 13px;
     }
 
     .message {
@@ -170,11 +178,6 @@
     .error {
       color: #b00020;
       background: #fff0f0;
-    }
-
-    .success {
-      color: #137333;
-      background: #edf8ee;
     }
 
     .hidden {
@@ -195,6 +198,10 @@
       .number {
         font-size: 28px;
       }
+
+      .section {
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -207,9 +214,7 @@
 </header>
 
 
-<!-- =========================
-     LOGIN
-========================= -->
+<!-- LOGIN -->
 
 <div
   id="loginSection"
@@ -221,12 +226,10 @@
     <h2>🔐 Admin Login</h2>
 
     <p>
-      SKNotes admin account se login karo.
+      Apne SKNotes admin account se login karo.
     </p>
 
-    <label>
-      Email
-    </label>
+    <label>Email</label>
 
     <input
       id="email"
@@ -235,9 +238,7 @@
       autocomplete="email"
     >
 
-    <label>
-      Password
-    </label>
+    <label>Password</label>
 
     <input
       id="password"
@@ -264,9 +265,7 @@
 </div>
 
 
-<!-- =========================
-     DASHBOARD
-========================= -->
+<!-- DASHBOARD -->
 
 <div
   id="dashboardSection"
@@ -312,9 +311,7 @@
     <div class="card">
       <div class="icon">👥</div>
 
-      <h3>
-        Total Users
-      </h3>
+      <h3>Total Users</h3>
 
       <div
         id="totalUsers"
@@ -328,9 +325,7 @@
     <div class="card">
       <div class="icon">🟢</div>
 
-      <h3>
-        Active Today
-      </h3>
+      <h3>Active Today</h3>
 
       <div
         id="activeToday"
@@ -344,9 +339,7 @@
     <div class="card">
       <div class="icon">📅</div>
 
-      <h3>
-        Active Last 7 Days
-      </h3>
+      <h3>Active Last 7 Days</h3>
 
       <div
         id="active7"
@@ -360,9 +353,7 @@
     <div class="card">
       <div class="icon">⭐</div>
 
-      <h3>
-        Regular Users
-      </h3>
+      <h3>Regular Users</h3>
 
       <div
         id="regularUsers"
@@ -376,9 +367,7 @@
     <div class="card">
       <div class="icon">⚡</div>
 
-      <h3>
-        Total Activities
-      </h3>
+      <h3>Total Activities</h3>
 
       <div
         id="activities"
@@ -395,9 +384,7 @@
 
   <div class="section">
 
-    <h2>
-      🛠️ Tool Usage
-    </h2>
+    <h2>🛠️ Tool Usage</h2>
 
     <div id="toolUsage">
       Loading...
@@ -406,11 +393,11 @@
   </div>
 
 
+  <!-- ADMIN STATUS -->
+
   <div class="section">
 
-    <h2>
-      🔐 Admin Status
-    </h2>
+    <h2>🔐 Admin Status</h2>
 
     <div id="adminStatus">
       Checking...
@@ -434,14 +421,19 @@
 <script>
 
   /* =========================
-     SUPABASE
+     SUPABASE CONFIG
   ========================= */
 
   const SUPABASE_URL =
     "https://ejwdvlenqdfelmahajct.supabase.co";
 
   const SUPABASE_KEY =
-    "sb_publishable_qy0u-EQxaagKQioyeNfgA_xvN6amzA";
+    "sb_publishable_qy0u-EQxaagkqQioyeNfgA_xvN6amzA";
+
+
+  /* =========================
+     SUPABASE CLIENT
+  ========================= */
 
   const supabaseClient =
     window.supabase.createClient(
@@ -496,7 +488,7 @@
 
 
   /* =========================
-     SHOW ERROR
+     LOGIN ERROR
   ========================= */
 
   function showLoginError(
@@ -511,20 +503,8 @@
   }
 
 
-  function showDashboardError(
-    message
-  ) {
-
-    dashboardError.textContent =
-      message;
-
-    dashboardError.style.display =
-      "block";
-  }
-
-
   /* =========================
-     LOGIN
+     ADMIN LOGIN
   ========================= */
 
   async function login() {
@@ -544,7 +524,10 @@
         .value;
 
 
-    if (!email || !password) {
+    if (
+      !email ||
+      !password
+    ) {
 
       showLoginError(
         "Email aur password dono bharo."
@@ -587,7 +570,7 @@
       }
 
 
-      await checkAdminAndLoad();
+      await loadDashboard();
 
 
     } catch (error) {
@@ -614,23 +597,24 @@
 
 
   /* =========================
-     CHECK ADMIN
+     LOAD DASHBOARD
   ========================= */
 
-  async function checkAdminAndLoad() {
+  async function loadDashboard() {
 
     dashboardError.style.display =
       "none";
 
+
     const {
-      data
+      data: sessionData
     } =
       await supabaseClient.auth
         .getSession();
 
 
     const session =
-      data?.session;
+      sessionData?.session;
 
 
     if (!session) {
@@ -645,9 +629,14 @@
       await fetch(
         "/api/admin/stats",
         {
+          method: "GET",
+
           headers: {
-            Authorization:
-              `Bearer ${session.access_token}`
+            "Authorization":
+              `Bearer ${session.access_token}`,
+
+            "Content-Type":
+              "application/json"
           }
         }
       );
@@ -686,7 +675,7 @@
 
 
   /* =========================
-     SHOW DASHBOARD
+     SHOW DATA
   ========================= */
 
   function showDashboard(
@@ -767,7 +756,7 @@
 
       box.innerHTML =
         `
-        <div class="empty">
+        <div>
           Abhi koi tool activity nahi hai.
         </div>
         `;
@@ -828,6 +817,7 @@
         number
       );
 
+
       box.appendChild(
         row
       );
@@ -862,58 +852,15 @@
 
       try {
 
-        const {
-          data
-        } =
-          await supabaseClient.auth
-            .getSession();
-
-
-        if (
-          !data?.session
-        ) {
-
-          throw new Error(
-            "Login session expire ho gayi."
-          );
-        }
-
-
-        const response =
-          await fetch(
-            "/api/admin/stats",
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${data.session.access_token}`
-              }
-            }
-          );
-
-
-        const result =
-          await response.json();
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            result?.error ||
-            "Data fetch failed."
-          );
-        }
-
-
-        showDashboard(
-          result
-        );
-
+        await loadDashboard();
 
       } catch (error) {
 
-        showDashboardError(
-          error.message
-        );
+        dashboardError.textContent =
+          error.message;
+
+        dashboardError.style.display =
+          "block";
       }
     }
   );
@@ -930,6 +877,7 @@
       await supabaseClient.auth
         .signOut();
 
+
       dashboardSection.classList.add(
         "hidden"
       );
@@ -937,6 +885,7 @@
       loginSection.classList.remove(
         "hidden"
       );
+
 
       document.getElementById(
         "password"
@@ -955,7 +904,7 @@
   );
 
 
-  /* Enter key */
+  /* ENTER KEY */
 
   document
     .getElementById("password")
@@ -966,6 +915,7 @@
         if (
           event.key === "Enter"
         ) {
+
           login();
         }
 
@@ -992,23 +942,13 @@
         data?.session
       ) {
 
-        try {
-
-          await checkAdminAndLoad();
-
-        } catch (error) {
-
-          showDashboardError(
-            error.message
-          );
-        }
+        await loadDashboard();
       }
 
     } catch (error) {
 
-      console.error(
-        "Session check error:",
-        error
+      console.log(
+        "No active admin session."
       );
     }
 
@@ -1017,4 +957,4 @@
 </script>
 
 </body>
-</html>
+                        </html>
