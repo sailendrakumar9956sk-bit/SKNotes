@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>SKNotes Admin Dashboard</title>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -25,6 +32,7 @@
         #ffffff,
         #138808
       );
+
       padding: 25px 18px;
       text-align: center;
       border-bottom: 1px solid #ddd;
@@ -65,7 +73,7 @@
     }
 
     button:hover {
-      opacity: .9;
+      opacity: 0.9;
     }
 
     .status {
@@ -77,6 +85,7 @@
       display: grid;
       grid-template-columns:
         repeat(auto-fit, minmax(210px, 1fr));
+
       gap: 15px;
     }
 
@@ -84,8 +93,10 @@
       background: white;
       border-radius: 16px;
       padding: 20px;
+
       box-shadow:
-        0 4px 18px rgba(0,0,0,.07);
+        0 4px 18px rgba(0, 0, 0, 0.07);
+
       border: 1px solid #e5e5e5;
     }
 
@@ -109,8 +120,9 @@
       background: white;
       border-radius: 16px;
       padding: 20px;
+
       box-shadow:
-        0 4px 18px rgba(0,0,0,.07);
+        0 4px 18px rgba(0, 0, 0, 0.07);
     }
 
     .section h2 {
@@ -122,7 +134,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
       padding: 13px 0;
+
       border-bottom: 1px solid #eee;
     }
 
@@ -137,8 +151,11 @@
     .tool-count {
       background: #e9f6e7;
       color: #138808;
+
       padding: 6px 10px;
+
       border-radius: 20px;
+
       font-weight: bold;
       font-size: 13px;
     }
@@ -151,20 +168,37 @@
     .error {
       color: #b00020;
       background: #fff0f0;
+
       padding: 12px;
+
       border-radius: 10px;
+
       margin-top: 15px;
+
       display: none;
+    }
+
+    .success {
+      color: #137333;
+      background: #edf8ee;
+
+      padding: 12px;
+
+      border-radius: 10px;
+
+      margin-top: 15px;
     }
 
     .footer {
       text-align: center;
       padding: 30px;
+
       color: #777;
       font-size: 13px;
     }
 
     @media (max-width: 600px) {
+
       header h1 {
         font-size: 23px;
       }
@@ -190,134 +224,272 @@
 <div class="container">
 
   <div class="topbar">
+
     <div>
       <strong>Dashboard Overview</strong>
-      <div class="status" id="updated">
+
+      <div
+        class="status"
+        id="updated"
+      >
         Loading...
       </div>
     </div>
 
-    <button id="refreshBtn">
+    <button
+      id="refreshBtn"
+      type="button"
+    >
       🔄 Refresh
     </button>
+
   </div>
+
+  <!-- STAT CARDS -->
 
   <div class="cards">
 
     <div class="card">
-      <div class="icon">👥</div>
-      <h3>Total Users</h3>
-      <div class="number" id="totalUsers">—</div>
+
+      <div class="icon">
+        👥
+      </div>
+
+      <h3>
+        Total Users
+      </h3>
+
+      <div
+        class="number"
+        id="totalUsers"
+      >
+        —
+      </div>
+
     </div>
 
-    <div class="card">
-      <div class="icon">🟢</div>
-      <h3>Active Today</h3>
-      <div class="number" id="activeToday">—</div>
-    </div>
 
     <div class="card">
-      <div class="icon">📅</div>
-      <h3>Active Last 7 Days</h3>
-      <div class="number" id="active7">—</div>
+
+      <div class="icon">
+        🟢
+      </div>
+
+      <h3>
+        Active Today
+      </h3>
+
+      <div
+        class="number"
+        id="activeToday"
+      >
+        —
+      </div>
+
     </div>
 
-    <div class="card">
-      <div class="icon">⭐</div>
-      <h3>Regular Users</h3>
-      <div class="number" id="regularUsers">—</div>
-    </div>
 
     <div class="card">
-      <div class="icon">⚡</div>
-      <h3>Total Activities</h3>
-      <div class="number" id="activities">—</div>
+
+      <div class="icon">
+        📅
+      </div>
+
+      <h3>
+        Active Last 7 Days
+      </h3>
+
+      <div
+        class="number"
+        id="active7"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="icon">
+        ⭐
+      </div>
+
+      <h3>
+        Regular Users
+      </h3>
+
+      <div
+        class="number"
+        id="regularUsers"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="icon">
+        ⚡
+      </div>
+
+      <h3>
+        Total Activities
+      </h3>
+
+      <div
+        class="number"
+        id="activities"
+      >
+        —
+      </div>
+
     </div>
 
   </div>
 
+
+  <!-- TOOL USAGE -->
+
   <div class="section">
-    <h2>🛠️ Tool Usage</h2>
+
+    <h2>
+      🛠️ Tool Usage
+    </h2>
 
     <div id="toolUsage">
+
       <div class="empty">
         Loading tool usage...
       </div>
+
     </div>
+
   </div>
 
-  <div class="section">
-    <h2>🔐 Admin Status</h2>
 
-    <div class="status" id="adminStatus">
+  <!-- ADMIN STATUS -->
+
+  <div class="section">
+
+    <h2>
+      🔐 Admin Status
+    </h2>
+
+    <div
+      class="status"
+      id="adminStatus"
+    >
       Checking admin access...
     </div>
 
-    <div class="error" id="errorBox"></div>
+    <div
+      class="error"
+      id="errorBox"
+    ></div>
+
   </div>
 
 </div>
+
 
 <div class="footer">
   SKNotes Admin Dashboard
 </div>
 
+
 <script>
+
+  /* =========================
+     SUPABASE CONFIG
+  ========================= */
+
   const SUPABASE_URL =
     "https://ejwdvlenqdfelmahajct.supabase.co";
 
   const SUPABASE_KEY =
     "sb_publishable_qy0u-EQxaagkQioyeNfgA_xvN6amzA";
 
+
+  /* =========================
+     SUPABASE CLIENT
+  ========================= */
+
   const supabaseClient =
-    window.supabase
-      ? window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_KEY
-        )
-      : null;
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  /* =========================
+     ELEMENTS
+  ========================= */
 
   const totalUsers =
-    document.getElementById("totalUsers");
+    document.getElementById(
+      "totalUsers"
+    );
 
   const activeToday =
-    document.getElementById("activeToday");
+    document.getElementById(
+      "activeToday"
+    );
 
   const active7 =
-    document.getElementById("active7");
+    document.getElementById(
+      "active7"
+    );
 
   const regularUsers =
-    document.getElementById("regularUsers");
+    document.getElementById(
+      "regularUsers"
+    );
 
   const activities =
-    document.getElementById("activities");
+    document.getElementById(
+      "activities"
+    );
 
   const toolUsage =
-    document.getElementById("toolUsage");
+    document.getElementById(
+      "toolUsage"
+    );
 
   const errorBox =
-    document.getElementById("errorBox");
+    document.getElementById(
+      "errorBox"
+    );
 
   const adminStatus =
-    document.getElementById("adminStatus");
+    document.getElementById(
+      "adminStatus"
+    );
 
   const updated =
-    document.getElementById("updated");
+    document.getElementById(
+      "updated"
+    );
+
+
+  /* =========================
+     LOAD DASHBOARD
+  ========================= */
 
   async function loadDashboard() {
 
-    errorBox.style.display = "none";
+    errorBox.style.display =
+      "none";
 
     adminStatus.textContent =
       "Checking admin access...";
 
+
     try {
 
-      if (!supabaseClient) {
-        throw new Error(
-          "Supabase load nahi hua."
-        );
-      }
+      /* Get logged-in user session */
 
       const {
         data: sessionData,
@@ -325,14 +497,20 @@
       } =
         await supabaseClient.auth.getSession();
 
+
       if (sessionError) {
         throw sessionError;
       }
 
+
       const session =
         sessionData?.session;
 
-      if (!session?.access_token) {
+
+      if (
+        !session ||
+        !session.access_token
+      ) {
 
         adminStatus.textContent =
           "❌ Login required";
@@ -342,53 +520,85 @@
         );
       }
 
+
+      /* Call backend */
+
       const response =
         await fetch(
           "/api/admin/stats",
           {
             method: "GET",
+
             headers: {
-              Authorization:
-                `Bearer ${session.access_token}`
+              "Authorization":
+                `Bearer ${session.access_token}`,
+
+              "Content-Type":
+                "application/json"
             }
           }
         );
 
+
       const data =
         await response.json();
 
+
       if (!response.ok) {
+
         throw new Error(
           data?.error ||
           "Dashboard data fetch nahi hua."
         );
       }
 
+
+      /* =========================
+         SHOW STATISTICS
+      ========================= */
+
       totalUsers.textContent =
         data.totalUsers ?? 0;
+
 
       activeToday.textContent =
         data.activeToday ?? 0;
 
+
       active7.textContent =
         data.activeLast7Days ?? 0;
+
 
       regularUsers.textContent =
         data.regularUsers ?? 0;
 
+
       activities.textContent =
         data.totalActivities ?? 0;
+
+
+      /* =========================
+         ADMIN VERIFIED
+      ========================= */
 
       adminStatus.textContent =
         "✅ Admin access verified";
 
+
       updated.textContent =
         "Last updated: " +
-        new Date().toLocaleString();
+        new Date()
+          .toLocaleString();
+
+
+      /* =========================
+         TOOL USAGE
+      ========================= */
 
       renderTools(
         data.toolUsage || {}
       );
+
 
     } catch (error) {
 
@@ -397,38 +607,61 @@
         error
       );
 
+
       adminStatus.textContent =
         "❌ Dashboard access failed";
+
 
       errorBox.textContent =
         error.message ||
         "Something went wrong.";
+
 
       errorBox.style.display =
         "block";
     }
   }
 
-  function renderTools(usage) {
 
-    toolUsage.innerHTML = "";
+  /* =========================
+     RENDER TOOLS
+  ========================= */
+
+  function renderTools(
+    usage
+  ) {
+
+    toolUsage.innerHTML =
+      "";
+
 
     const entries =
       Object.entries(usage);
 
-    if (!entries.length) {
+
+    if (
+      entries.length === 0
+    ) {
 
       toolUsage.innerHTML =
-        `<div class="empty">
+        `
+        <div class="empty">
           Abhi koi tool activity record nahi hai.
-        </div>`;
+        </div>
+        `;
 
       return;
     }
 
+
+    /* Highest usage first */
+
     entries.sort(
-      (a, b) => b[1] - a[1]
+      (a, b) =>
+        Number(b[1]) -
+        Number(a[1])
     );
+
 
     for (
       const [name, count]
@@ -436,47 +669,96 @@
     ) {
 
       const row =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       row.className =
         "tool-row";
 
-      row.innerHTML = `
-        <div class="tool-name">
-          ${formatToolName(name)}
-        </div>
 
-        <div class="tool-count">
-          ${count} uses
-        </div>
-      `;
+      const toolName =
+        document.createElement(
+          "div"
+        );
 
-      toolUsage.appendChild(row);
+      toolName.className =
+        "tool-name";
+
+      toolName.textContent =
+        formatToolName(name);
+
+
+      const toolCount =
+        document.createElement(
+          "div"
+        );
+
+      toolCount.className =
+        "tool-count";
+
+      toolCount.textContent =
+        `${count} uses`;
+
+
+      row.appendChild(
+        toolName
+      );
+
+      row.appendChild(
+        toolCount
+      );
+
+
+      toolUsage.appendChild(
+        row
+      );
     }
   }
 
-  function formatToolName(name) {
+
+  /* =========================
+     FORMAT TOOL NAME
+  ========================= */
+
+  function formatToolName(
+    name
+  ) {
 
     return String(name)
-      .replace(/[-_]/g, " ")
-      .replace(/\b\w/g, char =>
-        char.toUpperCase()
+      .replace(
+        /[-_]/g,
+        " "
+      )
+      .replace(
+        /\b\w/g,
+        char =>
+          char.toUpperCase()
       );
   }
 
+
+  /* =========================
+     REFRESH BUTTON
+  ========================= */
+
   document
-    .getElementById("refreshBtn")
+    .getElementById(
+      "refreshBtn"
+    )
     .addEventListener(
       "click",
       loadDashboard
     );
 
-  loadDashboard();
-</script>
 
-<!-- Supabase JS -->
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  /* =========================
+     START
+  ========================= */
+
+  loadDashboard();
+
 </script>
 
 </body>
