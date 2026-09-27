@@ -9,13 +9,13 @@
   "description": "AI-powered study assistant for students.",
   "icons": [
     {
-      "src": "/Sknotes-icon-192.png",
+      "src": "/sknotes-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Sknotes-icon-512.png",
+      "src": "/sknotes-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
