@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SKNotes Admin Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f5;
+      color: #17251d;
+    }
+
+    header {
+      background: linear-gradient(
+        135deg,
+        #ff9933,
+        #ffffff,
+        #138808
+      );
+      padding: 25px 18px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 7px 0 0;
+      color: #333;
+    }
+
+    .container {
+      width: min(1100px, 94%);
+      margin: 25px auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 17px;
+      background: #138808;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(210px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow:
+        0 4px 18px rgba(0,0,0,.07);
+      border: 1px solid #e5e5e5;
+    }
+
+    .card .icon {
+      font-size: 27px;
+    }
+
+    .card h3 {
+      margin: 12px 0 5px;
+      font-size: 15px;
+      color: #66716a;
+    }
+
+    .number {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-top: 22px;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow:
+        0 4px 18px rgba(0,0,0,.07);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .tool-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tool-row:last-child {
+      border-bottom: 0;
+    }
+
+    .tool-name {
+      font-weight: 600;
+    }
+
+    .tool-count {
+      background: #e9f6e7;
+      color: #138808;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .empty {
+      color: #777;
+      padding: 10px 0;
+    }
+
+    .error {
+      color: #b00020;
+      background: #fff0f0;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 23px;
+      }
+
+      .number {
+        font-size: 28px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>📊 SKNotes Admin</h1>
+  <p>Study app usage dashboard</p>
+</header>
+
+<div class="container">
+
+  <div class="topbar">
+    <div>
+      <strong>Dashboard Overview</strong>
+      <div class="status" id="updated">
+        Loading...
+      </div>
+    </div>
+
+    <button id="refreshBtn">
+      🔄 Refresh
+    </button>
+  </div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="icon">👥</div>
+      <h3>Total Users</h3>
+      <div class="number" id="totalUsers">—</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🟢</div>
+      <h3>Active Today</h3>
+      <div class="number" id="activeToday">—</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">📅</div>
+      <h3>Active Last 7 Days</h3>
+      <div class="number" id="active7">—</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">⭐</div>
+      <h3>Regular Users</h3>
+      <div class="number" id="regularUsers">—</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>Total Activities</h3>
+      <div class="number" id="activities">—</div>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <h2>🛠️ Tool Usage</h2>
+
+    <div id="toolUsage">
+      <div class="empty">
+        Loading tool usage...
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🔐 Admin Status</h2>
+
+    <div class="status" id="adminStatus">
+      Checking admin access...
+    </div>
+
+    <div class="error" id="errorBox"></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  SKNotes Admin Dashboard
+</div>
+
+<script>
+  const SUPABASE_URL =
+    "https://ejwdvlenqdfelmahajct.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_qy0u-EQxaagkQioyeNfgA_xvN6amzA";
+
+  const supabaseClient =
+    window.supabase
+      ? window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_KEY
+        )
+      : null;
+
+  const totalUsers =
+    document.getElementById("totalUsers");
+
+  const activeToday =
+    document.getElementById("activeToday");
+
+  const active7 =
+    document.getElementById("active7");
+
+  const regularUsers =
+    document.getElementById("regularUsers");
+
+  const activities =
+    document.getElementById("activities");
+
+  const toolUsage =
+    document.getElementById("toolUsage");
+
+  const errorBox =
+    document.getElementById("errorBox");
+
+  const adminStatus =
+    document.getElementById("adminStatus");
+
+  const updated =
+    document.getElementById("updated");
+
+  async function loadDashboard() {
+
+    errorBox.style.display = "none";
+
+    adminStatus.textContent =
+      "Checking admin access...";
+
+    try {
+
+      if (!supabaseClient) {
+        throw new Error(
+          "Supabase load nahi hua."
+        );
+      }
+
+      const {
+        data: sessionData,
+        error: sessionError
+      } =
+        await supabaseClient.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      const session =
+        sessionData?.session;
+
+      if (!session?.access_token) {
+
+        adminStatus.textContent =
+          "❌ Login required";
+
+        throw new Error(
+          "Pehle SKNotes ke admin account se login karo."
+        );
+      }
+
+      const response =
+        await fetch(
+          "/api/admin/stats",
+          {
+            method: "GET",
+            headers: {
+              Authorization:
+                `Bearer ${session.access_token}`
+            }
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+          "Dashboard data fetch nahi hua."
+        );
+      }
+
+      totalUsers.textContent =
+        data.totalUsers ?? 0;
+
+      activeToday.textContent =
+        data.activeToday ?? 0;
+
+      active7.textContent =
+        data.activeLast7Days ?? 0;
+
+      regularUsers.textContent =
+        data.regularUsers ?? 0;
+
+      activities.textContent =
+        data.totalActivities ?? 0;
+
+      adminStatus.textContent =
+        "✅ Admin access verified";
+
+      updated.textContent =
+        "Last updated: " +
+        new Date().toLocaleString();
+
+      renderTools(
+        data.toolUsage || {}
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Dashboard error:",
+        error
+      );
+
+      adminStatus.textContent =
+        "❌ Dashboard access failed";
+
+      errorBox.textContent =
+        error.message ||
+        "Something went wrong.";
+
+      errorBox.style.display =
+        "block";
+    }
+  }
+
+  function renderTools(usage) {
+
+    toolUsage.innerHTML = "";
+
+    const entries =
+      Object.entries(usage);
+
+    if (!entries.length) {
+
+      toolUsage.innerHTML =
+        `<div class="empty">
+          Abhi koi tool activity record nahi hai.
+        </div>`;
+
+      return;
+    }
+
+    entries.sort(
+      (a, b) => b[1] - a[1]
+    );
+
+    for (
+      const [name, count]
+      of entries
+    ) {
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "tool-row";
+
+      row.innerHTML = `
+        <div class="tool-name">
+          ${formatToolName(name)}
+        </div>
+
+        <div class="tool-count">
+          ${count} uses
+        </div>
+      `;
+
+      toolUsage.appendChild(row);
+    }
+  }
+
+  function formatToolName(name) {
+
+    return String(name)
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, char =>
+        char.toUpperCase()
+      );
+  }
+
+  document
+    .getElementById("refreshBtn")
+    .addEventListener(
+      "click",
+      loadDashboard
+    );
+
+  loadDashboard();
+</script>
+
+<!-- Supabase JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+</body>
+  </html>
