@@ -47,7 +47,7 @@ body{
   transition:.25s;
 }
 
-/* subtle Indian pattern */
+/* Indian + Kerala subtle pattern */
 body:before{
   content:"ॐ  ✦  ॐ  ✦  ॐ";
   position:fixed;
@@ -56,6 +56,17 @@ body:before{
   font-size:42px;
   letter-spacing:15px;
   opacity:.035;
+  pointer-events:none;
+  z-index:-1;
+}
+
+body:after{
+  content:"🌴  •  🥥  •  🌿";
+  position:fixed;
+  bottom:18px;
+  left:18px;
+  font-size:18px;
+  opacity:.08;
   pointer-events:none;
   z-index:-1;
 }
@@ -466,6 +477,22 @@ select:focus{
   line-height:1.5;
 }
 
+/* SPECIAL AI OUTPUT */
+
+.ai-note{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-left:4px solid var(--green);
+  padding:18px;
+  border-radius:14px;
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+
+.kerala-accent{
+  color:var(--green-dark);
+}
+
 /* MODALS */
 
 .overlay{
@@ -642,8 +669,8 @@ Study Smarter with
 </h1>
 
 <p>
-AI-powered notes, flashcards, quizzes, study planning and doubt solving —
-designed for students preparing for school and competitive exams.
+AI-powered notes, flashcards, quizzes, revision and exam preparation —
+designed to make studying simpler for Indian students.
 </p>
 
 </section>
@@ -689,11 +716,12 @@ Logout
 
 <div class="section-title">
 <h2>📚 Study Tools</h2>
-<p>Modern AI tools with a touch of Indian learning culture.</p>
+<p>Smart learning tools with an Indian student-friendly experience.</p>
 </div>
 
 <section class="services">
 
+<!-- 1 -->
 <div class="service">
 <div class="icon">🧠</div>
 <h3>Text → Flashcards</h3>
@@ -702,6 +730,7 @@ Logout
 <button class="primary" onclick="openFeature('flashcards')">Open</button>
 </div>
 
+<!-- 2 -->
 <div class="service">
 <div class="icon">▶️</div>
 <h3>YouTube → Notes</h3>
@@ -710,22 +739,7 @@ Logout
 <button class="primary" onclick="openFeature('youtube')">Open</button>
 </div>
 
-<div class="service">
-<div class="icon">🖼️</div>
-<h3>Image → Text</h3>
-<p>Extract text from handwritten or printed images.</p>
-<span class="soon">OCR</span>
-<button class="primary" onclick="openFeature('ocr')">Open</button>
-</div>
-
-<div class="service">
-<div class="icon">📷</div>
-<h3>Question Scanner</h3>
-<p>Scan a question and get an AI explanation.</p>
-<span class="soon">AI</span>
-<button class="primary" onclick="openFeature('scanner')">Open</button>
-</div>
-
+<!-- 3 -->
 <div class="service">
 <div class="icon">📝</div>
 <h3>Notes → Quiz</h3>
@@ -734,6 +748,7 @@ Logout
 <button class="primary" onclick="openFeature('quiz')">Open</button>
 </div>
 
+<!-- 4 -->
 <div class="service">
 <div class="icon">📄</div>
 <h3>PDF Export</h3>
@@ -742,14 +757,7 @@ Logout
 <button class="primary" onclick="openFeature('pdf')">Open</button>
 </div>
 
-<div class="service">
-<div class="icon">🤖</div>
-<h3>AI Tutor</h3>
-<p>Ask questions and learn concepts step-by-step.</p>
-<span class="soon">AI</span>
-<button class="primary" onclick="openFeature('tutor')">Open</button>
-</div>
-
+<!-- 5 -->
 <div class="service">
 <div class="icon">📚</div>
 <h3>AI Notes Generator</h3>
@@ -758,6 +766,7 @@ Logout
 <button class="primary" onclick="openFeature('notes')">Open</button>
 </div>
 
+<!-- 6 -->
 <div class="service">
 <div class="icon">📅</div>
 <h3>Study Planner</h3>
@@ -766,6 +775,7 @@ Logout
 <button class="primary" onclick="openFeature('planner')">Open</button>
 </div>
 
+<!-- 7 -->
 <div class="service">
 <div class="icon">📊</div>
 <h3>Study Progress</h3>
@@ -774,14 +784,43 @@ Logout
 <button class="primary" onclick="openFeature('progress')">Open</button>
 </div>
 
+<!-- 8 NEW -->
 <div class="service">
-<div class="icon">🎙️</div>
-<h3>AI Voice Tutor</h3>
-<p>Generate answers that are easy to listen to.</p>
-<span class="soon">VOICE</span>
-<button class="primary" onclick="openFeature('voice')">Open</button>
+<div class="icon">🧠</div>
+<h3>Mind Map</h3>
+<p>Topic ko visual map mein samjho aur yaad karo.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('mindmap')">Open</button>
 </div>
 
+<!-- 9 NEW -->
+<div class="service">
+<div class="icon">📖</div>
+<h3>Chapter Revision</h3>
+<p>Chapter ka quick revision important points ke saath.</p>
+<span class="soon">REVISION</span>
+<button class="primary" onclick="openFeature('revision')">Open</button>
+</div>
+
+<!-- 10 NEW -->
+<div class="service">
+<div class="icon">📝</div>
+<h3>Study Material</h3>
+<p>Topic ka complete study material ek jagah banao.</p>
+<span class="soon">AI</span>
+<button class="primary" onclick="openFeature('material')">Open</button>
+</div>
+
+<!-- 11 NEW -->
+<div class="service">
+<div class="icon">🎯</div>
+<h3>Exam Preparation</h3>
+<p>Exam ke liye important topics aur practice karo.</p>
+<span class="soon">EXAM</span>
+<button class="primary" onclick="openFeature('preparation')">Open</button>
+</div>
+
+<!-- 12 -->
 <div class="service">
 <div class="icon">🌐</div>
 <h3>AI Web Research</h3>
@@ -790,6 +829,7 @@ Logout
 <button class="primary" onclick="openFeature('research')">Open</button>
 </div>
 
+<!-- 13 -->
 <div class="service">
 <div class="icon">📑</div>
 <h3>Exam Paper Generator</h3>
@@ -798,6 +838,7 @@ Logout
 <button class="primary" onclick="openFeature('exam')">Open</button>
 </div>
 
+<!-- 14 -->
 <div class="service">
 <div class="icon">❓</div>
 <h3>AI Doubt Solver</h3>
@@ -823,8 +864,13 @@ Created with ❤️ for students
 </div>
 
 <div>
+🌴 Made with an Indian learning spirit
+</div>
+
+<div>
 Instagram:
-<a href="https://www.instagram.com/also__sk"
+<a
+href="https://www.instagram.com/also__sk"
 target="_blank"
 rel="noopener">
 @also__sk
@@ -852,11 +898,8 @@ rel="noopener">
 <div class="timer-buttons">
 
 <button onclick="startTimer()">▶ Start</button>
-
 <button onclick="pauseTimer()">⏸ Pause</button>
-
 <button onclick="resetTimer()">↻ Reset</button>
-
 <button onclick="closeTimer()">✕ Close</button>
 
 </div>
@@ -974,7 +1017,7 @@ window.supabase.createClient(
 
 
 /* =========================================================
-   BASIC HELPERS
+   HELPERS
    ========================================================= */
 
 function safe(value){
@@ -1629,13 +1672,16 @@ function openFeature(type){
 
 useTool();
 
+
+/* FLASHCARDS */
+
 if(type==="flashcards"){
 
 workspace(
 
 "🧠 Text → Flashcards",
 
-"Paste your notes and create revision flashcards.",
+"Paste your notes and create quick revision cards.",
 
 `
 <textarea
@@ -1658,7 +1704,7 @@ onclick="runFlashcards()">
 class="loading"
 id="featureLoading">
 
-🤖 Creating flashcards...
+🤖 Notes ko smart flashcards mein convert kar raha hoon...
 
 </div>
 
@@ -1674,13 +1720,15 @@ class="flashcards">
 }
 
 
+/* YOUTUBE */
+
 if(type==="youtube"){
 
 workspace(
 
 "▶️ YouTube → Notes",
 
-"Paste your educational YouTube URL.",
+"Educational YouTube video ko structured notes mein convert karo.",
 
 `
 <input
@@ -1703,7 +1751,7 @@ Generate Notes
 class="loading"
 id="featureLoading">
 
-🎬 Fetching transcript...
+🎬 Video transcript fetch kar raha hoon...
 
 </div>
 
@@ -1719,99 +1767,7 @@ class="result">
 }
 
 
-if(type==="ocr"){
-
-workspace(
-
-"🖼️ Image → Text",
-
-"Upload an image and extract its text.",
-
-`
-<input
-class="file-input"
-type="file"
-id="imageFile"
-accept="image/*">
-
-<div class="actions">
-
-<button
-class="primary"
-onclick="runOCR()">
-
-🔎 Extract Text
-
-</button>
-
-</div>
-
-<div
-class="loading"
-id="featureLoading">
-
-Reading image...
-
-</div>
-
-<div
-id="featureOutput"
-class="result">
-
-</div>
-`
-
-);
-
-}
-
-
-if(type==="scanner"){
-
-workspace(
-
-"📷 Question Scanner",
-
-"Upload a question image and get an AI solution.",
-
-`
-<input
-class="file-input"
-type="file"
-id="imageFile"
-accept="image/*">
-
-<div class="actions">
-
-<button
-class="primary"
-onclick="runScanner()">
-
-📷 Scan & Solve
-
-</button>
-
-</div>
-
-<div
-class="loading"
-id="featureLoading">
-
-🔎 Scanning...
-
-</div>
-
-<div
-id="featureOutput"
-class="result">
-
-</div>
-`
-
-);
-
-}
-
+/* QUIZ */
 
 if(type==="quiz"){
 
@@ -1819,7 +1775,7 @@ workspace(
 
 "📝 Notes → Quiz",
 
-"Generate 10 MCQs from your notes.",
+"Apne notes se practice MCQs banao.",
 
 `
 <textarea
@@ -1842,7 +1798,7 @@ onclick="runQuiz()">
 class="loading"
 id="featureLoading">
 
-🤖 Creating quiz...
+🤖 Questions prepare kar raha hoon...
 
 </div>
 
@@ -1858,13 +1814,15 @@ class="flashcards">
 }
 
 
+/* PDF */
+
 if(type==="pdf"){
 
 workspace(
 
 "📄 PDF Export",
 
-"Turn your notes into a downloadable PDF.",
+"Apne notes ko clean downloadable PDF mein save karo.",
 
 `
 <div class="field">
@@ -1905,50 +1863,7 @@ class="result">
 }
 
 
-if(type==="tutor"){
-
-workspace(
-
-"🤖 AI Tutor",
-
-"Ask SKNotes to explain your topic simply.",
-
-`
-<textarea
-id="featureText"
-placeholder="Example: Explain Newton's second law in simple language..."></textarea>
-
-<div class="actions">
-
-<button
-class="primary"
-onclick="runTutor()">
-
-🤖 Ask AI Tutor
-
-</button>
-
-</div>
-
-<div
-class="loading"
-id="featureLoading">
-
-Thinking...
-
-</div>
-
-<div
-id="featureOutput"
-class="result">
-
-</div>
-`
-
-);
-
-}
-
+/* NOTES */
 
 if(type==="notes"){
 
@@ -1956,7 +1871,7 @@ workspace(
 
 "📚 AI Notes Generator",
 
-"Create structured notes from raw study material.",
+"Raw material ko easy, structured study notes mein badlo.",
 
 `
 <div class="grid2">
@@ -2003,7 +1918,7 @@ onclick="runNotes()">
 class="loading"
 id="featureLoading">
 
-Creating notes...
+📚 Notes ko organize kar raha hoon...
 
 </div>
 
@@ -2019,13 +1934,15 @@ class="result">
 }
 
 
+/* PLANNER */
+
 if(type==="planner"){
 
 workspace(
 
 "📅 Study Planner",
 
-"Create a practical study timetable.",
+"Realistic aur manageable study timetable banao.",
 
 `
 <div class="grid2">
@@ -2094,7 +2011,7 @@ onclick="runPlanner()">
 class="loading"
 id="featureLoading">
 
-Planning...
+🗓️ Tumhare liye plan bana raha hoon...
 
 </div>
 
@@ -2110,13 +2027,15 @@ class="result">
 }
 
 
+/* PROGRESS */
+
 if(type==="progress"){
 
 workspace(
 
 "📊 Study Progress",
 
-"Calculate your current learning progress.",
+"Apni current preparation ko numbers mein dekho.",
 
 `
 <div class="grid2">
@@ -2196,34 +2115,52 @@ class="result">
 }
 
 
-if(type==="voice"){
+/* MIND MAP */
+
+if(type==="mindmap"){
 
 workspace(
 
-"🎙️ AI Voice Tutor",
+"🧠 Mind Map",
 
-"Generate an answer that is easy to listen to.",
+"Topic ko simple branches mein break karke samjho.",
 
 `
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
 <textarea
 id="featureText"
-placeholder="Ask your question..."></textarea>
+placeholder="Example: Electrostatics, Chemical Bonding, Matrices..."></textarea>
 
 <div class="actions">
 
 <button
 class="primary"
-onclick="runVoice()">
+onclick="runMindMap()">
 
-🎙️ Generate Answer
-
-</button>
-
-<button
-class="nav-btn"
-onclick="speakResult()">
-
-🔊 Speak
+🧠 Create Mind Map
 
 </button>
 
@@ -2233,13 +2170,13 @@ onclick="speakResult()">
 class="loading"
 id="featureLoading">
 
-Preparing answer...
+🧠 Topic ko branches mein organize kar raha hoon...
 
 </div>
 
 <div
 id="featureOutput"
-class="result">
+class="ai-note">
 
 </div>
 `
@@ -2249,18 +2186,233 @@ class="result">
 }
 
 
+/* CHAPTER REVISION */
+
+if(type==="revision"){
+
+workspace(
+
+"📖 Chapter Revision",
+
+"Chapter ka quick but useful revision sheet banao.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Chemistry">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Chapter ka naam likho..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runRevision()">
+
+📖 Start Revision
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+📖 Important points nikal raha hoon...
+
+</div>
+
+<div
+id="featureOutput"
+class="ai-note">
+
+</div>
+`
+
+);
+
+}
+
+
+/* STUDY MATERIAL */
+
+if(type==="material"){
+
+workspace(
+
+"📝 Study Material",
+
+"Ek topic ke liye complete student-friendly material banao.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Mathematics">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Topic / chapter ka naam..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runMaterial()">
+
+📝 Create Material
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+📝 Study material prepare kar raha hoon...
+
+</div>
+
+<div
+id="featureOutput"
+class="ai-note">
+
+</div>
+`
+
+);
+
+}
+
+
+/* EXAM PREPARATION */
+
+if(type==="preparation"){
+
+workspace(
+
+"🎯 Exam Preparation",
+
+"Exam ke liye focused preparation aur practice material.",
+
+`
+<div class="grid2">
+
+<div class="field">
+
+<label>Subject</label>
+
+<input
+id="subject"
+placeholder="Physics">
+
+</div>
+
+<div class="field">
+
+<label>Class</label>
+
+<input
+id="className"
+placeholder="Class 12">
+
+</div>
+
+</div>
+
+<textarea
+id="featureText"
+placeholder="Chapter / topics jinke liye preparation karni hai..."></textarea>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="runPreparation()">
+
+🎯 Prepare Me
+
+</button>
+
+</div>
+
+<div
+class="loading"
+id="featureLoading">
+
+🎯 Exam-focused practice bana raha hoon...
+
+</div>
+
+<div
+id="featureOutput"
+class="ai-note">
+
+</div>
+`
+
+);
+
+}
+
+
+/* RESEARCH */
+
 if(type==="research"){
 
 workspace(
 
 "🌐 AI Web Research",
 
-"Create a structured research answer.",
+"Topic par structured research-style answer banao.",
 
 `
 <textarea
 id="featureText"
-placeholder="Example: Explain India's Chandrayaan missions..."></textarea>
+placeholder="Example: Explain Chandrayaan missions..."></textarea>
 
 <div class="actions">
 
@@ -2278,7 +2430,7 @@ onclick="runResearch()">
 class="loading"
 id="featureLoading">
 
-Researching...
+🔎 Information organize kar raha hoon...
 
 </div>
 
@@ -2294,13 +2446,15 @@ class="result">
 }
 
 
+/* EXAM PAPER */
+
 if(type==="exam"){
 
 workspace(
 
 "📑 Exam Paper Generator",
 
-"Generate a school-level practice paper.",
+"School-level practice paper generate karo.",
 
 `
 <div class="grid2">
@@ -2376,7 +2530,7 @@ onclick="runExam()">
 class="loading"
 id="featureLoading">
 
-Creating paper...
+📝 Paper prepare kar raha hoon...
 
 </div>
 
@@ -2392,13 +2546,15 @@ class="result">
 }
 
 
+/* DOUBT */
+
 if(type==="doubt"){
 
 workspace(
 
 "❓ AI Doubt Solver",
 
-"Get a simple step-by-step explanation.",
+"Apna doubt likho aur simple step-by-step explanation pao.",
 
 `
 <div class="field">
@@ -2431,7 +2587,7 @@ onclick="runDoubt()">
 class="loading"
 id="featureLoading">
 
-Solving...
+🤔 Doubt ko samajh raha hoon...
 
 </div>
 
@@ -2538,7 +2694,7 @@ apiBusy(false);
 
 
 /* =========================================================
-   YOUTUBE NOTES
+   YOUTUBE
    ========================================================= */
 
 async function runYouTube(){
@@ -2574,170 +2730,6 @@ url:url
 
 output(
 safe(data.notes || "")
-);
-
-}catch(error){
-
-output(
-"❌ "+safe(error.message)
-);
-
-}
-
-apiBusy(false);
-
-}
-
-
-/* =========================================================
-   IMAGE DATA
-   ========================================================= */
-
-function getImageData(){
-
-const file =
-document.getElementById(
-"imageFile"
-).files[0];
-
-if(!file){
-
-throw new Error(
-"Image select karo."
-);
-
-}
-
-return new Promise(
-function(resolve,reject){
-
-const reader =
-new FileReader();
-
-reader.onload=
-function(){
-
-resolve(
-reader.result
-);
-
-};
-
-reader.onerror=
-function(){
-
-reject(
-new Error(
-"Image read nahi hui."
-)
-);
-
-};
-
-reader.readAsDataURL(file);
-
-}
-);
-
-}
-
-
-/* =========================================================
-   IMAGE OCR
-   ========================================================= */
-
-async function runOCR(){
-
-apiBusy(true);
-
-output("");
-
-try{
-
-const image =
-await getImageData();
-
-const data =
-await api(
-"/api/image-to-text",
-{
-image:image
-}
-);
-
-output(
-safe(
-data.text ||
-"Image me text nahi mila."
-)
-);
-
-}catch(error){
-
-output(
-"❌ "+safe(error.message)
-);
-
-}
-
-apiBusy(false);
-
-}
-
-
-/* =========================================================
-   QUESTION SCANNER
-   ========================================================= */
-
-async function runScanner(){
-
-apiBusy(true);
-
-output("");
-
-try{
-
-const image =
-await getImageData();
-
-const textData =
-await api(
-"/api/image-to-text",
-{
-image:image
-}
-);
-
-const question =
-textData.text || "";
-
-if(!question){
-
-throw new Error(
-"Question text nahi mila."
-);
-
-}
-
-const solution =
-await api(
-"/api/doubt-solver",
-{
-question:question,
-subject:""
-}
-);
-
-output(
-
-"<strong>Scanned Question</strong>\n\n"
-+
-safe(question)
-+
-"\n\n<strong>AI Solution</strong>\n\n"
-+
-safe(solution.answer)
-
 );
 
 }catch(error){
@@ -2955,63 +2947,6 @@ output(
 
 
 /* =========================================================
-   AI TUTOR
-   ========================================================= */
-
-async function runTutor(){
-
-const text =
-document.getElementById(
-"featureText"
-).value.trim();
-
-if(!text){
-
-alert(
-"Question likho."
-);
-
-return;
-
-}
-
-apiBusy(true);
-
-output("");
-
-try{
-
-const data =
-await api(
-"/api/tutor",
-{
-messages:[
-{
-role:"user",
-content:text
-}
-]
-}
-);
-
-output(
-safe(data.answer)
-);
-
-}catch(error){
-
-output(
-"❌ "+safe(error.message)
-);
-
-}
-
-apiBusy(false);
-
-}
-
-
-/* =========================================================
    NOTES GENERATOR
    ========================================================= */
 
@@ -3152,7 +3087,7 @@ apiBusy(false);
 
 
 /* =========================================================
-   STUDY PROGRESS
+   PROGRESS
    ========================================================= */
 
 async function runProgress(){
@@ -3245,25 +3180,10 @@ output(
 
 
 /* =========================================================
-   VOICE TUTOR
+   AI HELPER FOR NEW TOOLS
    ========================================================= */
 
-async function runVoice(){
-
-const question =
-document.getElementById(
-"featureText"
-).value.trim();
-
-if(!question){
-
-alert(
-"Question likho."
-);
-
-return;
-
-}
+async function runStudentAI(prompt){
 
 apiBusy(true);
 
@@ -3273,14 +3193,19 @@ try{
 
 const data =
 await api(
-"/api/voice-tutor",
+"/api/tutor",
 {
-question:question
+messages:[
+{
+role:"user",
+content:prompt
+}
+]
 }
 );
 
 output(
-safe(data.answer)
+safe(data.answer || "AI ne koi answer nahi diya.")
 );
 
 }catch(error){
@@ -3295,49 +3220,299 @@ apiBusy(false);
 
 }
 
-function speakResult(){
 
-const text =
+/* =========================================================
+   MIND MAP
+   ========================================================= */
+
+async function runMindMap(){
+
+const topic =
 document.getElementById(
-"featureOutput"
-)?.innerText || "";
+"featureText"
+).value.trim();
 
-if(!text){
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+const className =
+document.getElementById(
+"className"
+).value.trim();
+
+if(!topic){
 
 alert(
-"Pehle answer generate karo."
+"Topic ya chapter ka naam likho."
 );
 
 return;
 
 }
 
-if(
-!("speechSynthesis" in window)
-){
+const prompt = `
+
+You are SKNotes, a friendly Indian teacher.
+
+Create a simple TEXT-BASED MIND MAP for:
+
+Topic: ${topic}
+Subject: ${subject || "Not specified"}
+Class: ${className || "School student"}
+
+Make it useful for an Indian Class 11–12 student.
+
+Format it clearly like:
+
+🧠 MAIN TOPIC
+│
+├── 1. Main Concept
+│   ├── Important point
+│   ├── Definition
+│   └── Example
+│
+├── 2. Main Concept
+│   ├── Key point
+│   └── Formula if needed
+│
+└── Quick Memory Trick
+
+Rules:
+- Keep branches short.
+- Use simple Hindi/Hinglish.
+- Add English scientific terms where useful.
+- Add formulas when relevant.
+- Do not make it robotic.
+- Do not mention AI.
+- Focus on understanding and revision.
+- End with a "1-minute revision" section.
+
+`;
+
+await runStudentAI(prompt);
+
+}
+
+
+/* =========================================================
+   CHAPTER REVISION
+   ========================================================= */
+
+async function runRevision(){
+
+const chapter =
+document.getElementById(
+"featureText"
+).value.trim();
+
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+const className =
+document.getElementById(
+"className"
+).value.trim();
+
+if(!chapter){
 
 alert(
-"Is browser me voice support nahi hai."
+"Chapter ka naam likho."
 );
 
 return;
 
 }
 
-speechSynthesis.cancel();
+const prompt = `
 
-const speech =
-new SpeechSynthesisUtterance(
-text
+You are a helpful Indian school teacher helping a student revise quickly.
+
+Create a COMPLETE QUICK REVISION SHEET.
+
+Subject: ${subject || "Not specified"}
+Class: ${className || "Class 11–12"}
+Chapter: ${chapter}
+
+Use this structure:
+
+📖 CHAPTER REVISION
+
+1. Chapter ka basic idea
+2. Important concepts
+3. Important definitions
+4. Important formulas
+5. Important reactions / rules if applicable
+6. Common mistakes
+7. Exam mein kya yaad rakhein
+8. 5 quick practice questions
+9. 30-second final revision
+
+Rules:
+- Hindi/Hinglish mein naturally explain karo.
+- Important English terms bhi likho.
+- Explanation short but meaningful ho.
+- Student ko teacher jaisa samjhao.
+- Unnecessary long introduction mat do.
+- No AI mention.
+- Exam-focused but conceptually correct answer do.
+
+`;
+
+await runStudentAI(prompt);
+
+}
+
+
+/* =========================================================
+   STUDY MATERIAL
+   ========================================================= */
+
+async function runMaterial(){
+
+const topic =
+document.getElementById(
+"featureText"
+).value.trim();
+
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+const className =
+document.getElementById(
+"className"
+).value.trim();
+
+if(!topic){
+
+alert(
+"Topic ya chapter ka naam likho."
 );
 
-speech.lang="en-IN";
+return;
 
-speech.rate=.9;
+}
 
-speechSynthesis.speak(
-speech
+const prompt = `
+
+You are SKNotes, a friendly and practical teacher.
+
+Create COMPLETE STUDY MATERIAL for:
+
+Subject: ${subject || "Not specified"}
+Class: ${className || "Class 11–12"}
+Topic/Chapter: ${topic}
+
+Make the material useful for actual exam preparation.
+
+Include:
+
+📚 STUDY MATERIAL
+
+1. Topic introduction
+2. Easy explanation
+3. Important concepts
+4. Definitions
+5. Formulas / equations / rules
+6. Simple examples
+7. Important exam points
+8. Common mistakes
+9. Important questions
+10. Quick revision
+
+Rules:
+- Use simple Hindi/Hinglish.
+- English technical terms where necessary.
+- Explain like a good teacher.
+- Do not sound robotic.
+- Do not mention AI.
+- Avoid unnecessary filler.
+- Keep important points clearly separated.
+- If a formula is relevant, explain what each symbol means.
+
+`;
+
+await runStudentAI(prompt);
+
+}
+
+
+/* =========================================================
+   EXAM PREPARATION
+   ========================================================= */
+
+async function runPreparation(){
+
+const topics =
+document.getElementById(
+"featureText"
+).value.trim();
+
+const subject =
+document.getElementById(
+"subject"
+).value.trim();
+
+const className =
+document.getElementById(
+"className"
+).value.trim();
+
+if(!topics){
+
+alert(
+"Chapter ya topics likho."
 );
+
+return;
+
+}
+
+const prompt = `
+
+You are an experienced Indian school teacher helping a student prepare for exams.
+
+Create a focused EXAM PREPARATION GUIDE.
+
+Subject: ${subject || "Not specified"}
+Class: ${className || "Class 11–12"}
+Topics:
+${topics}
+
+Include:
+
+🎯 EXAM PREPARATION
+
+1. Most important concepts
+2. Must-remember definitions
+3. Important formulas / equations
+4. Concepts students commonly confuse
+5. Important question types
+6. 5 MCQ practice questions
+7. 5 short-answer questions
+8. 3 long-answer questions
+9. Common exam mistakes
+10. Last-minute revision checklist
+11. Smart exam strategy
+
+Rules:
+- Hindi/Hinglish naturally use karo.
+- Important English terms preserve karo.
+- Exam-focused but accurate raho.
+- Difficulty should be suitable for school exams.
+- Don't claim exact board questions will appear.
+- No AI mention.
+- Don't use fake statistics.
+- Make the student feel guided, not overwhelmed.
+
+`;
+
+await runStudentAI(prompt);
 
 }
 
@@ -3387,10 +3562,10 @@ safe(data.answer)
 
 +
 
-"ℹ️ This version uses the SKNotes AI research route. "
+"ℹ️ SKNotes research route used. "
 +
 
-"Live web browsing is not enabled in the current backend."
+"Current backend mein live web browsing enabled nahi hai."
 
 );
 
