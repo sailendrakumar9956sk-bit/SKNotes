@@ -2078,7 +2078,7 @@ function setFlashCount(){
 
 async function runFlashcards(){
 
-  const text=
+  const text =
     document.getElementById("inputText")?.value.trim();
 
   if(!text){
@@ -2090,18 +2090,14 @@ async function runFlashcards(){
 
   try{
 
-    const data=
-      await api("/api/flashcards",{
-        method:"POST",
-        body:JSON.stringify({
-          text
-        })
-      });
+    const data = await api("/api/flashcards",{
+      method:"POST",
+      body:JSON.stringify({text})
+    });
 
     incrementTools();
-    setFlashCount();
 
-    const cards=
+    const cards =
       data.cards ||
       data.flashcards ||
       [];
@@ -2111,4 +2107,959 @@ async function runFlashcards(){
       showResponse(`
         <div class="response-card">
           <h3>🧠 Flashcards</h3>
-          <p>${safe(data.text || data.answer || "No cards generated
+          <p>${safe(data.text || data.answer || "No cards generated.")}</p>
+        </div>
+      `);
+
+      return;
+    }
+
+    setFlashCount();
+
+    showResponse(`
+      <div class="response-card">
+        <div class="response-heading">
+          <div class="response-heading-icon">🧠</div>
+          <h3>Smart Flashcards</h3>
+        </div>
+
+        <div class="flashcard-grid">
+
+          ${cards.map((card,index)=>{
+
+            const question =
+              card.question ||
+              card.front ||
+              card.term ||
+              `Card ${index+1}`;
+
+            const answer =
+              card.answer ||
+              card.back ||
+              card.definition ||
+              "Answer unavailable.";
+
+            return `
+              <div
+                class="flashcard"
+                onclick="this.classList.toggle('flipped')">
+
+                <div class="flashcard-inner">
+
+                  <div class="flash-front">
+                    <div class="flash-label">
+                      Question ${index+1}
+                    </div>
+
+                    <div class="flash-text">
+                      ${safe(question)}
+                    </div>
+                  </div>
+
+                  <div class="flash-back">
+                    <div class="flash-label">
+                      Answer
+                    </div>
+
+                    <div class="flash-text">
+                      ${safe(answer)}
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+
+          }).join("")}
+
+        </div>
+
+        <p style="margin-top:12px">
+          Tap a card to flip it.
+        </p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- YOUTUBE ---------------- */
+
+async function runYouTube(){
+
+  const videoUrl =
+    document.getElementById("videoUrl")?.value.trim();
+
+  if(!videoUrl){
+    alert("YouTube URL dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes",{
+      method:"POST",
+      body:JSON.stringify({
+        videoUrl,
+        url:videoUrl
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+        <div class="response-heading">
+          <div class="response-heading-icon">▶️</div>
+          <h3>YouTube Notes</h3>
+        </div>
+
+        <p>${safe(
+          data.notes ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- QUIZ ---------------- */
+
+async function runQuiz(){
+
+  const text =
+    document.getElementById("inputText")?.value.trim();
+
+  if(!text){
+    alert("Pehle notes paste karo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/quiz",{
+      method:"POST",
+      body:JSON.stringify({text})
+    });
+
+    incrementTools();
+
+    const questions =
+      data.questions ||
+      data.quiz ||
+      [];
+
+    if(!questions.length){
+
+      showResponse(`
+        <div class="response-card">
+          <h3>❓ Quiz</h3>
+          <p>${safe(data.text || data.answer || "Quiz generate nahi hua.")}</p>
+        </div>
+      `);
+
+      return;
+    }
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">❓</div>
+          <h3>AI Quiz</h3>
+        </div>
+
+        ${questions.map((q,i)=>{
+
+          const question =
+            q.question ||
+            q.q ||
+            `Question ${i+1}`;
+
+          const options =
+            q.options ||
+            [];
+
+          return `
+            <div class="quiz-question">
+
+              <strong>
+                ${i+1}. ${safe(question)}
+              </strong>
+
+              <div style="margin-top:12px">
+
+                ${
+                  options.map((option,j)=>`
+
+                    <button
+                      class="quiz-option"
+                      onclick="this.classList.toggle('selected')">
+
+                      ${String.fromCharCode(65+j)}.
+                      ${safe(
+                        typeof option === "string"
+                        ? option
+                        : option.text || option.answer || ""
+                      )}
+
+                    </button>
+
+                  `).join("")
+                }
+
+              </div>
+
+            </div>
+          `;
+
+        }).join("")}
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- PDF ---------------- */
+
+async function runPDF(){
+
+  const text =
+    document.getElementById("inputText")?.value.trim();
+
+  if(!text){
+    alert("PDF ke liye content dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const response =
+      await fetch("/api/pdf",{
+        method:"POST",
+        body:JSON.stringify({text}),
+        headers:{
+          "Content-Type":"application/json"
+        }
+      });
+
+    if(!response.ok){
+
+      const errorText =
+        await response.text();
+
+      throw new Error(errorText || "PDF create nahi hua.");
+
+    }
+
+    const blob =
+      await response.blob();
+
+    const url =
+      URL.createObjectURL(blob);
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📄</div>
+          <h3>PDF Ready</h3>
+        </div>
+
+        <p>Your study PDF is ready.</p>
+
+        <a
+          href="${url}"
+          download="SKNotes.pdf"
+          style="
+            display:block;
+            text-align:center;
+            margin-top:14px;
+            padding:13px;
+            border-radius:14px;
+            background:#ff6b45;
+            color:white;
+            text-decoration:none;
+            font-weight:800;
+          ">
+          ⬇️ Download PDF
+        </a>
+
+      </div>
+    `);
+
+    incrementTools();
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- AI NOTES ---------------- */
+
+async function runNotes(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  const level =
+    document.getElementById("level")?.value.trim();
+
+  if(!topic){
+    alert("Topic dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes-generator",{
+      method:"POST",
+      body:JSON.stringify({
+        topic,
+        level
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📝</div>
+          <h3>AI Notes</h3>
+        </div>
+
+        <p>${safe(
+          data.notes ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- PLANNER ---------------- */
+
+async function runPlanner(){
+
+  const subjects =
+    document.getElementById("subjects")?.value.trim();
+
+  const hours =
+    document.getElementById("hours")?.value.trim();
+
+  if(!subjects){
+    alert("Subjects dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/study-planner",{
+      method:"POST",
+      body:JSON.stringify({
+        subjects,
+        hours
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📅</div>
+          <h3>Study Plan</h3>
+        </div>
+
+        <p>${safe(
+          data.plan ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- PROGRESS ---------------- */
+
+async function runProgress(){
+
+  showLoading();
+
+  try{
+
+    const data =
+      await api("/api/study-progress");
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📊</div>
+          <h3>Study Progress</h3>
+        </div>
+
+        <p>${safe(
+          data.summary ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- AI TUTOR ---------------- */
+
+async function runStudentAI(){
+
+  const question =
+    document.getElementById("question")?.value.trim();
+
+  if(!question){
+    alert("Apna question likho.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/tutor",{
+      method:"POST",
+      body:JSON.stringify({question})
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">🤖</div>
+          <h3>AI Tutor</h3>
+        </div>
+
+        <p>${safe(
+          data.answer ||
+          data.text ||
+          data.response ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- MIND MAP ---------------- */
+
+async function runMindMap(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  if(!topic){
+    alert("Topic dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes-generator",{
+      method:"POST",
+      body:JSON.stringify({
+        topic,
+        level:"Mind Map"
+      })
+    });
+
+    incrementTools();
+
+    const text =
+      data.notes ||
+      data.text ||
+      data.answer ||
+      "Mind map generated.";
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">🗺️</div>
+          <h3>${safe(topic)}</h3>
+        </div>
+
+        <div class="mindmap">
+
+          <div class="mind-center">
+            ${safe(topic)}
+          </div>
+
+          <div class="mind-branches">
+
+            <div class="mind-node">
+              📌 Key Concepts
+            </div>
+
+            <div class="mind-node">
+              📖 Definitions
+            </div>
+
+            <div class="mind-node">
+              🧮 Formulas
+            </div>
+
+            <div class="mind-node">
+              🎯 Applications
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="response-card">
+          <p>${safe(text)}</p>
+        </div>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- REVISION ---------------- */
+
+async function runRevision(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  if(!topic){
+    alert("Chapter dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes-generator",{
+      method:"POST",
+      body:JSON.stringify({
+        topic,
+        level:"Chapter Revision"
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📖</div>
+          <h3>Chapter Revision</h3>
+        </div>
+
+        <p>${safe(
+          data.notes ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- STUDY MATERIAL ---------------- */
+
+async function runMaterial(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  if(!topic){
+    alert("Topic dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes-generator",{
+      method:"POST",
+      body:JSON.stringify({
+        topic,
+        level:"Complete Study Material"
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📚</div>
+          <h3>Study Material</h3>
+        </div>
+
+        <p>${safe(
+          data.notes ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- EXAM PREPARATION ---------------- */
+
+async function runPreparation(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  if(!topic){
+    alert("Exam/Subject dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/notes-generator",{
+      method:"POST",
+      body:JSON.stringify({
+        topic,
+        level:"Exam Preparation"
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">🎯</div>
+          <h3>Exam Preparation</h3>
+        </div>
+
+        <p>${safe(
+          data.notes ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- WEB RESEARCH ---------------- */
+
+async function runResearch(){
+
+  const question =
+    document.getElementById("question")?.value.trim();
+
+  if(!question){
+    alert("Research topic likho.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/web-research",{
+      method:"POST",
+      body:JSON.stringify({question})
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">🔎</div>
+          <h3>AI Research</h3>
+        </div>
+
+        <p>${safe(
+          data.answer ||
+          data.text ||
+          data.research ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- EXAM PAPER ---------------- */
+
+async function runExam(){
+
+  const topic =
+    document.getElementById("topic")?.value.trim();
+
+  if(!topic){
+    alert("Subject/Chapter dalo.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/exam-paper",{
+      method:"POST",
+      body:JSON.stringify({
+        topic
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">📋</div>
+          <h3>Practice Exam Paper</h3>
+        </div>
+
+        <p>${safe(
+          data.paper ||
+          data.text ||
+          data.answer ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- DOUBT SOLVER ---------------- */
+
+async function runDoubt(){
+
+  const question =
+    document.getElementById("question")?.value.trim();
+
+  if(!question){
+    alert("Apna doubt likho.");
+    return;
+  }
+
+  showLoading();
+
+  try{
+
+    const data = await api("/api/doubt-solver",{
+      method:"POST",
+      body:JSON.stringify({
+        question
+      })
+    });
+
+    incrementTools();
+
+    showResponse(`
+      <div class="response-card">
+
+        <div class="response-heading">
+          <div class="response-heading-icon">💡</div>
+          <h3>Step-by-Step Solution</h3>
+        </div>
+
+        <p>${safe(
+          data.answer ||
+          data.solution ||
+          data.text ||
+          JSON.stringify(data)
+        )}</p>
+
+      </div>
+    `);
+
+  }catch(error){
+
+    errorResponse(error);
+
+  }
+
+}
+
+
+/* ---------------- SERVICE WORKER ---------------- */
+
+if("serviceWorker" in navigator){
+
+  window.addEventListener("load",()=>{
+
+    navigator.serviceWorker
+      .register("/sw.js")
+      .catch(error=>{
+        console.log("Service worker error:",error);
+      });
+
+  });
+
+}
+
+
+/* ---------------- AUTH CHECK ---------------- */
+
+supabaseClient.auth.onAuthStateChange(
+  (event,session)=>{
+
+    console.log(
+      "SKNotes auth:",
+      event,
+      session?.user?.email || "No user"
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
