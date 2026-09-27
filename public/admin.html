@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>SKNotes Admin Dashboard</title>
+  <title>SKNotes Admin</title>
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,186 +21,236 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f7f5;
-      color: #17251d;
+      background: #f3f6f5;
+      color: #17201c;
     }
 
-    header {
-      background: linear-gradient(
-        135deg,
-        #ff9933,
-        #ffffff,
-        #138808
-      );
-      padding: 25px 18px;
+    .header {
+      background:
+        linear-gradient(
+          90deg,
+          #ffb45c,
+          #ffffff,
+          #69b95d
+        );
+
       text-align: center;
+      padding: 42px 20px;
     }
 
-    header h1 {
+    .header h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 38px;
     }
 
-    header p {
-      margin: 7px 0 0;
-      color: #333;
+    .header p {
+      margin: 10px 0 0;
+      font-size: 21px;
     }
 
     .container {
-      width: min(1100px, 94%);
-      margin: 25px auto;
-    }
-
-    .login-box {
-      max-width: 430px;
-      margin: 50px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 18px;
-      box-shadow: 0 5px 25px rgba(0,0,0,.08);
-    }
-
-    .login-box h2 {
-      margin-top: 0;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 17px;
-      background: #138808;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    button:hover {
-      opacity: .9;
-    }
-
-    .login-btn {
-      width: 100%;
-    }
-
-    .logout-btn {
-      background: #b00020;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(210px, 1fr));
-      gap: 15px;
+      width: min(1100px, 92%);
+      margin: 55px auto;
     }
 
     .card {
       background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.07);
-      border: 1px solid #e5e5e5;
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow:
+        0 10px 35px rgba(0,0,0,.08);
+      margin-bottom: 30px;
     }
 
-    .icon {
-      font-size: 28px;
+    .login-card {
+      max-width: 650px;
+      margin: 0 auto;
     }
 
-    .card h3 {
-      margin: 12px 0 5px;
-      color: #66716a;
-      font-size: 15px;
-    }
-
-    .number {
+    h2 {
       font-size: 32px;
-      font-weight: bold;
-    }
-
-    .section {
-      margin-top: 22px;
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.07);
-    }
-
-    .section h2 {
       margin-top: 0;
     }
 
-    .tool-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px 0;
-      border-bottom: 1px solid #eee;
+    label {
+      display: block;
+      font-size: 18px;
+      margin: 20px 0 8px;
     }
 
-    .tool-row:last-child {
-      border-bottom: 0;
+    input {
+      width: 100%;
+      padding: 18px;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      font-size: 18px;
+      outline: none;
     }
 
-    .tool-count {
-      background: #e9f6e7;
-      color: #138808;
-      padding: 6px 10px;
-      border-radius: 20px;
+    input:focus {
+      border-color: #229b24;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 17px;
+      margin-top: 24px;
+      background: #249b25;
+      color: white;
+      font-size: 20px;
       font-weight: bold;
-      font-size: 13px;
+      cursor: pointer;
     }
 
-    .message {
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 12px;
-      display: none;
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .logout {
+      background: #555;
+      width: auto;
+      padding: 12px 22px;
+      font-size: 16px;
+      margin-top: 0;
     }
 
     .error {
-      color: #b00020;
       background: #fff0f0;
+      color: #a5162e;
+      padding: 17px;
+      border-radius: 16px;
+      margin-top: 20px;
+      font-size: 17px;
+    }
+
+    .success {
+      background: #edf9ee;
+      color: #16721b;
+      padding: 15px;
+      border-radius: 14px;
+      margin-top: 20px;
+      font-size: 17px;
     }
 
     .hidden {
       display: none !important;
     }
 
-    .footer {
-      text-align: center;
-      padding: 30px;
-      color: #777;
+    .dashboard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
     }
 
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 23px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    .stat {
+      background: #fff;
+      border-radius: 22px;
+      padding: 25px;
+      box-shadow:
+        0 8px 25px rgba(0,0,0,.06);
+    }
+
+    .stat-title {
+      color: #68736e;
+      font-size: 16px;
+    }
+
+    .stat-value {
+      font-size: 38px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .section-title {
+      margin-top: 45px;
+      font-size: 28px;
+    }
+
+    .tool-list {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 14px;
+    }
+
+    .tool {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f7f6;
+      padding: 17px;
+      border-radius: 15px;
+      font-size: 17px;
+    }
+
+    .tool-count {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #777;
+      padding: 50px 20px;
+      font-size: 18px;
+    }
+
+    @media (max-width: 800px) {
+
+      .header h1 {
+        font-size: 30px;
       }
 
-      .number {
-        font-size: 28px;
+      .header p {
+        font-size: 18px;
       }
 
-      .section {
-        padding: 16px;
+      .card {
+        padding: 25px;
+      }
+
+      .stats-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+      .tool-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+
+      .container {
+        width: 94%;
+        margin: 30px auto;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-value {
+        font-size: 32px;
+      }
+
+      h2 {
+        font-size: 27px;
       }
     }
   </style>
@@ -208,647 +258,721 @@
 
 <body>
 
-<header>
-  <h1>📊 SKNotes Admin</h1>
-  <p>Study app usage dashboard</p>
-</header>
+  <header class="header">
+    <h1>📊 SKNotes Admin</h1>
+    <p>Study app usage dashboard</p>
+  </header>
 
+  <main class="container">
 
-<!-- LOGIN -->
-
-<div
-  id="loginSection"
-  class="container"
->
-
-  <div class="login-box">
-
-    <h2>🔐 Admin Login</h2>
-
-    <p>
-      Apne SKNotes admin account se login karo.
-    </p>
-
-    <label>Email</label>
-
-    <input
-      id="email"
-      type="email"
-      placeholder="Admin email"
-      autocomplete="email"
+    <!-- LOGIN -->
+    <section
+      id="loginSection"
+      class="card login-card"
     >
 
-    <label>Password</label>
+      <h2>🔐 Admin Login</h2>
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-      autocomplete="current-password"
-    >
+      <p>
+        Apne SKNotes admin account se login karo.
+      </p>
 
-    <button
-      id="loginBtn"
-      class="login-btn"
-      type="button"
-    >
-      🔐 Login
-    </button>
+      <label for="email">
+        Email
+      </label>
 
-    <div
-      id="loginError"
-      class="message error"
-    ></div>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        placeholder="Admin email"
+      >
 
-  </div>
+      <label for="password">
+        Password
+      </label>
 
-</div>
-
-
-<!-- DASHBOARD -->
-
-<div
-  id="dashboardSection"
-  class="container hidden"
->
-
-  <div class="topbar">
-
-    <div>
-      <strong>Dashboard Overview</strong>
-
-      <div id="updated">
-        Loading...
-      </div>
-    </div>
-
-    <div>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Password"
+      >
 
       <button
-        id="refreshBtn"
+        id="loginBtn"
         type="button"
       >
-        🔄 Refresh
+        🔐 Login
       </button>
 
-      <button
-        id="logoutBtn"
-        class="logout-btn"
-        type="button"
-      >
-        Logout
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- STATISTICS -->
-
-  <div class="cards">
-
-    <div class="card">
-      <div class="icon">👥</div>
-
-      <h3>Total Users</h3>
-
       <div
-        id="totalUsers"
-        class="number"
-      >
-        —
+        id="loginError"
+        class="error hidden"
+      ></div>
+
+    </section>
+
+
+    <!-- DASHBOARD -->
+    <section
+      id="dashboardSection"
+      class="hidden"
+    >
+
+      <div class="card">
+
+        <div class="dashboard-top">
+
+          <div>
+            <h2>📊 Dashboard</h2>
+
+            <div
+              id="adminStatus"
+              class="success"
+            >
+              Checking admin access...
+            </div>
+          </div>
+
+          <button
+            id="logoutBtn"
+            class="logout"
+            type="button"
+          >
+            Logout
+          </button>
+
+        </div>
+
+        <div
+          id="dashboardError"
+          class="error hidden"
+        ></div>
+
+        <div class="stats-grid">
+
+          <div class="stat">
+            <div class="stat-title">
+              Total Users
+            </div>
+
+            <div
+              id="totalUsers"
+              class="stat-value"
+            >
+              0
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-title">
+              Active Today
+            </div>
+
+            <div
+              id="activeToday"
+              class="stat-value"
+            >
+              0
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-title">
+              Active Last 7 Days
+            </div>
+
+            <div
+              id="activeLast7Days"
+              class="stat-value"
+            >
+              0
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-title">
+              Regular Users
+            </div>
+
+            <div
+              id="regularUsers"
+              class="stat-value"
+            >
+              0
+            </div>
+          </div>
+
+        </div>
+
+
+        <h3 class="section-title">
+          🛠️ Tool Usage
+        </h3>
+
+        <div
+          id="toolUsage"
+          class="tool-list"
+        >
+          <div class="tool">
+            <span>Loading...</span>
+            <span class="tool-count">...</span>
+          </div>
+        </div>
+
+
+        <h3 class="section-title">
+          📈 Activity
+        </h3>
+
+        <div class="stats-grid">
+
+          <div class="stat">
+            <div class="stat-title">
+              Total Activities
+            </div>
+
+            <div
+              id="totalActivities"
+              class="stat-value"
+            >
+              0
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-title">
+              Generated At
+            </div>
+
+            <div
+              id="generatedAt"
+              style="
+                margin-top:12px;
+                font-size:16px;
+                font-weight:bold;
+              "
+            >
+              -
+            </div>
+          </div>
+
+        </div>
+
+        <button
+          id="refreshBtn"
+          type="button"
+        >
+          🔄 Refresh Dashboard
+        </button>
+
       </div>
-    </div>
 
+    </section>
 
-    <div class="card">
-      <div class="icon">🟢</div>
+  </main>
 
-      <h3>Active Today</h3>
 
-      <div
-        id="activeToday"
-        class="number"
-      >
-        —
-      </div>
-    </div>
+  <footer class="footer">
+    SKNotes Admin Dashboard
+  </footer>
 
 
-    <div class="card">
-      <div class="icon">📅</div>
+  <script>
 
-      <h3>Active Last 7 Days</h3>
+    /* =========================
+       SUPABASE CONFIG
+    ========================= */
 
-      <div
-        id="active7"
-        class="number"
-      >
-        —
-      </div>
-    </div>
+    const SUPABASE_URL =
+      "https://ejwdvlenqdfelmahajct.supabase.co";
 
+    const SUPABASE_KEY =
+      "sb_publishable_qy0u-EQxaagkqQioyeNfgA_xvN6amzA";
 
-    <div class="card">
-      <div class="icon">⭐</div>
 
-      <h3>Regular Users</h3>
-
-      <div
-        id="regularUsers"
-        class="number"
-      >
-        —
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="icon">⚡</div>
-
-      <h3>Total Activities</h3>
-
-      <div
-        id="activities"
-        class="number"
-      >
-        —
-      </div>
-    </div>
-
-  </div>
-
-
-  <!-- TOOL USAGE -->
-
-  <div class="section">
-
-    <h2>🛠️ Tool Usage</h2>
-
-    <div id="toolUsage">
-      Loading...
-    </div>
-
-  </div>
-
-
-  <!-- ADMIN STATUS -->
-
-  <div class="section">
-
-    <h2>🔐 Admin Status</h2>
-
-    <div id="adminStatus">
-      Checking...
-    </div>
-
-    <div
-      id="dashboardError"
-      class="message error"
-    ></div>
-
-  </div>
-
-</div>
-
-
-<div class="footer">
-  SKNotes Admin Dashboard
-</div>
-
-
-<script>
-
-  /* =========================
-     SUPABASE CONFIG
-  ========================= */
-
-  const SUPABASE_URL =
-    "https://ejwdvlenqdfelmahajct.supabase.co";
-
-  const SUPABASE_KEY =
-    "sb_publishable_qy0u-EQxaagkqQioyeNfgA_xvN6amzA";
-
-
-  /* =========================
-     SUPABASE CLIENT
-  ========================= */
-
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-
-  /* =========================
-     ELEMENTS
-  ========================= */
-
-  const loginSection =
-    document.getElementById(
-      "loginSection"
-    );
-
-  const dashboardSection =
-    document.getElementById(
-      "dashboardSection"
-    );
-
-  const loginBtn =
-    document.getElementById(
-      "loginBtn"
-    );
-
-  const logoutBtn =
-    document.getElementById(
-      "logoutBtn"
-    );
-
-  const refreshBtn =
-    document.getElementById(
-      "refreshBtn"
-    );
-
-  const loginError =
-    document.getElementById(
-      "loginError"
-    );
-
-  const dashboardError =
-    document.getElementById(
-      "dashboardError"
-    );
-
-  const adminStatus =
-    document.getElementById(
-      "adminStatus"
-    );
-
-
-  /* =========================
-     LOGIN ERROR
-  ========================= */
-
-  function showLoginError(
-    message
-  ) {
-
-    loginError.textContent =
-      message;
-
-    loginError.style.display =
-      "block";
-  }
-
-
-  /* =========================
-     ADMIN LOGIN
-  ========================= */
-
-  async function login() {
-
-    loginError.style.display =
-      "none";
-
-    const email =
-      document
-        .getElementById("email")
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById("password")
-        .value;
-
-
-    if (
-      !email ||
-      !password
-    ) {
-
-      showLoginError(
-        "Email aur password dono bharo."
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
       );
 
-      return;
+
+    /* =========================
+       ELEMENTS
+    ========================= */
+
+    const loginSection =
+      document.getElementById(
+        "loginSection"
+      );
+
+    const dashboardSection =
+      document.getElementById(
+        "dashboardSection"
+      );
+
+    const loginBtn =
+      document.getElementById(
+        "loginBtn"
+      );
+
+    const logoutBtn =
+      document.getElementById(
+        "logoutBtn"
+      );
+
+    const refreshBtn =
+      document.getElementById(
+        "refreshBtn"
+      );
+
+    const loginError =
+      document.getElementById(
+        "loginError"
+      );
+
+    const dashboardError =
+      document.getElementById(
+        "dashboardError"
+      );
+
+    const adminStatus =
+      document.getElementById(
+        "adminStatus"
+      );
+
+
+    /* =========================
+       ERROR HELPERS
+    ========================= */
+
+    function showLoginError(message) {
+
+      loginError.textContent =
+        message;
+
+      loginError.classList.remove(
+        "hidden"
+      );
     }
 
 
-    loginBtn.disabled =
-      true;
+    function hideLoginError() {
 
-    loginBtn.textContent =
-      "Logging in...";
+      loginError.textContent = "";
 
-
-    try {
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth
-          .signInWithPassword({
-            email,
-            password
-          });
+      loginError.classList.add(
+        "hidden"
+      );
+    }
 
 
-      if (error) {
-        throw error;
-      }
+    function showDashboardError(message) {
+
+      dashboardError.textContent =
+        message;
+
+      dashboardError.classList.remove(
+        "hidden"
+      );
+    }
 
 
-      if (!data?.session) {
+    function hideDashboardError() {
 
-        throw new Error(
-          "Login session nahi bani."
+      dashboardError.textContent = "";
+
+      dashboardError.classList.add(
+        "hidden"
+      );
+    }
+
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    async function login() {
+
+      hideLoginError();
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("password")
+          .value;
+
+
+      if (!email || !password) {
+
+        showLoginError(
+          "Email aur password dono bharo."
         );
+
+        return;
       }
 
 
-      await loadDashboard();
-
-
-    } catch (error) {
-
-      console.error(
-        "Login error:",
-        error
-      );
-
-      showLoginError(
-        error.message ||
-        "Login failed."
-      );
-
-    } finally {
-
-      loginBtn.disabled =
-        false;
+      loginBtn.disabled = true;
 
       loginBtn.textContent =
-        "🔐 Login";
-    }
-  }
+        "Logging in...";
 
 
-  /* =========================
-     LOAD DASHBOARD
-  ========================= */
+      try {
 
-  async function loadDashboard() {
-
-    dashboardError.style.display =
-      "none";
-
-
-    const {
-      data: sessionData
-    } =
-      await supabaseClient.auth
-        .getSession();
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .auth
+            .signInWithPassword({
+              email: email,
+              password: password
+            });
 
 
-    const session =
-      sessionData?.session;
-
-
-    if (!session) {
-
-      throw new Error(
-        "Login session nahi mili."
-      );
-    }
-
-
-    const response =
-      await fetch(
-        "/api/admin/stats",
-        {
-          method: "GET",
-
-          headers: {
-            "Authorization":
-              `Bearer ${session.access_token}`,
-
-            "Content-Type":
-              "application/json"
-          }
+        if (error) {
+          throw error;
         }
-      );
 
 
-    const result =
-      await response.json();
+        /*
+          IMPORTANT:
+
+          Login ke turant baad isi session
+          ka access_token backend ko bhej rahe hain.
+        */
+
+        const accessToken =
+          data?.session?.access_token;
 
 
-    if (!response.ok) {
+        if (!accessToken) {
 
-      throw new Error(
-        result?.error ||
-        "Admin access denied."
-      );
+          throw new Error(
+            "Login session nahi bani."
+          );
+        }
+
+
+        await loadDashboard(
+          accessToken
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Login error:",
+          error
+        );
+
+        showLoginError(
+          error?.message ||
+          "Login failed."
+        );
+
+      } finally {
+
+        loginBtn.disabled = false;
+
+        loginBtn.textContent =
+          "🔐 Login";
+      }
     }
 
 
-    loginSection.classList.add(
-      "hidden"
-    );
+    /* =========================
+       LOAD DASHBOARD
+    ========================= */
 
-    dashboardSection.classList.remove(
-      "hidden"
-    );
-
-
-    adminStatus.textContent =
-      "✅ Admin access verified";
-
-
-    showDashboard(
-      result
-    );
-  }
-
-
-  /* =========================
-     SHOW DATA
-  ========================= */
-
-  function showDashboard(
-    data
-  ) {
-
-    document.getElementById(
-      "totalUsers"
-    ).textContent =
-      data.totalUsers ?? 0;
-
-
-    document.getElementById(
-      "activeToday"
-    ).textContent =
-      data.activeToday ?? 0;
-
-
-    document.getElementById(
-      "active7"
-    ).textContent =
-      data.activeLast7Days ?? 0;
-
-
-    document.getElementById(
-      "regularUsers"
-    ).textContent =
-      data.regularUsers ?? 0;
-
-
-    document.getElementById(
-      "activities"
-    ).textContent =
-      data.totalActivities ?? 0;
-
-
-    document.getElementById(
-      "updated"
-    ).textContent =
-      "Last updated: " +
-      new Date()
-        .toLocaleString();
-
-
-    renderTools(
-      data.toolUsage || {}
-    );
-  }
-
-
-  /* =========================
-     TOOL USAGE
-  ========================= */
-
-  function renderTools(
-    usage
-  ) {
-
-    const box =
-      document.getElementById(
-        "toolUsage"
-      );
-
-
-    box.innerHTML =
-      "";
-
-
-    const entries =
-      Object.entries(
-        usage
-      );
-
-
-    if (
-      entries.length === 0
+    async function loadDashboard(
+      accessToken = null
     ) {
 
-      box.innerHTML =
-        `
-        <div>
-          Abhi koi tool activity nahi hai.
-        </div>
+      hideDashboardError();
+
+
+      /*
+        Agar token directly login se nahi aaya,
+        to current Supabase session se token lenge.
+      */
+
+      if (!accessToken) {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .auth
+            .getSession();
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        accessToken =
+          data?.session?.access_token;
+      }
+
+
+      if (!accessToken) {
+
+        throw new Error(
+          "Login session nahi mili."
+        );
+      }
+
+
+      /*
+        Backend ko Bearer token bhejna
+      */
+
+      const response =
+        await fetch(
+          "/api/admin/stats",
+          {
+            method: "GET",
+
+            headers: {
+              "Authorization":
+                `Bearer ${accessToken}`,
+
+              "Content-Type":
+                "application/json"
+            }
+          }
+        );
+
+
+      let result = null;
+
+
+      try {
+
+        result =
+          await response.json();
+
+      } catch {
+
+        throw new Error(
+          "Server se valid response nahi mila."
+        );
+      }
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          result?.error ||
+          "Admin access denied."
+        );
+      }
+
+
+      /*
+        Dashboard show
+      */
+
+      loginSection.classList.add(
+        "hidden"
+      );
+
+      dashboardSection.classList.remove(
+        "hidden"
+      );
+
+
+      adminStatus.textContent =
+        "✅ Admin access verified";
+
+
+      showDashboard(result);
+    }
+
+
+    /* =========================
+       SHOW DASHBOARD DATA
+    ========================= */
+
+    function showDashboard(data) {
+
+      document.getElementById(
+        "totalUsers"
+      ).textContent =
+        Number(
+          data?.totalUsers || 0
+        );
+
+
+      document.getElementById(
+        "activeToday"
+      ).textContent =
+        Number(
+          data?.activeToday || 0
+        );
+
+
+      document.getElementById(
+        "activeLast7Days"
+      ).textContent =
+        Number(
+          data?.activeLast7Days || 0
+        );
+
+
+      document.getElementById(
+        "regularUsers"
+      ).textContent =
+        Number(
+          data?.regularUsers || 0
+        );
+
+
+      document.getElementById(
+        "totalActivities"
+      ).textContent =
+        Number(
+          data?.totalActivities || 0
+        );
+
+
+      const generatedAt =
+        document.getElementById(
+          "generatedAt"
+        );
+
+
+      if (data?.generatedAt) {
+
+        const date =
+          new Date(
+            data.generatedAt
+          );
+
+        generatedAt.textContent =
+          date.toLocaleString(
+            "en-IN"
+          );
+
+      } else {
+
+        generatedAt.textContent =
+          "-";
+      }
+
+
+      /*
+        Tool usage
+      */
+
+      const toolUsage =
+        document.getElementById(
+          "toolUsage"
+        );
+
+
+      toolUsage.innerHTML = "";
+
+
+      const usage =
+        data?.toolUsage || {};
+
+
+      const entries =
+        Object.entries(usage);
+
+
+      if (entries.length === 0) {
+
+        toolUsage.innerHTML = `
+          <div class="tool">
+            <span>No tool activity yet</span>
+            <span class="tool-count">0</span>
+          </div>
         `;
 
-      return;
+        return;
+      }
+
+
+      entries
+        .sort(
+          (a, b) =>
+            Number(b[1]) -
+            Number(a[1])
+        )
+        .forEach(
+          ([tool, count]) => {
+
+            const item =
+              document.createElement(
+                "div"
+              );
+
+            item.className =
+              "tool";
+
+
+            const name =
+              document.createElement(
+                "span"
+              );
+
+            name.textContent =
+              tool;
+
+
+            const value =
+              document.createElement(
+                "span"
+              );
+
+            value.className =
+              "tool-count";
+
+            value.textContent =
+              Number(count || 0);
+
+
+            item.appendChild(name);
+
+            item.appendChild(value);
+
+            toolUsage.appendChild(
+              item
+            );
+          }
+        );
     }
 
 
-    entries.sort(
-      (a, b) =>
-        Number(b[1]) -
-        Number(a[1])
-    );
+    /* =========================
+       REFRESH
+    ========================= */
 
+    async function refreshDashboard() {
 
-    for (
-      const [name, count]
-      of entries
-    ) {
+      refreshBtn.disabled = true;
 
-      const row =
-        document.createElement(
-          "div"
-        );
+      refreshBtn.textContent =
+        "🔄 Loading...";
 
-      row.className =
-        "tool-row";
-
-
-      const title =
-        document.createElement(
-          "span"
-        );
-
-      title.textContent =
-        formatToolName(
-          name
-        );
-
-
-      const number =
-        document.createElement(
-          "span"
-        );
-
-      number.className =
-        "tool-count";
-
-      number.textContent =
-        `${count} uses`;
-
-
-      row.appendChild(
-        title
-      );
-
-      row.appendChild(
-        number
-      );
-
-
-      box.appendChild(
-        row
-      );
-    }
-  }
-
-
-  function formatToolName(
-    name
-  ) {
-
-    return String(name)
-      .replace(
-        /[-_]/g,
-        " "
-      )
-      .replace(
-        /\b\w/g,
-        char =>
-          char.toUpperCase()
-      );
-  }
-
-
-  /* =========================
-     REFRESH
-  ========================= */
-
-  refreshBtn.addEventListener(
-    "click",
-    async () => {
 
       try {
 
@@ -856,26 +980,45 @@
 
       } catch (error) {
 
-        dashboardError.textContent =
-          error.message;
+        console.error(
+          "Refresh error:",
+          error
+        );
 
-        dashboardError.style.display =
-          "block";
+        showDashboardError(
+          error?.message ||
+          "Dashboard refresh failed."
+        );
+
+      } finally {
+
+        refreshBtn.disabled = false;
+
+        refreshBtn.textContent =
+          "🔄 Refresh Dashboard";
       }
     }
-  );
 
 
-  /* =========================
-     LOGOUT
-  ========================= */
+    /* =========================
+       LOGOUT
+    ========================= */
 
-  logoutBtn.addEventListener(
-    "click",
-    async () => {
+    async function logout() {
 
-      await supabaseClient.auth
-        .signOut();
+      try {
+
+        await supabaseClient
+          .auth
+          .signOut();
+
+      } catch (error) {
+
+        console.error(
+          "Logout error:",
+          error
+        );
+      }
 
 
       dashboardSection.classList.add(
@@ -886,75 +1029,108 @@
         "hidden"
       );
 
-
       document.getElementById(
         "password"
       ).value = "";
+
+      hideDashboardError();
+
+      hideLoginError();
     }
-  );
 
 
-  /* =========================
-     LOGIN BUTTON
-  ========================= */
+    /* =========================
+       BUTTON EVENTS
+    ========================= */
 
-  loginBtn.addEventListener(
-    "click",
-    login
-  );
-
-
-  /* ENTER KEY */
-
-  document
-    .getElementById("password")
-    .addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          login();
-        }
-
-      }
+    loginBtn.addEventListener(
+      "click",
+      login
     );
 
 
-  /* =========================
-     AUTO LOGIN
-  ========================= */
-
-  (async function () {
-
-    try {
-
-      const {
-        data
-      } =
-        await supabaseClient.auth
-          .getSession();
+    logoutBtn.addEventListener(
+      "click",
+      logout
+    );
 
 
-      if (
-        data?.session
-      ) {
+    refreshBtn.addEventListener(
+      "click",
+      refreshDashboard
+    );
 
-        await loadDashboard();
+
+    /*
+      Enter key se login
+    */
+
+    document
+      .getElementById("password")
+      .addEventListener(
+        "keydown",
+        function(event) {
+
+          if (
+            event.key === "Enter"
+          ) {
+            login();
+          }
+        }
+      );
+
+
+    /* =========================
+       AUTO LOGIN
+    ========================= */
+
+    (async function () {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .auth
+            .getSession();
+
+
+        if (error) {
+          console.error(
+            "Session error:",
+            error
+          );
+
+          return;
+        }
+
+
+        const session =
+          data?.session;
+
+
+        if (
+          session?.access_token
+        ) {
+
+          await loadDashboard(
+            session.access_token
+          );
+        }
+
+      } catch (error) {
+
+        console.log(
+          "No active admin session."
+        );
+
       }
 
-    } catch (error) {
+    })();
 
-      console.log(
-        "No active admin session."
-      );
-    }
-
-  })();
-
-</script>
+  </script>
 
 </body>
-                        </html>
+            </html>
