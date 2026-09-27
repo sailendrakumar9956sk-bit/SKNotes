@@ -1,12 +1,12 @@
 {
-  "name": "SKNotes",
+  "name": "SKNotes — AI Study Assistant",
   "short_name": "SKNotes",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#111827",
+  "background_color": "#071426",
   "theme_color": "#111827",
-  "description": "SKNotes — AI Study Assistant",
+  "description": "AI-powered study assistant for students.",
   "icons": [
     {
       "src": "/Sknotes-icon-192.png",
