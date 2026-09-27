@@ -38,6 +38,44 @@ const supabaseAdmin =
     : null;
 
 /* =========================
+   USER ACTIVITY TRACKING
+========================= */
+
+async function trackActivity(req, eventType, toolName = null) {
+  try {
+    if (!supabaseAdmin) return;
+
+    const authHeader =
+      req.headers.authorization || "";
+
+    const token =
+      authHeader.replace("Bearer ", "");
+
+    if (!token) return;
+
+    const {
+      data: userData,
+      error: userError
+    } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !userData?.user) return;
+
+    await supabaseAdmin
+      .from("user_activity")
+      .insert({
+        user_id: userData.user.id,
+        event_type: eventType,
+        tool_name: toolName
+      });
+
+  } catch (error) {
+    console.error(
+      "Activity tracking error:",
+      error.message
+    );
+  }
+}
+/* =========================
    HELPERS
 ========================= */
 
