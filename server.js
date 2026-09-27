@@ -43,36 +43,75 @@ const supabaseAdmin =
 
 async function getAuthenticatedUser(req) {
   try {
-    if (!supabaseAdmin) return null;
+    if (!supabaseAdmin) {
+      console.error(
+        "AUTH ERROR: supabaseAdmin configured nahi hai."
+      );
+      return null;
+    }
 
     const authHeader =
       req.headers.authorization || "";
 
-    const token =
-      authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!authHeader) {
+      console.error(
+        "AUTH ERROR: Authorization header nahi mila."
+      );
+      return null;
+    }
 
-    if (!token) return null;
+    const token =
+      authHeader
+        .replace(/^Bearer\s+/i, "")
+        .trim();
+
+    if (!token) {
+      console.error(
+        "AUTH ERROR: Bearer token empty hai."
+      );
+      return null;
+    }
 
     const {
       data,
       error
-    } = await supabaseAdmin.auth.getUser(token);
+    } =
+      await supabaseAdmin.auth.getUser(
+        token
+      );
 
-    if (error || !data?.user) {
+    if (error) {
+      console.error(
+        "AUTH ERROR: Supabase getUser:",
+        error.message
+      );
       return null;
     }
+
+    if (!data?.user) {
+      console.error(
+        "AUTH ERROR: Supabase ne user return nahi kiya."
+      );
+      return null;
+    }
+
+    console.log(
+      "AUTH SUCCESS:",
+      data.user.email
+    );
 
     return data.user;
 
   } catch (error) {
+
     console.error(
-      "Authentication error:",
+      "AUTH EXCEPTION:",
       error.message
     );
 
     return null;
   }
-}
+  }
 
 /* =========================================================
    USER ACTIVITY TRACKING
