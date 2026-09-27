@@ -1014,7 +1014,58 @@ window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+const originalFetch = window.fetch.bind(window);
 
+window.fetch = async function(input, init = {}) {
+
+  const requestUrl =
+    new URL(
+      typeof input === "string"
+        ? input
+        : input.url,
+      window.location.href
+    );
+
+  const headers =
+    new Headers(
+      init.headers ||
+      (typeof input !== "string"
+        ? input.headers
+        : undefined)
+    );
+
+  // Sirf SKNotes ke apne API requests mein token bhejo
+  if (
+    requestUrl.origin ===
+    window.location.origin
+  ) {
+
+    const {
+      data
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+    const token =
+      data?.session?.access_token;
+
+    if (token) {
+      headers.set(
+        "Authorization",
+        `Bearer ${token}`
+      );
+    }
+  }
+
+  return originalFetch(
+    input,
+    {
+      ...init,
+      headers
+    }
+  );
+};
 
 /* =========================================================
    HELPERS
