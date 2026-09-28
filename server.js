@@ -422,6 +422,7 @@ ${text.slice(0, 30000)}
 );
 
 /* =========================================================
+/* =========================================================
    2. NOTES → QUIZ
 ========================================================= */
 
@@ -452,27 +453,38 @@ app.post(
       const prompt = `
 Create exactly 10 multiple-choice questions from these notes.
 
-Return ONLY JSON:
+Return ONLY valid JSON:
 
 [
   {
     "question": "Question",
     "options": [
-      "Option A",
-      "Option B",
-      "Option C",
-      "Option D"
+      "Option 1",
+      "Option 2",
+      "Option 3",
+      "Option 4"
     ],
-    "answer": "Option A"
+    "answer": "EXACT TEXT OF THE CORRECT OPTION"
   }
 ]
 
-Rules:
+VERY IMPORTANT RULES:
+
 - Exactly 10 questions.
-- Exactly 4 options.
-- Only one correct answer.
-- Answer must exactly match one option.
+- Exactly 4 options per question.
+- Only ONE option is correct.
+- "answer" MUST exactly match the text of the correct option.
+- Do NOT always make the first option correct.
+- Distribute correct answers across all four positions.
+- Across 10 questions, approximately:
+  - 2-3 correct answers should be in position 1
+  - 2-3 correct answers should be in position 2
+  - 2-3 correct answers should be in position 3
+  - 2-3 correct answers should be in position 4
+- Never make all questions have the same correct-option position.
+- Make the options plausible and similar in style.
 - Use only information from the notes.
+- Do not invent information.
 - No markdown.
 - No explanation outside JSON.
 
@@ -482,7 +494,7 @@ ${text.slice(0, 30000)}
 
       const raw =
         await askAI(prompt, {
-          temperature: 0.2,
+          temperature: 0.7,
           max_completion_tokens: 4096
         });
 
@@ -491,11 +503,111 @@ ${text.slice(0, 30000)}
           cleanAIJson(raw)
         );
 
+      /* =====================================================
+         RANDOMIZE / BALANCE CORRECT ANSWER POSITION
+         This guarantees the correct option is not always A.
+      ===================================================== */
+
+      const positions = [
+        0, 1, 2, 3,
+        1, 2, 3, 0,
+        2, 3
+      ];
+
+      // Random starting point so every quiz feels different
+      for (
+        let i = positions.length - 1;
+        i > 0;
+        i--
+      ) {
+        const j =
+          Math.floor(
+            Math.random() * (i + 1)
+          );
+
+        [
+          positions[i],
+          positions[j]
+        ] = [
+          positions[j],
+          positions[i]
+        ];
+      }
+
+      quiz.forEach((item, index) => {
+
+        if (
+          !item ||
+          !Array.isArray(item.options) ||
+          item.options.length !== 4 ||
+          typeof item.answer !== "string"
+        ) {
+          return;
+        }
+
+        const correctAnswer =
+          item.answer.trim();
+
+        const correctIndex =
+          item.options.findIndex(
+            option =>
+              String(option).trim() ===
+              correctAnswer
+          );
+
+        if (
+          correctIndex === -1
+        ) {
+          return;
+        }
+
+        const wrongOptions =
+          item.options.filter(
+            (_, i) =>
+              i !== correctIndex
+          );
+
+        const targetPosition =
+          positions[index % positions.length];
+
+        const newOptions = [];
+
+        let wrongIndex = 0;
+
+        for (
+          let i = 0;
+          i < 4;
+          i++
+        ) {
+          if (
+            i === targetPosition
+          ) {
+            newOptions.push(
+              item.options[correctIndex]
+            );
+          } else {
+            newOptions.push(
+              wrongOptions[wrongIndex]
+            );
+
+            wrongIndex++;
+          }
+        }
+
+        item.options =
+          newOptions;
+
+        // Keep answer synchronized
+        item.answer =
+          item.options[targetPosition];
+      });
+
       res.json({
         quiz
       });
 
     } catch (error) {
+
       console.error(
         "Quiz error:",
         error
